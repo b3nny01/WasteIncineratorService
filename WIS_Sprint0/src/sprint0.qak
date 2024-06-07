@@ -1,0 +1,11 @@
+System wis_system
+ 
+Context ctx_wis ip [ host="localhost" port=8020] 
+
+QActor incinerator context ctx_wis{     
+ 	State s0 initial{ 
+ 		println("$name starts") color yellow
+		delay 5000
+	} 
+	  
+ }
