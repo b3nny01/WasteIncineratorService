@@ -37,7 +37,7 @@ At the end of each Sprint we produced an executable version of the system coveri
         </td>
         <td>
             <img src="_readmeImgs_/readmeLogo.svg" height="15px"/> <a href="./WIS_Sprint0/userDocs/sprint0.md">userDoc.md</a><br/>
-            <img src="_readmeImgs_/pdfLogo.png" height="15px"/> <a href="./WIS_Sprint0/userDocs/sprint0.pdf"     target="_blank">userDoc.pdf</a>
+            <img src="_readmeImgs_/pdfLogo.png" height="15px"/> <a href="./WIS_Sprint0/userDocs/sprint0.pdf" download>userDoc.pdf</a>
         </td>
     </tr>
 </table>
