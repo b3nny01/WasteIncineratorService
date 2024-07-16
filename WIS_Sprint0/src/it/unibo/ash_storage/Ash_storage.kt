@@ -44,13 +44,13 @@ class Ash_storage ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t01",targetState="handle_state_request",cond=whenRequest("ash_storage_state_request"))
+					 transition(edgeName="t02",targetState="handle_state_request",cond=whenRequest("ash_storage_state_request"))
 				}	 
 				state("handle_state_request") { //this:State
 					action { //it:State
 						CommUtils.outblue("$name: handling state request")
 						
-									val ASH_LEVEL_PERC=ASH_LEVEL/MAX_ASH_LEVEL.toFloat()* 100
+									val ASH_LEVEL_PERC=ASH_LEVEL.toFloat()/MAX_ASH_LEVEL* 100
 						answer("ash_storage_state_request", "ash_storage_state_reply", "ash_storage_state_reply($ASH_LEVEL_PERC)"   )  
 						//genTimer( actor, state )
 					}

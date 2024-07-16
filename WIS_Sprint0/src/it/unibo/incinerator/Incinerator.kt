@@ -21,6 +21,9 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
+		
+		 		var BURNING    = false;
+		 		var BURNOUT_FREE = true;		
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -31,6 +34,28 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
+					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
+				}	 
+				state("idle") { //this:State
+					action { //it:State
+						CommUtils.outred("$name: idle")
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t00",targetState="handle_state_request",cond=whenRequest("incinerator_state_request"))
+				}	 
+				state("handle_state_request") { //this:State
+					action { //it:State
+						CommUtils.outblue("$name: handling state request")
+						answer("incinerator_state_request", "incinerator_state_reply", "incinerator_state_reply($BURNING,$BURNOUT_FREE)"   )  
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
 				}	 
 			}
 		}

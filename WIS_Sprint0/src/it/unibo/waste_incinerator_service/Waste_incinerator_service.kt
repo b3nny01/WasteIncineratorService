@@ -44,16 +44,16 @@ class Waste_incinerator_service ( name: String, scope: CoroutineScope, isconfine
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t02",targetState="handle_waste_storage_state_reply",cond=whenReply("waste_storage_state_reply"))
+					 transition(edgeName="t03",targetState="handle_waste_storage_state_reply",cond=whenReply("waste_storage_state_reply"))
 				}	 
 				state("handle_waste_storage_state_reply") { //this:State
 					action { //it:State
 						if( checkMsgContent( Term.createTerm("waste_storage_state_reply(N)"), Term.createTerm("waste_storage_state_reply(N)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
-												val N = payloadArg(0).toInt()
-												ok = N>0
-								CommUtils.outyellow("$name: waste storage contains $N roll packets")
+												val ROLL_PACKETS = payloadArg(0).toInt()
+												ok = ROLL_PACKETS>0
+								CommUtils.outyellow("$name: waste storage contains $ROLL_PACKETS roll packets")
 						}
 						//genTimer( actor, state )
 					}
@@ -83,16 +83,16 @@ class Waste_incinerator_service ( name: String, scope: CoroutineScope, isconfine
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t03",targetState="handle_ash_storage_state_reply",cond=whenReply("ash_storage_state_reply"))
+					 transition(edgeName="t04",targetState="handle_ash_storage_state_reply",cond=whenReply("ash_storage_state_reply"))
 				}	 
 				state("handle_ash_storage_state_reply") { //this:State
 					action { //it:State
 						if( checkMsgContent( Term.createTerm("ash_storage_state_reply(N)"), Term.createTerm("ash_storage_state_reply(L)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
-												val L = payloadArg(0).toFloat();
-												ok = L<100.0
-								CommUtils.outyellow("$name: ash storage is $L% full")
+												val ASH_LEVEL_PERC = payloadArg(0).toFloat();
+												ok = ASH_LEVEL_PERC<100.0
+								CommUtils.outyellow("$name: ash storage is $ASH_LEVEL_PERC% full")
 						}
 						//genTimer( actor, state )
 					}
@@ -115,6 +115,38 @@ class Waste_incinerator_service ( name: String, scope: CoroutineScope, isconfine
 				}	 
 				state("request_incinerator_state") { //this:State
 					action { //it:State
+						CommUtils.outyellow("$name: requesting incinerator state")
+						request("incinerator_state_request", "incinerator_state_request" ,"incinerator" )  
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t05",targetState="handle_incinerator_state_reply",cond=whenReply("incinerator_state_reply"))
+				}	 
+				state("handle_incinerator_state_reply") { //this:State
+					action { //it:State
+						if( checkMsgContent( Term.createTerm("incinerator_state_reply(B,BOF)"), Term.createTerm("incinerator_state_reply(B,BOF)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								
+												val BURNING = payloadArg(0).toBoolean();
+												val BURNOUT_FREE = payloadArg(1).toBoolean();
+												ok = (!BURNING) && BURNOUT_FREE
+								CommUtils.outyellow("$name: incinerator burning: $BURNING, burnout free: $BURNOUT_FREE ")
+						}
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="handle_incinerator_not_available", cond=doswitchGuarded({ ok  
+					}) )
+					transition( edgeName="goto",targetState="handle_incinerator_not_available", cond=doswitchGuarded({! ( ok  
+					) }) )
+				}	 
+				state("handle_incinerator_not_available") { //this:State
+					action { //it:State
+						CommUtils.outyellow("$name: incinerator not available, waiting...")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

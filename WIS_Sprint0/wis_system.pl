@@ -3,6 +3,7 @@
 %====================================================================================
 request( waste_storage_state_request, waste_storage_state_request(N) ). %
 request( ash_storage_state_request, ash_storage_state_request(N) ). %
+request( incinerator_state_request, incinerator_state_request(N) ). %
 %====================================================================================
 context(ctx_wis, "localhost",  "TCP", "8020").
  qactor( incinerator, ctx_wis, "it.unibo.incinerator.Incinerator").

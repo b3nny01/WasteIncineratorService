@@ -4,6 +4,7 @@
 
 ### Structure
 
+analyzing the natural language requirements text we found out the following entities that should be somehow modelled:
 * ServiceArea
 * WIS
 * OpRobot
@@ -22,6 +23,22 @@
 * MonitoringDevice:
   * Sonar
   * Led
+
+#### *Service Area Model*
+the **ServiceArea** is modelled as an Euclidean space delimited by its edges(similar to what has been done in the [BoundaryWalk](resources/slides/html/BoudaryWalk24.html) and [RobotCleaner](resources/slides/html/RobotCleaner.html) projects):
+
+<img src="resources/imgs/ServiceAreaModel_01.png" width="300px">
+
+* the **perimeter edge** has length ```lf+ld+lr+lu```
+* being the ServiceArea rectangular we have ```lf=lr && ld==lu```
+* we define ```DR=2R``` being ```R``` the radius of the DDRRobot circumscribable circle
+
+Given this model we have that **Home**, **BurnIn**, **BurnOut**,**WasteIn**, **AshOut** are all modelled as collections of cells in the serviceArea
+
+<img src="resources/imgs/ServiceAreaModel_02.png" width="300px">
+
+#### *DDRRobot model*
+The **OpRobot**, defined in the requirements as the robot controlled by the WIS, makes use of a DDRRobot (and its control software) given by the customer, we link the [detailed definition of DDRRobot](resources/slides/html/BasicRobot24.html) and its [qak control software](resources/projects/unibo.basicrobot24/src/basicrobot.qak).
 
 ### Interaction
 

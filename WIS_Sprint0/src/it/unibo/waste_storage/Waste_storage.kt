@@ -43,7 +43,7 @@ class Waste_storage ( name: String, scope: CoroutineScope, isconfined: Boolean=f
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t00",targetState="handle_state_request",cond=whenRequest("waste_storage_state_request"))
+					 transition(edgeName="t01",targetState="handle_state_request",cond=whenRequest("waste_storage_state_request"))
 				}	 
 				state("handle_state_request") { //this:State
 					action { //it:State
