@@ -1,11 +1,132 @@
 System wis_system
  
+Request waste_storage_state_request : waste_storage_state_request(N)	 ""
+Reply   waste_storage_state_reply	: waste_storage_state_reply(N)		 ""
+
+Request ash_storage_state_request   : ash_storage_state_request(N)	 ""
+Reply   ash_storage_state_reply	    : ash_storage_state_reply(N)		 ""
+
+ 
 Context ctx_wis ip [ host="localhost" port=8020] 
 
 QActor incinerator context ctx_wis{     
  	State s0 initial{ 
- 		println("$name starts") color yellow
-		delay 5000
+ 		println("$name starts") color red
+		delay 500
 	} 
 	  
+ }
+ 
+ QActor waste_storage context ctx_wis{
+ 	[#
+ 		var ROLL_PACKETS=10
+ 	 #]
+ 	 
+ 	State s0 initial{ 
+ 		println("$name starts") color blue
+		delay 500
+	}Goto idle
+	
+	State idle{
+		println("$name: idle") color blue
+	}Transition t0 
+		whenRequest waste_storage_state_request->handle_state_request
+	
+	State handle_state_request{
+		println("$name: handling state request") color blue
+		replyTo waste_storage_state_request with waste_storage_state_reply : waste_storage_state_reply($ROLL_PACKETS)
+	}Goto idle
+	
+ }
+ 
+ QActor ash_storage context ctx_wis{
+ 	[#
+ 		var ASH_LEVEL=0
+ 		val MAX_ASH_LEVEL=10
+ 	 #]
+ 	
+ 	 State s0 initial{ 
+ 		println("$name starts") color magenta
+		delay 500
+	} Goto idle
+	
+		
+	State idle{
+		println("$name: idle") color blue
+	}Transition t0 
+		whenRequest ash_storage_state_request->handle_state_request
+	
+	State handle_state_request{
+		println("$name: handling state request") color blue
+		[#
+			val ASH_LEVEL_PERC=ASH_LEVEL/MAX_ASH_LEVEL.toFloat()* 100
+		#]
+		replyTo ash_storage_state_request with ash_storage_state_reply : ash_storage_state_reply($ASH_LEVEL_PERC)
+	}Goto idle
+	
+}
+ 
+ 
+ QActor waste_incinerator_service context ctx_wis{
+ 	[#
+ 		var ok=true;	
+ 	#]
+ 	
+ 	State s0 initial{ 
+ 		println("$name starts") color yellow
+		delay 500
+	}Goto request_waste_storage_state
+	
+
+	// waste storage check
+	State request_waste_storage_state{
+		println("$name: requesting waste storage state") color yellow
+		request waste_storage -m waste_storage_state_request:waste_storage_state_request
+	}Transition t0
+	whenReply waste_storage_state_reply -> handle_waste_storage_state_reply
+	
+	State handle_waste_storage_state_reply{
+		onMsg(waste_storage_state_reply:waste_storage_state_reply(N)){
+			[#
+				val N = payloadArg(0).toInt()
+				ok = N>0
+			#]
+			println("$name: waste storage contains $N roll packets") color yellow
+		}
+	}Goto request_ash_storage_state if [# ok #] else handle_waste_storage_empty
+	
+	State handle_waste_storage_empty{
+		println("$name: waste storage is empty, waiting...") color yellow
+	}
+	
+	
+	// ash storage check
+	State request_ash_storage_state{
+		println("$name: requesting ash storage state") color yellow
+		request ash_storage -m ash_storage_state_request:ash_storage_state_request
+	}Transition t0
+	whenReply ash_storage_state_reply -> handle_ash_storage_state_reply
+	
+	State handle_ash_storage_state_reply{
+		onMsg(ash_storage_state_reply:ash_storage_state_reply(L)){
+			[#
+				val L = payloadArg(0).toFloat();
+				ok = L<100.0
+			#]
+			println("$name: ash storage is $L% full") color yellow
+		}
+	}Goto request_incinerator_state if [# ok #] else handle_ash_storage_empty
+	
+	State handle_ash_storage_empty{
+		println("$name: ash storage is full, waiting...") color yellow
+	}
+	
+	// incinerator check
+	
+	State request_incinerator_state{
+		
+	}
+	
+
+	
  }
