@@ -40,7 +40,7 @@ By requirements we inferred the following informations that need to be modelled:
 
 
 
-#### ```Service Area Model```
+#### Service Area Model
 the **ServiceArea** is modelled as an Euclidean space delimited by its edges(similar to what has been done in the [BoundaryWalk](resources/slides/BoundaryWalkProjectDoc.pdf) and [RobotCleaner](resources/slides/RobotCleanerProjectDoc.pdf) projects):
 
 * the **perimeter edge** has length ```lf+ld+lr+lu```
@@ -53,7 +53,7 @@ Given this model we have that **Home**, **BurnIn**, **BurnOut**,**WasteIn**, **A
 
 <img src="resources/imgs/ServiceAreaModel_02.png" width="500px">
 
-#### ```DDRRobot model```
+#### DDRRobot model
 
 The **OpRobot**, defined in the requirements as the robot controlled by the WIS, makes use of a DDRRobot (and its control software) given by the customer, we link the [detailed definition of DDRRobot](resources/slides/BasicRobot24ProjectDoc.pdf) and its [qak control software](resources/projects/basicrobot.qak).
 
