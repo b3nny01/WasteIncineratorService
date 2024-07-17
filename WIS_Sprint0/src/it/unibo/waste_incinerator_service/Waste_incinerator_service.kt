@@ -44,7 +44,7 @@ class Waste_incinerator_service ( name: String, scope: CoroutineScope, isconfine
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t03",targetState="handle_waste_storage_state_reply",cond=whenReply("waste_storage_state_reply"))
+					 transition(edgeName="t04",targetState="handle_waste_storage_state_reply",cond=whenReply("waste_storage_state_reply"))
 				}	 
 				state("handle_waste_storage_state_reply") { //this:State
 					action { //it:State
@@ -83,7 +83,7 @@ class Waste_incinerator_service ( name: String, scope: CoroutineScope, isconfine
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t04",targetState="handle_ash_storage_state_reply",cond=whenReply("ash_storage_state_reply"))
+					 transition(edgeName="t05",targetState="handle_ash_storage_state_reply",cond=whenReply("ash_storage_state_reply"))
 				}	 
 				state("handle_ash_storage_state_reply") { //this:State
 					action { //it:State
@@ -122,7 +122,7 @@ class Waste_incinerator_service ( name: String, scope: CoroutineScope, isconfine
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t05",targetState="handle_incinerator_state_reply",cond=whenReply("incinerator_state_reply"))
+					 transition(edgeName="t06",targetState="handle_incinerator_state_reply",cond=whenReply("incinerator_state_reply"))
 				}	 
 				state("handle_incinerator_state_reply") { //this:State
 					action { //it:State

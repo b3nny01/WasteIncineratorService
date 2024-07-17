@@ -1,14 +1,26 @@
 System wis_system
- 
+
 Request waste_storage_state_request : waste_storage_state_request(N)	 ""
-Reply   waste_storage_state_reply	: waste_storage_state_reply(N)		 ""
+Reply   waste_storage_state_reply	: waste_storage_state_reply(N)										for waste_storage_state_request	 ""
 
 Request ash_storage_state_request   : ash_storage_state_request(N)	 	 ""
-Reply   ash_storage_state_reply	    : ash_storage_state_reply(N)		 ""
+Reply   ash_storage_state_reply	    : ash_storage_state_reply(N)
+										for ash_storage_state_request	 ""
 
 Request incinerator_state_request   : incinerator_state_request(N)	 	 ""
-Reply   incinerator_state_reply	    : incinerator_state_reply(B,BOF)	 ""
+Reply   incinerator_state_reply	    : incinerator_state_reply(B,BOF) 
+										for incinerator_state_request	 ""
 
+Request rp_request					: rp_request(N)						 ""	
+Reply   rp_reply					: rp_reply(N)
+										for rp_request		 			 ""
+
+// for now dispatches, maybe they'll become requests
+Dispatch move_to			    	: move_to(X,Y)						 ""
+Dispatch load_rp					: load_rp(N)						 ""
+Dispatch unload_rp					: unload_rp(N)						 ""
+Dispatch load_ash					: load_ash(N)						 ""
+Dispatch unload_ash					: unload_ash(N)						 ""
  
 Context ctx_wis ip [ host="localhost" port=8020] 
 
@@ -83,7 +95,50 @@ QActor incinerator context ctx_wis{
 	}Goto idle
 	
 }
- 
+
+
+QActor op_robot context ctx_wis{
+	State s0 initial{ 
+ 		println("$name starts") color green
+		delay 500
+	}Goto idle
+	
+	State idle{
+		println("$name: idle") color green
+	}Transition t0
+	 whenRequest move_request -> handle_move_request
+		
+		
+	// PLACEHOLDER	
+	State handle_move_request{
+		[#
+			val RESULT=true
+		#]
+		println("$name: moving...") color green
+		delay 2000
+		println("$name: moved") color green
+		replyTo move_request with move_reply($RESULT)
+	} 
+	
+	
+	
+	State request_rp{
+		println("$name: requesting an RP") color green
+		request	waste_storage -m rp_request:rp_request
+	}Transition t0
+		whenReply rp_reply->handle_rp_reply
+	
+	State handle_rp_reply{
+		[#
+			val RESULT=true
+		#]
+		println("$name: obtained an RP") color green
+		replyTo move_request 
+	} Goto 
+	
+	
+	
+}
  
  QActor waste_incinerator_service context ctx_wis{
  	[#
@@ -161,6 +216,5 @@ QActor incinerator context ctx_wis{
 		println("$name: incinerator not available, waiting...") color yellow
 	}
 	
-
 	
  }

@@ -49,7 +49,7 @@ the **ServiceArea** is modelled as an Euclidean space delimited by its edges(sim
 
 <img src="resources/imgs/ServiceAreaModel_01.png" width="500px">
 
-Given this model we have that **Home**, **BurnIn**, **BurnOut**,**WasteIn**, **AshOut** are all modelled as collections of cells in the serviceArea:
+Given this model we have that **Home**, **BurnIn**, **BurnOut**,**WasteIn**, **AshOut** are all modelled as cells in the serviceArea:
 
 <img src="resources/imgs/ServiceAreaModel_02.png" width="500px">
 
@@ -57,20 +57,14 @@ Given this model we have that **Home**, **BurnIn**, **BurnOut**,**WasteIn**, **A
 
 The **OpRobot**, defined in the requirements as the robot controlled by the WIS, makes use of a DDRRobot (and its control software) given by the customer, we link the [detailed definition of DDRRobot](resources/slides/BasicRobot24ProjectDoc.pdf) and its [qak control software](resources/projects/basicrobot.qak).
 
+<!--
+Priority
+core buisness = Incinerator => probably i'll have to analyze the MonitoringDevice before the raspberry and the Scale
+-->
 
-### Priority
-
-* core buisness = Incinerator => probably i'll have to analyze the MonitoringDevice before the raspberry and the Scale
-
-### SSGUI
-
-* WasteStorage state
-* AshStorage state
-* Incinerator state
-* OpRobot state
-
+<!--
+TODO
 ## Problem Analysis
-
 ### Entities Models
 
 * ServiceArea -> other serviceAreas models
@@ -91,3 +85,4 @@ The **OpRobot**, defined in the requirements as the robot controlled by the WIS,
 * MonitoringDevice: -> actor? || context?
   * Sonar      -> actor (sends/receives messages) || pojo
   * Led        -> actor (receives messages) || pojo (is quite simple)
+-->
