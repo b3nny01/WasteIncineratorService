@@ -3,55 +3,60 @@
 ## Requirements Analysis
 
 ### Structure
-
 analyzing the natural language requirements text we found out the following entities that should be somehow modelled:
 * ServiceArea
+  * Home
+  * BurnIn port
+  * BurnOut port
+  * WasteIn
+  * AshOut
 * WIS
 * OpRobot
 * DDRRobot
-* Home
 * Incinerator
-  * BurnIn port
-  * BurnOut port
-* WasteIn
 * WasteStorage
   * Scale
-* RP
+  * RP
   * WRP
-* AshOut
 * AshStorage
-* MonitoringDevice:
+  * MonitoringDevice
   * Sonar
   * Led
 
-#### *Service Area Model*
-the **ServiceArea** is modelled as an Euclidean space delimited by its edges(similar to what has been done in the [BoundaryWalk](resources/slides/html/BoudaryWalk24.html) and [RobotCleaner](resources/slides/html/RobotCleaner.html) projects):
+### Interaction and Behaviour
+By requirements we inferred the following informations that need to be modelled:
+* activationCommand:&nbsp;&nbsp;(?) -> (Incinerator)
+* endOfBurning:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Incinerator)->(OpRobot,WIS)
+* BurnInPortInfo:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(OpRobot? (fixed) )->(Incinerator)
+* BurnOutPortInfo:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(?)->(Incinerator)
+* scaleInfo:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Scale)->(WIS)
+* sonarInfo:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Sonar)->(WIS)
 
-<img src="resources/imgs/ServiceAreaModel_01.png" width="300px">
+> [!NOTE]
+> we merged Interactions and Behaviour sections because at this stage of the project for the majority of this informations we don't know yet if they will be modelled as POJOs' methods or messages between actors
+
+### Model Diagram
+<img src="resources/imgs/wis_systemarch.png" width="500px">
+
+
+
+#### ```Service Area Model```
+the **ServiceArea** is modelled as an Euclidean space delimited by its edges(similar to what has been done in the [BoundaryWalk](resources/slides/BoundaryWalkProjectDoc.pdf) and [RobotCleaner](resources/slides/RobotCleanerProjectDoc.pdf) projects):
 
 * the **perimeter edge** has length ```lf+ld+lr+lu```
 * being the ServiceArea rectangular we have ```lf=lr && ld==lu```
-* we define ```DR=2R``` being ```R``` the radius of the DDRRobot circumscribable circle
+* we define ```DR=2R``` being ```R``` the radius of the DDRRobot    circumscribable circle
 
-Given this model we have that **Home**, **BurnIn**, **BurnOut**,**WasteIn**, **AshOut** are all modelled as collections of cells in the serviceArea
+<img src="resources/imgs/ServiceAreaModel_01.png" width="500px">
 
-<img src="resources/imgs/ServiceAreaModel_02.png" width="300px">
+Given this model we have that **Home**, **BurnIn**, **BurnOut**,**WasteIn**, **AshOut** are all modelled as collections of cells in the serviceArea:
 
-#### *DDRRobot model*
-The **OpRobot**, defined in the requirements as the robot controlled by the WIS, makes use of a DDRRobot (and its control software) given by the customer, we link the [detailed definition of DDRRobot](resources/slides/html/BasicRobot24.html) and its [qak control software](resources/projects/unibo.basicrobot24/src/basicrobot.qak).
+<img src="resources/imgs/ServiceAreaModel_02.png" width="500px">
 
-### Interaction
+#### ```DDRRobot model```
 
-* activationCommand (WIS?) -> (Incinerator) // not evincible from requirements
-* endOfBurning      (Incinerator)->(OpRobot,WIS) // probably an event
-* BurnInPortInfo    (OpRobot? (fixed) )->(Incinerator) // emerges from requirements since otherwise the incinerator cant know when to start
-* BurnOutPortInfo   (Oprobot|WIS?)->(Incinerator) // emerges from requirements since the incinerator cannot burn if there are ahes
-* scaleInfo         (Scale)->(WIS) // not ncess. a message, could be a method to analyze during Problem
-* sonarInfo         (Sonar)->(WIS) // not necess. a message could be a method to analyze during Problem
+The **OpRobot**, defined in the requirements as the robot controlled by the WIS, makes use of a DDRRobot (and its control software) given by the customer, we link the [detailed definition of DDRRobot](resources/slides/BasicRobot24ProjectDoc.pdf) and its [qak control software](resources/projects/basicrobot.qak).
 
-### Behaviour
-
-### Test
 
 ### Priority
 
