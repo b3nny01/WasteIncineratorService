@@ -99,7 +99,7 @@ The **OpRobot**, defined in the requirements as the robot controlled by the WIS,
 
 <img src="resources/imgs/robotsUnibo.jpg" width="500px">
 
-### WIS, WasteStorage, Incinerator and AshStorage models
+#### WIS, WasteStorage, Incinerator and AshStorage models
 **WasteStorage**, **Incinerator** and **AshStorage** need to exchange messages by requirements so they are modelled as Actors.
 **Scale** can be modelled both as an actor or a POJO inside WasteStorage, for now we will represent it as a Pojo and **demand the discussion to another moment**.
 The same can be said for **MonitoringDevice**, **Sonar** and **Led**, that will be for now modelled as POJOs inside AshStorage.
