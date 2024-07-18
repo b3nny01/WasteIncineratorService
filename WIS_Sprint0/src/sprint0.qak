@@ -15,14 +15,16 @@ Request rp_request					: rp_request(N)						 ""
 Reply   rp_reply					: rp_reply(N)
 										for rp_request		 			 ""
 
-// for now dispatches, maybe they'll become requests
-Dispatch move_to			    	: move_to(X,Y)						 ""
+// WIS - OpRobot Interface
+Request  move_request			    : move_request(D)					 ""
+Reply 	 move_reply					: move_reply(R) 
+										for move_request				 ""					
 Dispatch load_rp					: load_rp(N)						 ""
 Dispatch unload_rp					: unload_rp(N)						 ""
 Dispatch load_ash					: load_ash(N)						 ""
 Dispatch unload_ash					: unload_ash(N)						 ""
  
-Context ctx_wis ip [ host="localhost" port=8020] 
+Context ctx_wis ip [ host="localhost" port=8020]  
 
 QActor incinerator context ctx_wis{     
  	[#
@@ -47,7 +49,7 @@ QActor incinerator context ctx_wis{
 	  
  }
  
- QActor waste_storage context ctx_wis{
+QActor waste_storage context ctx_wis{
  	[#
  		var ROLL_PACKETS=10
  	 #]
@@ -69,7 +71,7 @@ QActor incinerator context ctx_wis{
 	
  }
  
- QActor ash_storage context ctx_wis{
+QActor ash_storage context ctx_wis{
  	[#
  		var ASH_LEVEL=0
  		val MAX_ASH_LEVEL=10
@@ -111,14 +113,24 @@ QActor op_robot context ctx_wis{
 		
 	// PLACEHOLDER	
 	State handle_move_request{
+		onMsg(move_request:move_request(DEST))
+		{ 
+			[#
+				val DEST=payloadArg(0)	
+			#]
+			println("$name: moving to $DEST...") color green
+			// TODO: implement movement logic
+			delay 2000
+		}
+	}Goto move_reply 
+	
+	State move_reply{
 		[#
 			val RESULT=true
 		#]
-		println("$name: moving...") color green
-		delay 2000
-		println("$name: moved") color green
-		replyTo move_request with move_reply($RESULT)
-	} 
+		println("$name: end of movement") color green
+		replyTo move_request with move_reply:move_reply($RESULT)
+	}
 	
 	
 	
@@ -133,14 +145,13 @@ QActor op_robot context ctx_wis{
 			val RESULT=true
 		#]
 		println("$name: obtained an RP") color green
-		replyTo move_request 
-	} Goto 
+	} 
 	
 	
 	
 }
  
- QActor waste_incinerator_service context ctx_wis{
+QActor waste_incinerator_service context ctx_wis{
  	[#
  		var ok=true;	
  	#]
@@ -210,11 +221,31 @@ QActor op_robot context ctx_wis{
 			#]
 			println("$name: incinerator burning: $BURNING, burnout free: $BURNOUT_FREE ") color yellow
 		}
-	}Goto handle_incinerator_not_available if [# ok #] else handle_incinerator_not_available
+	}Goto op_robot_to_waste_storage if [# ok #] else handle_incinerator_not_available
 	
 	State handle_incinerator_not_available{
 		println("$name: incinerator not available, waiting...") color yellow
 	}
+	
+	// opRobot to waste storage
+	State op_robot_to_waste_storage{
+		[#
+			val DEST="waste_storage"
+			
+		#]
+		println ("$name: asking robot to move to waste_storage") color yellow
+		request op_robot -m move_request:move_request($DEST)
+		
+	}Transition t0
+	whenReply move_reply -> end //TODO: check reply result
+	
+	
+	
+	
+	State end{
+		println("$name: end") color yellow
+	}
+
 	
 	
  }

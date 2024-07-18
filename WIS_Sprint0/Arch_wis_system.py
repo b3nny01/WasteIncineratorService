@@ -31,8 +31,9 @@ with Diagram('wis_systemArch', show=False, outformat='png', graph_attr=graphattr
           ash_storage=Custom('ash_storage','./qakicons/symActorSmall.png')
           op_robot=Custom('op_robot','./qakicons/symActorSmall.png')
           waste_incinerator_service=Custom('waste_incinerator_service','./qakicons/symActorSmall.png')
-     waste_incinerator_service >> Edge(color='magenta', style='solid', decorate='true', label='<incinerator_state_request &nbsp; >',  fontcolor='magenta') >> incinerator
-     waste_incinerator_service >> Edge(color='magenta', style='solid', decorate='true', label='<waste_storage_state_request &nbsp; >',  fontcolor='magenta') >> waste_storage
-     waste_incinerator_service >> Edge(color='magenta', style='solid', decorate='true', label='<ash_storage_state_request &nbsp; >',  fontcolor='magenta') >> ash_storage
-     op_robot >> Edge(color='magenta', style='solid', decorate='true', label='<rp_request &nbsp; >',  fontcolor='magenta') >> waste_storage
+     waste_incinerator_service >> Edge(color='magenta', style='solid', decorate='true', label='<incinerator_state_request<font color="darkgreen"> incinerator_state_reply</font> &nbsp; >',  fontcolor='magenta') >> incinerator
+     waste_incinerator_service >> Edge(color='magenta', style='solid', decorate='true', label='<waste_storage_state_request<font color="darkgreen"> waste_storage_state_reply</font> &nbsp; >',  fontcolor='magenta') >> waste_storage
+     waste_incinerator_service >> Edge(color='magenta', style='solid', decorate='true', label='<ash_storage_state_request<font color="darkgreen"> ash_storage_state_reply</font> &nbsp; >',  fontcolor='magenta') >> ash_storage
+     op_robot >> Edge(color='magenta', style='solid', decorate='true', label='<rp_request<font color="darkgreen"> rp_reply</font> &nbsp; >',  fontcolor='magenta') >> waste_storage
+     waste_incinerator_service >> Edge(color='magenta', style='solid', decorate='true', label='<move_request<font color="darkgreen"> move_reply</font> &nbsp; >',  fontcolor='magenta') >> op_robot
 diag

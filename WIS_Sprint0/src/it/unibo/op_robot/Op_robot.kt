@@ -31,11 +31,40 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="at_home", cond=doswitch() )
+					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
 				}	 
-				state("at_home") { //this:State
+				state("idle") { //this:State
 					action { //it:State
-						CommUtils.outgreen("$name: at HOME")
+						CommUtils.outgreen("$name: idle")
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t03",targetState="handle_move_request",cond=whenRequest("move_request"))
+				}	 
+				state("handle_move_request") { //this:State
+					action { //it:State
+						if( checkMsgContent( Term.createTerm("move_request(D)"), Term.createTerm("move_request(DEST)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								
+												val DEST=payloadArg(0)	
+								CommUtils.outgreen("$name: moving to $DEST...")
+								delay(2000) 
+						}
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="move_reply", cond=doswitch() )
+				}	 
+				state("move_reply") { //this:State
+					action { //it:State
+						
+									val RESULT=true
+						CommUtils.outgreen("$name: end of movement")
+						answer("move_request", "move_reply", "move_reply($RESULT)"   )  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -51,10 +80,12 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t03",targetState="handle_rp_reply",cond=whenReply("rp_reply"))
+					 transition(edgeName="t04",targetState="handle_rp_reply",cond=whenReply("rp_reply"))
 				}	 
 				state("handle_rp_reply") { //this:State
 					action { //it:State
+						
+									val RESULT=true
 						CommUtils.outgreen("$name: obtained an RP")
 						//genTimer( actor, state )
 					}

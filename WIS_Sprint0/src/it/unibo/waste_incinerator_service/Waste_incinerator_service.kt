@@ -44,7 +44,7 @@ class Waste_incinerator_service ( name: String, scope: CoroutineScope, isconfine
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t04",targetState="handle_waste_storage_state_reply",cond=whenReply("waste_storage_state_reply"))
+					 transition(edgeName="t05",targetState="handle_waste_storage_state_reply",cond=whenReply("waste_storage_state_reply"))
 				}	 
 				state("handle_waste_storage_state_reply") { //this:State
 					action { //it:State
@@ -83,7 +83,7 @@ class Waste_incinerator_service ( name: String, scope: CoroutineScope, isconfine
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t05",targetState="handle_ash_storage_state_reply",cond=whenReply("ash_storage_state_reply"))
+					 transition(edgeName="t06",targetState="handle_ash_storage_state_reply",cond=whenReply("ash_storage_state_reply"))
 				}	 
 				state("handle_ash_storage_state_reply") { //this:State
 					action { //it:State
@@ -122,7 +122,7 @@ class Waste_incinerator_service ( name: String, scope: CoroutineScope, isconfine
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t06",targetState="handle_incinerator_state_reply",cond=whenReply("incinerator_state_reply"))
+					 transition(edgeName="t07",targetState="handle_incinerator_state_reply",cond=whenReply("incinerator_state_reply"))
 				}	 
 				state("handle_incinerator_state_reply") { //this:State
 					action { //it:State
@@ -139,7 +139,7 @@ class Waste_incinerator_service ( name: String, scope: CoroutineScope, isconfine
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="handle_incinerator_not_available", cond=doswitchGuarded({ ok  
+					 transition( edgeName="goto",targetState="op_robot_to_waste_storage", cond=doswitchGuarded({ ok  
 					}) )
 					transition( edgeName="goto",targetState="handle_incinerator_not_available", cond=doswitchGuarded({! ( ok  
 					) }) )
@@ -147,6 +147,29 @@ class Waste_incinerator_service ( name: String, scope: CoroutineScope, isconfine
 				state("handle_incinerator_not_available") { //this:State
 					action { //it:State
 						CommUtils.outyellow("$name: incinerator not available, waiting...")
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+				}	 
+				state("op_robot_to_waste_storage") { //this:State
+					action { //it:State
+						
+									val DEST="waste_storage"
+									
+						CommUtils.outyellow("$name: asking robot to move to waste_storage")
+						request("move_request", "move_request($DEST)" ,"op_robot" )  
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t08",targetState="end",cond=whenReply("move_reply"))
+				}	 
+				state("end") { //this:State
+					action { //it:State
+						CommUtils.outyellow("$name: end")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
