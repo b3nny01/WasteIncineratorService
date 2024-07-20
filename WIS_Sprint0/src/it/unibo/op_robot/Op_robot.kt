@@ -41,11 +41,12 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t03",targetState="handle_move_request",cond=whenRequest("move_request"))
+					 transition(edgeName="t00",targetState="handle_cmd_move",cond=whenRequest("cmd_move"))
+					transition(edgeName="t01",targetState="handle_cmd_add_rp",cond=whenRequest("cmd_add_rp"))
 				}	 
-				state("handle_move_request") { //this:State
+				state("handle_cmd_move") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("move_request(D)"), Term.createTerm("move_request(DEST)"), 
+						if( checkMsgContent( Term.createTerm("cmd_move(D)"), Term.createTerm("cmd_move(DEST)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
 												val DEST=payloadArg(0)	
@@ -57,36 +58,27 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="move_reply", cond=doswitch() )
+					 transition( edgeName="goto",targetState="cmd_move_reply", cond=doswitch() )
 				}	 
-				state("move_reply") { //this:State
+				state("cmd_move_reply") { //this:State
 					action { //it:State
 						
 									val RESULT=true
 						CommUtils.outgreen("$name: end of movement")
-						answer("move_request", "move_reply", "move_reply($RESULT)"   )  
+						answer("cmd_move", "cmd_reply", "cmd_reply($RESULT)"   )  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
+					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
 				}	 
-				state("request_rp") { //this:State
-					action { //it:State
-						CommUtils.outgreen("$name: requesting an RP")
-						request("rp_request", "rp_request" ,"waste_storage" )  
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition(edgeName="t04",targetState="handle_rp_reply",cond=whenReply("rp_reply"))
-				}	 
-				state("handle_rp_reply") { //this:State
+				state("handle_cmd_add_rp") { //this:State
 					action { //it:State
 						
 									val RESULT=true
-						CommUtils.outgreen("$name: obtained an RP")
+						CommUtils.outgreen("$name: loading an RP")
+						answer("cmd_add_rp", "cmd_reply", "cmd_reply($RESULT)"   )  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

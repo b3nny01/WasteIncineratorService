@@ -1,20 +1,18 @@
 %====================================================================================
 % wis_system description   
 %====================================================================================
-request( waste_storage_state_request, waste_storage_state_request(N) ). %
-reply( waste_storage_state_reply, waste_storage_state_reply(N) ). %%for waste_storage_state_request | 
-request( ash_storage_state_request, ash_storage_state_request(N) ). %
-reply( ash_storage_state_reply, ash_storage_state_reply(N) ). %%for ash_storage_state_request | 
-request( incinerator_state_request, incinerator_state_request(N) ). %
-reply( incinerator_state_reply, incinerator_state_reply(B,BOF) ). %%for incinerator_state_request | 
-request( rp_request, rp_request(N) ). %
-reply( rp_reply, rp_reply(N) ). %%for rp_request | 
-request( move_request, move_request(D) ). %
-reply( move_reply, move_reply(R) ). %%for move_request | 
-dispatch( load_rp, load_rp(N) ). %
-dispatch( unload_rp, unload_rp(N) ). %
-dispatch( load_ash, load_ash(N) ). %
-dispatch( unload_ash, unload_ash(N) ). %
+dispatch( actor_state, actor_state(P,V) ).
+request( conditions_verified_req, conditions_verified_req(N) ).
+reply( conditions_verified_repl, conditions_verified_repl(R) ).  %%for conditions_verified_req
+request( rp_request, rp_request(N) ).
+reply( rp_reply, rp_reply(N) ).  %%for rp_request
+event( end_of_burning, end_of_burning(N) ).
+request( cmd_move, cmd_move(D) ).
+request( cmd_add_rp, cmd_add_rp(N) ).
+request( cmd_remove_rp, cmd_remove_rp(N) ).
+request( cmd_add_ash, cmd_add_ash(N) ).
+request( cmd_remove_ash, cmd_remove_ash(N) ).
+request( cmd_burn, cmd_burn(N) ).
 %====================================================================================
 context(ctx_wis, "localhost",  "TCP", "8020").
  qactor( incinerator, ctx_wis, "it.unibo.incinerator.Incinerator").

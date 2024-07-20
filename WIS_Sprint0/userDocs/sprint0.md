@@ -103,7 +103,10 @@ The **OpRobot**, defined in the requirements as the robot controlled by the WIS,
 **WasteStorage**, **Incinerator** and **AshStorage** need to exchange messages by requirements so they are modelled as Actors.
 **Scale** can be modelled both as an actor or a POJO inside WasteStorage, for now we will represent it as a Pojo and **demand the discussion to another moment**.
 The same can be said for **MonitoringDevice**, **Sonar** and **Led**, that will be for now modelled as POJOs inside AshStorage.
-In the first prototype of the model we will introduce the **WIS** actor (waste_incinerator_service) as the 'brain' of the application, however by requirements there are **no specification** about where to inject the businsess logic (the OpRobot for example could also be an eligible option), so we **demand the discussion to the Problem Analysis**.
+In the first prototype of the model we will have the OpRobot contain the majority of the buisness, asking **WIS** for the permission to start a cycle.
+**WIS** will then act as an observer of WasteStorage,AshStorage and Incinerator,
+checking that the constraints are satisfied.
+However by requirements there are **no specification** about where to inject the businsess logic (injecting all buisness logic into WIS could also be an option), so we **demand the discussion to the Problem Analysis**.
 The following diagram illustrate the structure of what has been produced basing on requirements:
 
 <img src="resources/imgs/wis_systemarch.png" width="500px">

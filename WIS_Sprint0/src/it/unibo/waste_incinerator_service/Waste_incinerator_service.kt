@@ -22,154 +22,65 @@ class Waste_incinerator_service ( name: String, scope: CoroutineScope, isconfine
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
 		
-		 		var ok=true;	
+		 		var RP = 0
+		 		var B = false
+		 		var L = 0
+		 		val LMAX = 3
+		 	
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
 						CommUtils.outyellow("$name starts")
-						delay(500) 
+						observeResource("localhost","8020","ctx_wis","waste_storage","actor_state")
+						observeResource("localhost","8020","ctx_wis","incinerator","actor_state")
+						observeResource("localhost","8020","ctx_wis","ash_storage","actor_state")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="request_waste_storage_state", cond=doswitch() )
+					 transition( edgeName="goto",targetState="waiting_for_updates", cond=doswitch() )
 				}	 
-				state("request_waste_storage_state") { //this:State
+				state("waiting_for_updates") { //this:State
 					action { //it:State
-						CommUtils.outyellow("$name: requesting waste storage state")
-						request("waste_storage_state_request", "waste_storage_state_request" ,"waste_storage" )  
+						CommUtils.outyellow("$name: waiting for updates...")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t05",targetState="handle_waste_storage_state_reply",cond=whenReply("waste_storage_state_reply"))
+					 transition(edgeName="t02",targetState="update_state",cond=whenDispatch("actor_state"))
+					transition(edgeName="t03",targetState="handle_conditions_verified_req",cond=whenRequest("conditions_verified_req"))
 				}	 
-				state("handle_waste_storage_state_reply") { //this:State
+				state("update_state") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("waste_storage_state_reply(N)"), Term.createTerm("waste_storage_state_reply(N)"), 
+						CommUtils.outcyan("$name in ${currentState.stateName} | $currentMsg | ${Thread.currentThread().getName()} n=${Thread.activeCount()}")
+						 	   
+						if( checkMsgContent( Term.createTerm("actor_state(P,V)"), Term.createTerm("actor_state(P,V)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
-												val ROLL_PACKETS = payloadArg(0).toInt()
-												ok = ROLL_PACKETS>0
-								CommUtils.outyellow("$name: waste storage contains $ROLL_PACKETS roll packets")
+												val P=payloadArg(0);
+												val V=payloadArg(1);
+												when (P){
+													"incinerator_burning"-> B=V.toBoolean()
+													"waste_storage_rps"  -> RP=V.toInt()
+													"ash_storage_level"  -> L=V.toInt()
+												}
+								CommUtils.outyellow("$name: $P updated")
 						}
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="request_ash_storage_state", cond=doswitchGuarded({ ok  
-					}) )
-					transition( edgeName="goto",targetState="handle_waste_storage_empty", cond=doswitchGuarded({! ( ok  
-					) }) )
+					 transition( edgeName="goto",targetState="waiting_for_updates", cond=doswitch() )
 				}	 
-				state("handle_waste_storage_empty") { //this:State
-					action { //it:State
-						CommUtils.outyellow("$name: waste storage is empty, waiting...")
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-				}	 
-				state("request_ash_storage_state") { //this:State
-					action { //it:State
-						CommUtils.outyellow("$name: requesting ash storage state")
-						request("ash_storage_state_request", "ash_storage_state_request" ,"ash_storage" )  
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition(edgeName="t06",targetState="handle_ash_storage_state_reply",cond=whenReply("ash_storage_state_reply"))
-				}	 
-				state("handle_ash_storage_state_reply") { //this:State
-					action { //it:State
-						if( checkMsgContent( Term.createTerm("ash_storage_state_reply(N)"), Term.createTerm("ash_storage_state_reply(L)"), 
-						                        currentMsg.msgContent()) ) { //set msgArgList
-								
-												val ASH_LEVEL_PERC = payloadArg(0).toFloat();
-												ok = ASH_LEVEL_PERC<100.0
-								CommUtils.outyellow("$name: ash storage is $ASH_LEVEL_PERC% full")
-						}
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition( edgeName="goto",targetState="request_incinerator_state", cond=doswitchGuarded({ ok  
-					}) )
-					transition( edgeName="goto",targetState="handle_ash_storage_empty", cond=doswitchGuarded({! ( ok  
-					) }) )
-				}	 
-				state("handle_ash_storage_empty") { //this:State
-					action { //it:State
-						CommUtils.outyellow("$name: ash storage is full, waiting...")
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-				}	 
-				state("request_incinerator_state") { //this:State
-					action { //it:State
-						CommUtils.outyellow("$name: requesting incinerator state")
-						request("incinerator_state_request", "incinerator_state_request" ,"incinerator" )  
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition(edgeName="t07",targetState="handle_incinerator_state_reply",cond=whenReply("incinerator_state_reply"))
-				}	 
-				state("handle_incinerator_state_reply") { //this:State
-					action { //it:State
-						if( checkMsgContent( Term.createTerm("incinerator_state_reply(B,BOF)"), Term.createTerm("incinerator_state_reply(B,BOF)"), 
-						                        currentMsg.msgContent()) ) { //set msgArgList
-								
-												val BURNING = payloadArg(0).toBoolean();
-												val BURNOUT_FREE = payloadArg(1).toBoolean();
-												ok = (!BURNING) && BURNOUT_FREE
-								CommUtils.outyellow("$name: incinerator burning: $BURNING, burnout free: $BURNOUT_FREE ")
-						}
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition( edgeName="goto",targetState="op_robot_to_waste_storage", cond=doswitchGuarded({ ok  
-					}) )
-					transition( edgeName="goto",targetState="handle_incinerator_not_available", cond=doswitchGuarded({! ( ok  
-					) }) )
-				}	 
-				state("handle_incinerator_not_available") { //this:State
-					action { //it:State
-						CommUtils.outyellow("$name: incinerator not available, waiting...")
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-				}	 
-				state("op_robot_to_waste_storage") { //this:State
+				state("handle_conditions_verified_req") { //this:State
 					action { //it:State
 						
-									val DEST="waste_storage"
-									
-						CommUtils.outyellow("$name: asking robot to move to waste_storage")
-						request("move_request", "move_request($DEST)" ,"op_robot" )  
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition(edgeName="t08",targetState="end",cond=whenReply("move_reply"))
-				}	 
-				state("end") { //this:State
-					action { //it:State
-						CommUtils.outyellow("$name: end")
+									val RESULT=(RP>0) && (!B) && (L<LMAX)
+						CommUtils.outblack("$name: current state { RP:$RP, B:$B, L:$L }, conditions verified: $RESULT")
+						answer("conditions_verified_req", "conditions_verified_repl", "conditions_verified_repl($RESULT)"   )  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

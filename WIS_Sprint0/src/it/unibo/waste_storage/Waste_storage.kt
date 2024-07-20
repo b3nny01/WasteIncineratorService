@@ -28,6 +28,8 @@ class Waste_storage ( name: String, scope: CoroutineScope, isconfined: Boolean=f
 					action { //it:State
 						CommUtils.outblue("$name starts")
 						delay(500) 
+						updateResourceRep( "actor_state(waste_storage_rps,$ROLL_PACKETS)"  
+						)
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -43,18 +45,6 @@ class Waste_storage ( name: String, scope: CoroutineScope, isconfined: Boolean=f
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t01",targetState="handle_state_request",cond=whenRequest("waste_storage_state_request"))
-				}	 
-				state("handle_state_request") { //this:State
-					action { //it:State
-						CommUtils.outblue("$name: handling state request")
-						answer("waste_storage_state_request", "waste_storage_state_reply", "waste_storage_state_reply($ROLL_PACKETS)"   )  
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
 				}	 
 			}
 		}

@@ -23,12 +23,13 @@ class Ash_storage ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 		//val interruptedStateTransitions = mutableListOf<Transition>()
 		
 		 		var ASH_LEVEL=0
-		 		val MAX_ASH_LEVEL=10
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
 						CommUtils.outmagenta("$name starts")
 						delay(500) 
+						updateResourceRep( "actor_state(ash_storage_level,$ASH_LEVEL)"  
+						)
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -44,20 +45,6 @@ class Ash_storage ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t02",targetState="handle_state_request",cond=whenRequest("ash_storage_state_request"))
-				}	 
-				state("handle_state_request") { //this:State
-					action { //it:State
-						CommUtils.outblue("$name: handling state request")
-						
-									val ASH_LEVEL_PERC=ASH_LEVEL.toFloat()/MAX_ASH_LEVEL* 100
-						answer("ash_storage_state_request", "ash_storage_state_reply", "ash_storage_state_reply($ASH_LEVEL_PERC)"   )  
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
 				}	 
 			}
 		}

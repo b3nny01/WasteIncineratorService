@@ -29,6 +29,8 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 					action { //it:State
 						CommUtils.outred("$name starts")
 						delay(500) 
+						updateResourceRep( "actor_state(incinerator_burning,$BURNING)"  
+						)
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -44,18 +46,6 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t00",targetState="handle_state_request",cond=whenRequest("incinerator_state_request"))
-				}	 
-				state("handle_state_request") { //this:State
-					action { //it:State
-						CommUtils.outblue("$name: handling state request")
-						answer("incinerator_state_request", "incinerator_state_reply", "incinerator_state_reply($BURNING,$BURNOUT_FREE)"   )  
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
 				}	 
 			}
 		}
