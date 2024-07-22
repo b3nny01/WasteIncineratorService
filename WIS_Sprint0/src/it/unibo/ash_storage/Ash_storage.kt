@@ -23,6 +23,7 @@ class Ash_storage ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 		//val interruptedStateTransitions = mutableListOf<Transition>()
 		
 		 		var ASH_LEVEL=0
+		 		val MAX_ASH_LEVEL=3
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -39,12 +40,33 @@ class Ash_storage ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 				}	 
 				state("idle") { //this:State
 					action { //it:State
-						CommUtils.outblue("$name: idle")
+						CommUtils.outmagenta("$name: idle")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
+					 transition(edgeName="t02",targetState="handle_ash_req",cond=whenRequest("ash_req"))
+				}	 
+				state("handle_ash_req") { //this:State
+					action { //it:State
+						
+									var R=false
+									if(ASH_LEVEL<MAX_ASH_LEVEL){
+										R=true
+										ASH_LEVEL++
+									}
+									
+						CommUtils.outmagenta("$name: handling ash request, result:$R")
+						updateResourceRep( "actor_state(ash_storage_level,$ASH_LEVEL)"  
+						)
+						answer("ash_req", "ash_repl", "ash_repl($R)"   )  
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
 				}	 
 			}
 		}

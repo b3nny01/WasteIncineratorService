@@ -21,6 +21,9 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
+		
+				var POSITION="home"
+				var OK=false;
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -31,59 +34,179 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
+					 transition( edgeName="goto",targetState="check_start_conditions", cond=doswitch() )
 				}	 
-				state("idle") { //this:State
+				state("check_start_conditions") { //this:State
 					action { //it:State
-						CommUtils.outgreen("$name: idle")
+						delay(500) 
+						CommUtils.outgreen("$name: checking conditions")
+						request("conditions_verified_req", "conditions_verified_req" ,"waste_incinerator_service" )  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t00",targetState="handle_cmd_move",cond=whenRequest("cmd_move"))
-					transition(edgeName="t01",targetState="handle_cmd_add_rp",cond=whenRequest("cmd_add_rp"))
+					 transition(edgeName="t03",targetState="handle_start_conditions_verified_repl",cond=whenReply("conditions_verified_repl"))
 				}	 
-				state("handle_cmd_move") { //this:State
+				state("handle_start_conditions_verified_repl") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("cmd_move(D)"), Term.createTerm("cmd_move(DEST)"), 
+						if( checkMsgContent( Term.createTerm("conditions_verified_repl(R)"), Term.createTerm("conditions_verified_repl(R)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
-												val DEST=payloadArg(0)	
-								CommUtils.outgreen("$name: moving to $DEST...")
-								delay(2000) 
+												OK=payloadArg(0).toBoolean()
 						}
+						CommUtils.outgreen("$name: conditions verified: $OK")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="cmd_move_reply", cond=doswitch() )
+					 transition( edgeName="goto",targetState="move_to_waste_storage", cond=doswitchGuarded({ OK  
+					}) )
+					transition( edgeName="goto",targetState="check_start_conditions", cond=doswitchGuarded({! ( OK  
+					) }) )
 				}	 
-				state("cmd_move_reply") { //this:State
+				state("move_to_waste_storage") { //this:State
+					action { //it:State
+						CommUtils.outgreen("$name: moving to waste storage...")
+						delay(2000) 
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="request_rp_to_waste_storage", cond=doswitch() )
+				}	 
+				state("request_rp_to_waste_storage") { //this:State
+					action { //it:State
+						CommUtils.outgreen("$name: requesting an rp")
+						request("rp_req", "rp_req" ,"waste_storage" )  
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t04",targetState="handle_rp_repl",cond=whenReply("rp_repl"))
+				}	 
+				state("handle_rp_repl") { //this:State
 					action { //it:State
 						
-									val RESULT=true
-						CommUtils.outgreen("$name: end of movement")
-						answer("cmd_move", "cmd_reply", "cmd_reply($RESULT)"   )  
+									OK=payloadArg(0).toBoolean()	
+						CommUtils.outblack("$name: rp request result: $OK")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
+					 transition( edgeName="goto",targetState="move_to_incinerator", cond=doswitch() )
 				}	 
-				state("handle_cmd_add_rp") { //this:State
+				state("move_to_incinerator") { //this:State
+					action { //it:State
+						CommUtils.outgreen("$name: moving to incinerator...")
+						delay(2000) 
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="request_to_burn", cond=doswitch() )
+				}	 
+				state("request_to_burn") { //this:State
+					action { //it:State
+						CommUtils.outgreen("$name: requesting to burn an rp")
+						request("burn_req", "burn_req" ,"incinerator" )  
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t05",targetState="handle_burn_repl",cond=whenReply("burn_repl"))
+				}	 
+				state("handle_burn_repl") { //this:State
 					action { //it:State
 						
-									val RESULT=true
-						CommUtils.outgreen("$name: loading an RP")
-						answer("cmd_add_rp", "cmd_reply", "cmd_reply($RESULT)"   )  
+									OK=payloadArg(0).toBoolean()	
+						CommUtils.outgreen("$name: burn request result: $OK")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
+					 transition( edgeName="goto",targetState="move_to_ash_storage", cond=doswitch() )
+				}	 
+				state("move_to_ash_storage") { //this:State
+					action { //it:State
+						CommUtils.outgreen("$name: moving to ash storage...")
+						delay(2000) 
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="request_to_unload_ash", cond=doswitch() )
+				}	 
+				state("request_to_unload_ash") { //this:State
+					action { //it:State
+						CommUtils.outgreen("$name: requesting to unload ash...")
+						request("ash_req", "ash_req" ,"ash_storage" )  
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t06",targetState="handle_ash_repl",cond=whenReply("ash_repl"))
+				}	 
+				state("handle_ash_repl") { //this:State
+					action { //it:State
+						
+									OK=payloadArg(0).toBoolean()	
+						CommUtils.outgreen("$name: request to unload ash result: $OK")
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="check_continue_conditions", cond=doswitch() )
+				}	 
+				state("check_continue_conditions") { //this:State
+					action { //it:State
+						CommUtils.outgreen("$name: checking conditions")
+						request("conditions_verified_req", "conditions_verified_req" ,"waste_incinerator_service" )  
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t07",targetState="handle_continue_conditions_verified_repl",cond=whenReply("conditions_verified_repl"))
+				}	 
+				state("handle_continue_conditions_verified_repl") { //this:State
+					action { //it:State
+						if( checkMsgContent( Term.createTerm("conditions_verified_repl(R)"), Term.createTerm("conditions_verified_repl(R)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								
+												OK=payloadArg(0).toBoolean()
+						}
+						CommUtils.outgreen("$name: conditions verified: $OK")
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="move_to_waste_storage", cond=doswitchGuarded({OK 
+					}) )
+					transition( edgeName="goto",targetState="move_to_home", cond=doswitchGuarded({! (OK 
+					) }) )
+				}	 
+				state("move_to_home") { //this:State
+					action { //it:State
+						CommUtils.outgreen("moving to home...")
+						delay(2000) 
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="check_start_conditions", cond=doswitch() )
 				}	 
 			}
 		}

@@ -49,13 +49,11 @@ class Waste_incinerator_service ( name: String, scope: CoroutineScope, isconfine
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t02",targetState="update_state",cond=whenDispatch("actor_state"))
-					transition(edgeName="t03",targetState="handle_conditions_verified_req",cond=whenRequest("conditions_verified_req"))
+					 transition(edgeName="t08",targetState="update_state",cond=whenDispatch("actor_state"))
+					transition(edgeName="t09",targetState="handle_conditions_verified_req",cond=whenRequest("conditions_verified_req"))
 				}	 
 				state("update_state") { //this:State
 					action { //it:State
-						CommUtils.outcyan("$name in ${currentState.stateName} | $currentMsg | ${Thread.currentThread().getName()} n=${Thread.activeCount()}")
-						 	   
 						if( checkMsgContent( Term.createTerm("actor_state(P,V)"), Term.createTerm("actor_state(P,V)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
@@ -86,6 +84,7 @@ class Waste_incinerator_service ( name: String, scope: CoroutineScope, isconfine
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
+					 transition( edgeName="goto",targetState="waiting_for_updates", cond=doswitch() )
 				}	 
 			}
 		}

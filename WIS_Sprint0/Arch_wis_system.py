@@ -31,6 +31,10 @@ with Diagram('wis_systemArch', show=False, outformat='png', graph_attr=graphattr
           ash_storage=Custom('ash_storage','./qakicons/symActorSmall.png')
           op_robot=Custom('op_robot','./qakicons/symActorSmall.png')
           waste_incinerator_service=Custom('waste_incinerator_service','./qakicons/symActorSmall.png')
+     op_robot >> Edge(color='magenta', style='solid', decorate='true', label='<burn_req<font color="darkgreen"> burn_repl</font> &nbsp; >',  fontcolor='magenta') >> incinerator
+     op_robot >> Edge(color='magenta', style='solid', decorate='true', label='<ash_req<font color="darkgreen"> ash_repl</font> &nbsp; >',  fontcolor='magenta') >> ash_storage
+     op_robot >> Edge(color='magenta', style='solid', decorate='true', label='<rp_req<font color="darkgreen"> rp_repl</font> &nbsp; >',  fontcolor='magenta') >> waste_storage
+     op_robot >> Edge(color='magenta', style='solid', decorate='true', label='<conditions_verified_req<font color="darkgreen"> conditions_verified_repl</font> &nbsp; >',  fontcolor='magenta') >> waste_incinerator_service
      waste_storage >> Edge(color='blue', style='solid',  decorate='true', label='<actor_state &nbsp; >',  fontcolor='blue') >> waste_incinerator_service
      ash_storage >> Edge(color='blue', style='solid',  decorate='true', label='<actor_state &nbsp; >',  fontcolor='blue') >> waste_incinerator_service
      incinerator >> Edge(color='blue', style='solid',  decorate='true', label='<actor_state &nbsp; >',  fontcolor='blue') >> waste_incinerator_service

@@ -1,32 +1,17 @@
 System wis_system
 
-Dispatch actor_state		: actor_state(P,V)
-Request conditions_verified_req		: conditions_verified_req(N)
-Reply conditions_verified_repl		: conditions_verified_repl(R) for conditions_verified_req
+Dispatch	actor_state					: actor_state(P,V)
+Request 	conditions_verified_req		: conditions_verified_req(N)
+Reply 		conditions_verified_repl	: conditions_verified_repl(R) for conditions_verified_req
 
-//Request waste_storage_state_request : waste_storage_state_request(N)
-//Reply   waste_storage_state_reply	: waste_storage_state_reply(N) for waste_storage_state_request
-//
-//Request ash_storage_state_request   : ash_storage_state_request(N)
-//Reply   ash_storage_state_reply	    : ash_storage_state_reply(N) for ash_storage_state_request
-//
-//Request incinerator_state_request   : incinerator_state_request(N)
-//Reply   incinerator_state_reply	    : incinerator_state_reply(B,BOF) for incinerator_state_request
+Request rp_req						: rp_req(N)
+Reply   rp_repl						: rp_repl(N) for rp_req
 
-Request rp_request					: rp_request(N)
-Reply   rp_reply					: rp_reply(N) for rp_request
+Request burn_req					: burn_req(N)
+Reply 	burn_repl					: burn_repl(N) for burn_req
 
-Event end_of_burning				: end_of_burning(N)
-
-// commands
-Request  cmd_move				    : cmd_move(D)					 	 					
-Request  cmd_add_rp					: cmd_add_rp(N)						 
-Request  cmd_remove_rp				: cmd_remove_rp(N)						 
-Request  cmd_add_ash				: cmd_add_ash(N)						 
-Request  cmd_remove_ash				: cmd_remove_ash(N)
-Request	 cmd_burn					: cmd_burn(N)
-						 
-Reply	 cmd_reply					: cmd_reply(R)
+Request ash_req						: ash_req(N)
+Reply	ash_repl					: ash_repl(N) for ash_req
 
 
 
@@ -48,7 +33,31 @@ QActor incinerator context ctx_wis{
 	
 	State idle{
 		println("$name: idle") color red
-	}
+	}Transition t0
+	whenRequest burn_req -> handle_burn_req
+	
+	State handle_burn_req{
+		[#
+			var R=false
+			if(!BURNING){
+				BURNING=true
+				R=true
+			}
+			
+		#]
+		println("$name: handling burn request, result:$BURNING") color red
+
+		if[# BURNING #]{
+			updateResource  [# "actor_state(incinerator_burning,$BURNING)" #]
+			delay 5000 // burning simulation
+			[# 
+				BURNING=false
+				BURNOUT_FREE=false
+			#]
+			updateResource  [# "actor_state(incinerator_burning,$BURNING)" #]
+		}
+		replyTo burn_req with burn_repl : burn_repl($R)
+	}Goto idle
 }
  
 QActor waste_storage context ctx_wis{
@@ -64,13 +73,30 @@ QActor waste_storage context ctx_wis{
 	
 	State idle{
 		println("$name: idle") color blue
-	}
+	}Transition t0 
+	whenRequest rp_req -> handle_rp_req
+	
+	State handle_rp_req{
+		[#
+			var R=false
+			if(ROLL_PACKETS>0){
+				R=true
+				ROLL_PACKETS--
+			}
+			
+		#]
+		println("$name: handling rp request, result:$R") color blue
+		
+		updateResource [# "actor_state(waste_storage_rps,$ROLL_PACKETS)" #]
+		replyTo rp_req with rp_repl : rp_repl($R)
+	}Goto idle
 	
  }
  
 QActor ash_storage context ctx_wis{
  	[#
  		var ASH_LEVEL=0
+ 		val MAX_ASH_LEVEL=3
  	 #]
  	
  	 State s0 initial{ 
@@ -81,56 +107,133 @@ QActor ash_storage context ctx_wis{
 	
 		
 	State idle{
-		println("$name: idle") color blue
-	}
+		println("$name: idle") color magenta
+	}Transition t0 
+	whenRequest ash_req -> handle_ash_req
+	
+	State handle_ash_req{
+		[#
+			var R=false
+			if(ASH_LEVEL<MAX_ASH_LEVEL){
+				R=true
+				ASH_LEVEL++
+			}
+			
+		#]
+		println("$name: handling ash request, result:$R") color magenta
+		
+		updateResource [# "actor_state(ash_storage_level,$ASH_LEVEL)" #]
+		replyTo ash_req with ash_repl : ash_repl($R)
+	}Goto idle
+	
 }
 
-
 QActor op_robot context ctx_wis{
+	[#
+		var POSITION="home"
+		var OK=false;
+	#]
 	State s0 initial{ 
  		println("$name starts") color green
 		delay 500
-	}Goto idle
+	}Goto check_start_conditions
 	
-	State idle{
-		println("$name: idle") color green
+	State check_start_conditions{
+		delay 500
+		println("$name: checking conditions") color green
+		request waste_incinerator_service -m conditions_verified_req:conditions_verified_req
 	}Transition t0
-	 whenRequest cmd_move -> handle_cmd_move
-	 whenRequest cmd_add_rp -> handle_cmd_add_rp
-		
-		
-	// PLACEHOLDER	
-	State handle_cmd_move{
-		onMsg(cmd_move:cmd_move(DEST))
-		{ 
+	whenReply conditions_verified_repl->handle_start_conditions_verified_repl
+	
+	State handle_start_conditions_verified_repl{
+		onMsg(conditions_verified_repl:conditions_verified_repl(R)){
 			[#
-				val DEST=payloadArg(0)	
+				OK=payloadArg(0).toBoolean()
 			#]
-			println("$name: moving to $DEST...") color green
-			// TODO: implement movement logic
-			delay 2000
 		}
-	}Goto cmd_move_reply 
+		println("$name: conditions verified: $OK") color green
+	}Goto move_to_waste_storage if [# OK #] else check_start_conditions
 	
-	State cmd_move_reply{
+	
+	// loading an rp
+	State move_to_waste_storage{
+		println("$name: moving to waste storage...") color green
+		delay 2000
+	} Goto request_rp_to_waste_storage
+	
+	State request_rp_to_waste_storage{
+		println("$name: requesting an rp") color green
+		request waste_storage -m rp_req:rp_req
+	}Transition t0
+	whenReply rp_repl -> handle_rp_repl
+	
+	State handle_rp_repl{
 		[#
-			val RESULT=true
+			OK=payloadArg(0).toBoolean()	
 		#]
-		println("$name: end of movement") color green
-		replyTo cmd_move with cmd_reply:cmd_reply($RESULT)
-	}Goto idle
+		println("$name: rp request result: $OK")
+	}Goto move_to_incinerator
 	
 	
 	
-	State handle_cmd_add_rp{
+	// burning the rp
+	State move_to_incinerator{
+		println("$name: moving to incinerator...") color green
+		delay 2000
+	}Goto request_to_burn 
+	
+	State request_to_burn{
+		println("$name: requesting to burn an rp") color green
+		request incinerator -m burn_req : burn_req
+	}Transition t0
+	whenReply burn_repl -> handle_burn_repl
+	
+	State handle_burn_repl{
 		[#
-			val RESULT=true
+			OK=payloadArg(0).toBoolean()	
 		#]
-		println("$name: loading an RP") color green
-		replyTo cmd_add_rp with cmd_reply:cmd_reply($RESULT) 
-	}
+		println("$name: burn request result: $OK") color green
+	}Goto move_to_ash_storage
 	
 	
+	// unload ashes
+	State move_to_ash_storage{
+		println("$name: moving to ash storage...") color green
+		delay 2000
+	}Goto request_to_unload_ash
+	
+	 State request_to_unload_ash{
+	 	println("$name: requesting to unload ash...") color green
+	 	request ash_storage -m ash_req : ash_req
+	 }Transition t0
+	 whenReply ash_repl -> handle_ash_repl
+	 
+	 State handle_ash_repl{
+	 	[#
+			OK=payloadArg(0).toBoolean()	
+		#]
+		println("$name: request to unload ash result: $OK") color green
+	 }Goto check_continue_conditions
+	 
+	 State check_continue_conditions{
+		println("$name: checking conditions") color green
+		request waste_incinerator_service -m conditions_verified_req:conditions_verified_req
+	}Transition t0
+	whenReply conditions_verified_repl->handle_continue_conditions_verified_repl
+	
+	State handle_continue_conditions_verified_repl{
+		onMsg(conditions_verified_repl:conditions_verified_repl(R)){
+			[#
+				OK=payloadArg(0).toBoolean()
+			#]
+		}
+		println("$name: conditions verified: $OK") color green
+	}Goto move_to_waste_storage if [#OK#] else move_to_home
+	
+	State move_to_home{
+		println("moving to home...") color green
+		delay 2000
+	}Goto check_start_conditions
 }
 
 QActor waste_incinerator_service context ctx_wis{
@@ -157,7 +260,6 @@ QActor waste_incinerator_service context ctx_wis{
 		whenRequest conditions_verified_req -> handle_conditions_verified_req
 		
 	State update_state{
-		printCurrentMessage
 		onMsg(actor_state:actor_state(P,V)){
 			[#
 				val P=payloadArg(0);
@@ -179,132 +281,7 @@ QActor waste_incinerator_service context ctx_wis{
 		#]
 		println("$name: current state { RP:$RP, B:$B, L:$L }, conditions verified: $RESULT")
 		replyTo conditions_verified_req with conditions_verified_repl : conditions_verified_repl($RESULT)
-	}
+	}Goto waiting_for_updates
 	
  }
 
-
-//QActor waste_incinerator_service context ctx_wis{
-// 	[#
-// 		var ok=false;
-// 	
-// 	#]
-// 	
-// 	State s0 initial{ 
-// 		println("$name starts") color yellow
-//		delay 500
-//	} Goto request_waste_storage_state
-//	
-//
-//	// waste storage check
-//	State request_waste_storage_state{
-//		println("$name: requesting waste storage state") color yellow
-//		request waste_storage -m waste_storage_state_request:waste_storage_state_request
-//	}Transition t0
-//	whenReply waste_storage_state_reply -> handle_waste_storage_state_reply
-//	
-//	State handle_waste_storage_state_reply{
-//		onMsg(waste_storage_state_reply:waste_storage_state_reply(N)){
-//			[#
-//				val ROLL_PACKETS = payloadArg(0).toInt()
-//				ok = ROLL_PACKETS>0
-//			#]
-//			println("$name: waste storage contains $ROLL_PACKETS roll packets") color yellow
-//		}
-//	}Goto request_ash_storage_state if [# ok #] else handle_waste_storage_empty
-//	
-//	State handle_waste_storage_empty{
-//		println("$name: waste storage is empty, waiting...") color yellow
-//	}
-//	
-//	
-//	// ash storage check
-//	State request_ash_storage_state{
-//		println("$name: requesting ash storage state") color yellow
-//		request ash_storage -m ash_storage_state_request:ash_storage_state_request
-//	}Transition t0
-//	whenReply ash_storage_state_reply -> handle_ash_storage_state_reply
-//	
-//	State handle_ash_storage_state_reply{
-//		onMsg(ash_storage_state_reply:ash_storage_state_reply(L)){
-//			[#
-//				val ASH_LEVEL_PERC = payloadArg(0).toFloat();
-//				ok = ASH_LEVEL_PERC<100.0
-//			#]
-//			println("$name: ash storage is $ASH_LEVEL_PERC% full") color yellow
-//		}
-//	}Goto request_incinerator_state if [# ok #] else handle_ash_storage_empty
-//	
-//	State handle_ash_storage_empty{
-//		println("$name: ash storage is full, waiting...") color yellow
-//	}
-//	
-//	// incinerator check 
-//	State request_incinerator_state{ 
-//		println("$name: requesting incinerator state") color yellow
-//		request incinerator -m incinerator_state_request:incinerator_state_request
-//	}Transition t0
-//	whenReply incinerator_state_reply -> handle_incinerator_state_reply
-//	
-//	State handle_incinerator_state_reply{
-//		onMsg(incinerator_state_reply:incinerator_state_reply(B,BOF)){
-//			[#
-//				val BURNING = payloadArg(0).toBoolean();
-//				val BURNOUT_FREE = payloadArg(1).toBoolean();
-//				ok = (!BURNING) && BURNOUT_FREE
-//			#]
-//			println("$name: incinerator burning: $BURNING, burnout free: $BURNOUT_FREE ") color yellow
-//		}
-//	}Goto op_robot_to_waste_storage if [# ok #] else handle_incinerator_not_available
-//	
-//	State handle_incinerator_not_available{
-//		println("$name: incinerator not available, waiting...") color yellow
-//	}
-//	
-//	// opRobot to waste storage
-//	State op_robot_to_waste_storage{
-//		[#
-//			val DEST="waste_storage"
-//			
-//		#]
-//		println ("$name: asking robot to move to $DEST") color yellow
-//		request op_robot -m cmd_move:cmd_move($DEST)
-//		
-//	}Transition t0
-//	whenReply cmd_reply -> remove_rp_from_waste_storage //TODO: check reply result
-//	
-//	// loading an RP into opRobot
-//	State remove_rp_from_waste_storage{
-//		request ash_storage -m cmd_remove_ash: cmd_remove_ash 
-//	}Transition t0
-//	whenReply cmd_reply -> add_rp_to_op_robot
-//	
-//	State add_rp_to_op_robot{
-//		request op_robot -m cmd_add_rp: cmd_add_rp
-//	}Transition t0
-//	whenReply cmd_reply -> op_robot_to_incinerator
-//	
-//	// opRobot to incinerator
-//	State op_robot_to_incinerator{
-//		[#
-//			val DEST="incinerator"
-//			
-//		#]
-//		println ("$name: asking robot to move to $DEST") color yellow
-//		request op_robot -m cmd_move:cmd_move($DEST)
-//		
-//	}Transition t0
-//	whenReply cmd_reply -> end//TODO: check reply result
-//	
-//	
-//	
-//	
-//	
-//	
-//	State end{
-//		println("$name: end") color yellow
-//	}
-//
-//	
-//	
-// }

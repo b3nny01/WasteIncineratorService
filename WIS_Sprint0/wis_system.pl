@@ -4,15 +4,12 @@
 dispatch( actor_state, actor_state(P,V) ).
 request( conditions_verified_req, conditions_verified_req(N) ).
 reply( conditions_verified_repl, conditions_verified_repl(R) ).  %%for conditions_verified_req
-request( rp_request, rp_request(N) ).
-reply( rp_reply, rp_reply(N) ).  %%for rp_request
-event( end_of_burning, end_of_burning(N) ).
-request( cmd_move, cmd_move(D) ).
-request( cmd_add_rp, cmd_add_rp(N) ).
-request( cmd_remove_rp, cmd_remove_rp(N) ).
-request( cmd_add_ash, cmd_add_ash(N) ).
-request( cmd_remove_ash, cmd_remove_ash(N) ).
-request( cmd_burn, cmd_burn(N) ).
+request( rp_req, rp_req(N) ).
+reply( rp_repl, rp_repl(N) ).  %%for rp_req
+request( burn_req, burn_req(N) ).
+reply( burn_repl, burn_repl(N) ).  %%for burn_req
+request( ash_req, ash_req(N) ).
+reply( ash_repl, ash_repl(N) ).  %%for ash_req
 %====================================================================================
 context(ctx_wis, "localhost",  "TCP", "8020").
  qactor( incinerator, ctx_wis, "it.unibo.incinerator.Incinerator").

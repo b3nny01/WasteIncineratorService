@@ -46,6 +46,35 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
+					 transition(edgeName="t00",targetState="handle_burn_req",cond=whenRequest("burn_req"))
+				}	 
+				state("handle_burn_req") { //this:State
+					action { //it:State
+						
+									var R=false
+									if(!BURNING){
+										BURNING=true
+										R=true
+									}
+									
+						CommUtils.outred("$name: handling burn request, result:$BURNING")
+						if(  BURNING  
+						 ){updateResourceRep( "actor_state(incinerator_burning,$BURNING)"  
+						)
+						delay(5000) 
+						 
+										BURNING=false
+										BURNOUT_FREE=false
+						updateResourceRep( "actor_state(incinerator_burning,$BURNING)"  
+						)
+						}
+						answer("burn_req", "burn_repl", "burn_repl($R)"   )  
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
 				}	 
 			}
 		}
