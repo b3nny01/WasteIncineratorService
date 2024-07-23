@@ -109,7 +109,7 @@ checking that the constraints are satisfied.
 However by requirements there are **no specification** about where to inject the businsess logic (injecting all buisness logic into WIS could also be an option), so we **demand the discussion to the Problem Analysis**.
 The following diagram illustrate the structure of what has been produced basing on requirements:
 
-<img src="resources/imgs/wis_systemarch.png" width="500px">
+<img src="resources/imgs/wis_systemarch.png" width="1000px">
 
 
 <!--
