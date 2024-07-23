@@ -22,6 +22,7 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
 		
+		 		var ACTIVE	   = false;
 		 		var BURNING    = false;
 		 		var BURNOUT_FREE = true;		
 		return { //this:ActionBasciFsm
@@ -46,13 +47,35 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t00",targetState="handle_burn_req",cond=whenRequest("burn_req"))
+					 transition(edgeName="t00",targetState="handle_activation_req",cond=whenRequest("activation_req"))
+					transition(edgeName="t01",targetState="handle_burn_req",cond=whenRequest("burn_req"))
+				}	 
+				state("handle_activation_req") { //this:State
+					action { //it:State
+						 
+									var RESULT=false
+						if( checkMsgContent( Term.createTerm("activation_req(A)"), Term.createTerm("activation_req(A)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								
+												ACTIVE=payloadArg(0).toBoolean()
+												RESULT=true
+								updateResourceRep( "actor_state(incinerator_active,$ACTIVE)"  
+								)
+						}
+						answer("activation_req", "activation_repl", "activation_repl($RESULT)"   )  
+						CommUtils.outred("$name: handling activation request, result:$RESULT")
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
 				}	 
 				state("handle_burn_req") { //this:State
 					action { //it:State
 						
 									var R=false
-									if(!BURNING){
+									if(!BURNING && ACTIVE){
 										BURNING=true
 										R=true
 									}

@@ -46,7 +46,7 @@ class Ash_storage ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t02",targetState="handle_ash_req",cond=whenRequest("ash_req"))
+					 transition(edgeName="t03",targetState="handle_ash_req",cond=whenRequest("ash_req"))
 				}	 
 				state("handle_ash_req") { //this:State
 					action { //it:State

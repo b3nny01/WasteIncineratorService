@@ -1,1 +1,1 @@
-{"actor":"waste_incinerator_service", "msgType":"dispatch", "curstate":"waiting_for_updates", "nextstate":"update_state", "msgId":"actor_state"}
+{"actor":"wis_state_observer", "msgType":"dispatch", "curstate":"waiting_for_updates", "nextstate":"update_state", "msgId":"actor_state"}

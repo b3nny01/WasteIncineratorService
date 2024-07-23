@@ -40,13 +40,13 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					action { //it:State
 						delay(500) 
 						CommUtils.outgreen("$name: checking conditions")
-						request("conditions_verified_req", "conditions_verified_req" ,"waste_incinerator_service" )  
+						request("conditions_verified_req", "conditions_verified_req" ,"wis_state_observer" )  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t03",targetState="handle_start_conditions_verified_repl",cond=whenReply("conditions_verified_repl"))
+					 transition(edgeName="t04",targetState="handle_start_conditions_verified_repl",cond=whenReply("conditions_verified_repl"))
 				}	 
 				state("handle_start_conditions_verified_repl") { //this:State
 					action { //it:State
@@ -86,7 +86,7 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t04",targetState="handle_rp_repl",cond=whenReply("rp_repl"))
+					 transition(edgeName="t05",targetState="handle_rp_repl",cond=whenReply("rp_repl"))
 				}	 
 				state("handle_rp_repl") { //this:State
 					action { //it:State
@@ -120,7 +120,7 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t05",targetState="handle_burn_repl",cond=whenReply("burn_repl"))
+					 transition(edgeName="t06",targetState="handle_burn_repl",cond=whenReply("burn_repl"))
 				}	 
 				state("handle_burn_repl") { //this:State
 					action { //it:State
@@ -154,7 +154,7 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t06",targetState="handle_ash_repl",cond=whenReply("ash_repl"))
+					 transition(edgeName="t07",targetState="handle_ash_repl",cond=whenReply("ash_repl"))
 				}	 
 				state("handle_ash_repl") { //this:State
 					action { //it:State
@@ -171,13 +171,13 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 				state("check_continue_conditions") { //this:State
 					action { //it:State
 						CommUtils.outgreen("$name: checking conditions")
-						request("conditions_verified_req", "conditions_verified_req" ,"waste_incinerator_service" )  
+						request("conditions_verified_req", "conditions_verified_req" ,"wis_state_observer" )  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t07",targetState="handle_continue_conditions_verified_repl",cond=whenReply("conditions_verified_repl"))
+					 transition(edgeName="t08",targetState="handle_continue_conditions_verified_repl",cond=whenReply("conditions_verified_repl"))
 				}	 
 				state("handle_continue_conditions_verified_repl") { //this:State
 					action { //it:State

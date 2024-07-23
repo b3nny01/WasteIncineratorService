@@ -2,6 +2,9 @@
 % wis_system description   
 %====================================================================================
 dispatch( actor_state, actor_state(P,V) ).
+event( activation_e, activation_e(N) ).
+request( activation_req, activation_req(A) ).
+reply( activation_repl, activation_repl(N) ).  %%for activation_req
 request( conditions_verified_req, conditions_verified_req(N) ).
 reply( conditions_verified_repl, conditions_verified_repl(R) ).  %%for conditions_verified_req
 request( rp_req, rp_req(N) ).
@@ -20,5 +23,7 @@ context(ctx_wis, "localhost",  "TCP", "8020").
  static(ash_storage).
   qactor( op_robot, ctx_wis, "it.unibo.op_robot.Op_robot").
  static(op_robot).
-  qactor( waste_incinerator_service, ctx_wis, "it.unibo.waste_incinerator_service.Waste_incinerator_service").
- static(waste_incinerator_service).
+  qactor( wis_state_observer, ctx_wis, "it.unibo.wis_state_observer.Wis_state_observer").
+ static(wis_state_observer).
+  qactor( wis_incinerator_scheduler, ctx_wis, "it.unibo.wis_incinerator_scheduler.Wis_incinerator_scheduler").
+ static(wis_incinerator_scheduler).

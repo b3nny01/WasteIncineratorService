@@ -1,6 +1,11 @@
 System wis_system
 
 Dispatch	actor_state					: actor_state(P,V)
+
+Event	 	activation_e				: activation_e(N)
+Request 	activation_req				: activation_req(A)
+Reply 		activation_repl				: activation_repl(N) for activation_req	
+
 Request 	conditions_verified_req		: conditions_verified_req(N)
 Reply 		conditions_verified_repl	: conditions_verified_repl(R) for conditions_verified_req
 
@@ -21,6 +26,7 @@ Context ctx_wis ip [ host="localhost" port=8020]
 
 QActor incinerator context ctx_wis{     
  	[#
+ 		var ACTIVE	   = false;
  		var BURNING    = false;
  		var BURNOUT_FREE = true;		
  	 #]
@@ -34,12 +40,28 @@ QActor incinerator context ctx_wis{
 	State idle{
 		println("$name: idle") color red
 	}Transition t0
+	whenRequest activation_req -> handle_activation_req
 	whenRequest burn_req -> handle_burn_req
+	
+	State handle_activation_req{
+		[# 
+			var RESULT=false
+		#]
+		onMsg (activation_req:activation_req(A)){
+			[#
+				ACTIVE=payloadArg(0).toBoolean()
+				RESULT=true
+			#]
+			updateResource  [# "actor_state(incinerator_active,$ACTIVE)" #]
+		}
+		replyTo activation_req with activation_repl : activation_repl($RESULT)
+		println("$name: handling activation request, result:$RESULT") color red
+	} Goto idle
 	
 	State handle_burn_req{
 		[#
 			var R=false
-			if(!BURNING){
+			if(!BURNING && ACTIVE){
 				BURNING=true
 				R=true
 			}
@@ -141,7 +163,7 @@ QActor op_robot context ctx_wis{
 	State check_start_conditions{
 		delay 500
 		println("$name: checking conditions") color green
-		request waste_incinerator_service -m conditions_verified_req:conditions_verified_req
+		request wis_state_observer -m conditions_verified_req:conditions_verified_req
 	}Transition t0
 	whenReply conditions_verified_repl->handle_start_conditions_verified_repl
 	
@@ -217,7 +239,7 @@ QActor op_robot context ctx_wis{
 	 
 	 State check_continue_conditions{
 		println("$name: checking conditions") color green
-		request waste_incinerator_service -m conditions_verified_req:conditions_verified_req
+		request wis_state_observer -m conditions_verified_req:conditions_verified_req
 	}Transition t0
 	whenReply conditions_verified_repl->handle_continue_conditions_verified_repl
 	
@@ -236,9 +258,10 @@ QActor op_robot context ctx_wis{
 	}Goto check_start_conditions
 }
 
-QActor waste_incinerator_service context ctx_wis{
+QActor wis_state_observer context ctx_wis{
  	[#
  		var RP = 0
+ 		var A = false
  		var B = false
  		var L = 0
  		val LMAX = 3
@@ -249,7 +272,7 @@ QActor waste_incinerator_service context ctx_wis{
  		println("$name starts") color yellow
 		observeResource waste_storage msgid actor_state
 		observeResource incinerator msgid actor_state
-		observeResource ash_storage msgid actor_state  
+		observeResource ash_storage msgid actor_state
 		
 	} Goto waiting_for_updates
 	
@@ -265,6 +288,7 @@ QActor waste_incinerator_service context ctx_wis{
 				val P=payloadArg(0);
 				val V=payloadArg(1);
 				when (P){
+					"incinerator_active" -> A=V.toBoolean()
 					"incinerator_burning"-> B=V.toBoolean()
 					"waste_storage_rps"  -> RP=V.toInt()
 					"ash_storage_level"  -> L=V.toInt()
@@ -277,11 +301,29 @@ QActor waste_incinerator_service context ctx_wis{
 
 	State handle_conditions_verified_req{
 		[#
-			val RESULT=(RP>0) && (!B) && (L<LMAX)
+			val RESULT=(RP>0) && (A && !B) && (L<LMAX)
 		#]
 		println("$name: current state { RP:$RP, B:$B, L:$L }, conditions verified: $RESULT")
 		replyTo conditions_verified_req with conditions_verified_repl : conditions_verified_repl($RESULT)
 	}Goto waiting_for_updates
 	
+ }
+ 
+ QActor wis_incinerator_scheduler context ctx_wis{
+ 	 	State s0 initial{ 
+ 		println("$name starts") color yellow
+	}Transition t0 whenTime 5000 -> request_activation   
+	
+	State request_activation{
+		[#
+			val AR=true	
+		#]
+		println("$name: requesting incinerator activation") color yellow
+		request incinerator -m activation_req : activation_req($AR)
+	}Transition t0 whenReply activation_repl -> handle_activation_repl
+	
+	State handle_activation_repl{
+		println("$name: handling activation repl")
+	}
  }
 
