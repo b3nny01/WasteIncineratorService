@@ -27,32 +27,48 @@ Analyzing the natural language requirements text, we identified the following en
 From the requirements, we inferred the following information that needs to be modeled:
 
 <table>
-<tr>
-  <td><b>Information</b>  </td>
-  <td><b>Source</b>  </td>
-  <td><b>Destination</b></td>
-<tr>
-<tr>
-  <td>**Information**  </td>
-  <td>**Source**  </td>
-  <td>**Destination**</td>
-<tr>
-<tr>
-  <td>**Information**  </td>
-  <td>**Source**  </td>
-  <td>**Destination**</td>
-<tr>
-
+  <tr>
+    <td><b>Information</b></td>
+    <td><b>Source</b></td>
+    <td><b>Destination</b>
+  </tr>
+  <tr>
+    <td>activationCommand</td>
+    <td>unspecified</td>
+    <td>Incinerator</td>
+  </tr>
+  <tr>
+    <td>isBurning</td>
+    <td>Incinerator</td>
+    <td>unspecfied</td>
+  </tr>
+    <tr>
+    <td>ashLevel</td>
+    <td>Sonar</td>
+    <td>unspecified</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>loadRP</td>
+    <td>WasteStorage</td>
+    <td>OpRobot</td>
+  </tr>
+  <tr>
+    <td>burnRp</td>
+    <td>OpRobot</td>
+    <td>Incinerator</td>
+  </tr>
+  <tr>
+    <td>loadAsh</td>
+    <td>unspecified (OpRobot || Incinerator || WIS)</td>
+    <td>unspecified (OpRobot || Incinerator || WIS)</td>
+  </tr>
+  <tr>
+    <td>unloadAsh</td>
+    <td>OpRobot</td>
+    <td>AshStorage</td>
+  </tr>
 </table>
-| **Information**      | **Source**                                 | **Destination**                        |
-|----------------------|--------------------------------------------|----------------------------------------|
-| activationCommand    | unspecified                                | Incinerator                            |
-| isBurning            | Incinerator                                | unspecified                            |
-| ashLevel             | Sonar                                      | unspecified                            |
-| loadRP               | WasteStorage                               | OpRobot                                |
-| burnRp               | OpRobot                                    | Incinerator                            |
-| loadAsh              | unspecified (OpRobot \|\| Incinerator \|\| WIS) | unspecified (OpRobot \|\| Incinerator \|\| WIS) |
-| unloadAsh            | OpRobot                                    | AshStorage                             |
 
 > [!NOTE]
 > We merged the Interactions and Behavior sections because at this stage of the project, for the majority of this information, we don't know yet if it will be modeled as POJOs' methods or messages between actors.
