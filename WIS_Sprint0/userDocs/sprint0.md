@@ -3,7 +3,7 @@
 ## Requirements Analysis
 
 ### Structure
-analyzing the natural language requirements text we found out the following entities that should be somehow modelled:
+Analyzing the natural language requirements text, we identified the following entities that should be modeled:
 * ServiceArea
   * Home
   * BurnIn port
@@ -23,121 +23,70 @@ analyzing the natural language requirements text we found out the following enti
   * Sonar
   * Led
 
-### Interaction and Behaviour
-By requirements we inferred the following informations that need to be modelled:
+### Interaction and Behavior
+From the requirements, we inferred the following information that needs to be modeled:
 
 <table>
-  <tr>
-    <td><b>Information</b></td>
-    <td><b>Source</b></td>
-    <td><b>Destination</b>
-    </td><td><b>Description</b></td>
-  </tr>
-  <tr>
-    <td>activationCommand</td>
-    <td>unspecified</td>
-    <td>Incinerator</td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>isBurning</td>
-    <td>Incinerator</td>
-    <td>unspecfied</td>
-    <td></td>
-  </tr>
-    <tr>
-    <td>ashLevel</td>
-    <td>Sonar</td>
-    <td>unspecified</td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>loadRP</td>
-    <td>WasteStorage</td>
-    <td>OpRobot</td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>unloadRp</td>
-    <td>OpRobot</td>
-    <td>Incinerator</td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>loadAsh</td>
-    <td>Incinerator</td>
-    <td>OpRobot</td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>unloadAsh</td>
-    <td>OpRobot</td>
-    <td>AshStorage</td>
-    <td></td>
-  </tr>
+<tr>
+  <td><b>Information</b>  </td>
+  <td><b>Source</b>  </td>
+  <td><b>Destination</b></td>
+<tr>
+<tr>
+  <td>**Information**  </td>
+  <td>**Source**  </td>
+  <td>**Destination**</td>
+<tr>
+<tr>
+  <td>**Information**  </td>
+  <td>**Source**  </td>
+  <td>**Destination**</td>
+<tr>
+
 </table>
+| **Information**      | **Source**                                 | **Destination**                        |
+|----------------------|--------------------------------------------|----------------------------------------|
+| activationCommand    | unspecified                                | Incinerator                            |
+| isBurning            | Incinerator                                | unspecified                            |
+| ashLevel             | Sonar                                      | unspecified                            |
+| loadRP               | WasteStorage                               | OpRobot                                |
+| burnRp               | OpRobot                                    | Incinerator                            |
+| loadAsh              | unspecified (OpRobot \|\| Incinerator \|\| WIS) | unspecified (OpRobot \|\| Incinerator \|\| WIS) |
+| unloadAsh            | OpRobot                                    | AshStorage                             |
 
 > [!NOTE]
-> we merged Interactions and Behaviour sections because at this stage of the project for the majority of this informations we don't know yet if they will be modelled as POJOs' methods or messages between actors
+> We merged the Interactions and Behavior sections because at this stage of the project, for the majority of this information, we don't know yet if it will be modeled as POJOs' methods or messages between actors.
 
 #### Service Area Model
-the **ServiceArea** is modelled as an Euclidean space delimited by its edges(similar to what has been done in the [BoundaryWalk](resources/slides/BoundaryWalkProjectDoc.pdf) and [RobotCleaner](resources/slides/RobotCleanerProjectDoc.pdf) projects):
+The **ServiceArea** is modeled as an Euclidean space delimited by its edges (similar to what has been done in the [BoundaryWalk](resources/slides/BoundaryWalkProjectDoc.pdf) and [RobotCleaner](resources/slides/RobotCleanerProjectDoc.pdf) projects):
 
-* the **perimeter edge** has length ```lf+ld+lr+lu```
-* being the ServiceArea rectangular we have ```lf=lr && ld==lu```
-* we define ```DR=2R``` being ```R``` the radius of the DDRRobot    circumscribable circle
+* The **perimeter edge** has length `lf + ld + lr + lu`.
+* Being the ServiceArea rectangular, we have `lf = lr` and `ld = lu`.
+* We define `DR = 2R`, where `R` is the radius of the DDRRobot's circumscribable circle.
 
-<img src="resources/imgs/ServiceAreaModel_01.png" width="500px">
+![ServiceAreaModel_01](resources/imgs/ServiceAreaModel_01.png)
 
-Given this model we have that **Home**, **BurnIn**, **BurnOut**,**WasteIn**, **AshOut** are all modelled as cells in the serviceArea:
+Given this model, we have that **Home**, **BurnIn**, **BurnOut**, **WasteIn**, and **AshOut** are all modeled as cells in the ServiceArea:
 
-<img src="resources/imgs/ServiceAreaModel_02.png" width="500px">
+![ServiceAreaModel_02](resources/imgs/ServiceAreaModel_02.png)
 
-#### DDRRobot model
+#### DDRRobot Model
 
-The **OpRobot**, defined in the requirements as the robot controlled by the WIS, makes use of a DDRRobot (and its control software) given by the customer, we link the [detailed definition of DDRRobot](resources/slides/BasicRobot24ProjectDoc.pdf) and its [qak control software](resources/projects/basicrobot.qak).
+The **OpRobot**, defined in the requirements as the robot controlled by the WIS, makes use of a DDRRobot (and its control software) provided by the customer. We link the [detailed definition of DDRRobot](resources/slides/BasicRobot24ProjectDoc.pdf) and its [qak control software](resources/projects/basicrobot.qak).
 
-<img src="resources/imgs/robotsUnibo.jpg" width="500px">
+![robotsUnibo](resources/imgs/robotsUnibo.jpg)
 
-#### WIS, WasteStorage, Incinerator and AshStorage models
-**WasteStorage**, **Incinerator** and **AshStorage** need to exchange messages by requirements so they are modelled as Actors.
-**Scale** can be modelled both as an actor or a POJO inside WasteStorage, for now we will represent it as a Pojo and **demand the discussion to another moment**.
-The same can be said for **MonitoringDevice**, **Sonar** and **Led**, that will be for now modelled as POJOs inside AshStorage.
-In the first prototype of the model we will have the OpRobot contain the majority of the buisness, asking **WIS** for the permission to start a cycle.
-**WIS** will then act as an observer of WasteStorage,AshStorage and Incinerator,
-checking that the constraints are satisfied.
-However by requirements there are **no specification** about where to inject the businsess logic (injecting all buisness logic into WIS could also be an option), so we **demand the discussion to the Problem Analysis**.
-The following diagram illustrate the structure of what has been produced basing on requirements:
+#### WIS, WasteStorage, Incinerator, and AshStorage Models
+**WasteStorage**, **Incinerator**, and **AshStorage** need to exchange messages according to the requirements, so they are modeled as actors.
+**Scale** can be modeled either as an actor or a POJO inside WasteStorage. For now, we will represent it as a POJO and **defer the discussion to a later moment**.
+The same applies to the **MonitoringDevice**, **Sonar**, and **Led**, which will be modeled as POJOs inside AshStorage for now.
 
-<img src="resources/imgs/wis_systemarch.png" width="1000px">
+In the first prototype of the model, the OpRobot will contain the majority of the business logic for the realization of a 'WIS cycle' (move to waste storage, load an RP, move to incinerator, burn the RP, move to ash storage, unload ash).
+However, there are **no specifications** about where to inject the business logic (injecting all business logic into WIS could also be an option), so we **defer this discussion to the Problem Analysis**.
 
+**WIS** will be divided into two sub-components: a **WISStateObserver** that will act as an observer of WasteStorage, AshStorage, and Incinerator, checking that the constraints are satisfied, and a **WISIncineratorScheduler** that will activate the incinerator.
+**This organization of WIS is not evident from the requirements; hence, it may change in future sprints.**
 
-<!--
-Priority
-core buisness = Incinerator => probably i'll have to analyze the MonitoringDevice before the raspberry and the Scale
--->
+The following diagram illustrates the structure based on requirements:
 
-<!--
-TODO
-## Problem Analysis
-### Entities Models
-
-* ServiceArea -> other serviceAreas models
-* WIS         -> service (sends/recives messages)
-* OpRobot     -> service (given as service)
-* DDRRobot    -> service (sends/recives messages)
-* Home        -> colections of cells inside the serviceArea
-* Incinerator -> actor (sends/receives messages) || pojo
-  * BurnIn port
-  * BurnOut port
-* WasteIn      -> collections of cells || coordinates
-* WasteStorage -> context?
-  * Scale      -> actor (if sends/recives messages) || pojo (if Scaleinfo is retrieved using a method)
-* RP           -> pojo
-  * WRP        -> pojo attribute || config param of Scale actor, so that Scale sends the number of RPs, not the weights
-* AshOut       -> collections of cells || coordinates
-* AshStorage   -> context? (outside service area?)
-* MonitoringDevice: -> actor? || context?
-  * Sonar      -> actor (sends/receives messages) || pojo
-  * Led        -> actor (receives messages) || pojo (is quite simple)
--->
+![wis_systemarch](resources/imgs/wis_systemarch.png)
