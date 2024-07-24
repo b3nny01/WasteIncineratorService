@@ -30,7 +30,7 @@ From the requirements, we inferred the following information that needs to be mo
   <tr>
     <td><b>Information</b></td>
     <td><b>Source</b></td>
-    <td><b>Destination</b>
+    <td><b>Destination</b></td>
   </tr>
   <tr>
     <td>activationCommand</td>
