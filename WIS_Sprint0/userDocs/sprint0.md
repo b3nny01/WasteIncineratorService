@@ -42,11 +42,9 @@ From the requirements, we inferred the following information that needs to be mo
     <td>Incinerator</td>
     <td>unspecfied</td>
   </tr>
-    <tr>
     <td>ashLevel</td>
     <td>Sonar</td>
     <td>unspecified</td>
-    <td></td>
   </tr>
   <tr>
     <td>loadRP</td>
