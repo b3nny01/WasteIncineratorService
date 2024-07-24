@@ -28,9 +28,9 @@ From the requirements, we inferred the following information that needs to be mo
 
 <table>
   <tr>
-    <td><b>Information</b></td>
-    <td><b>Source</b></td>
-    <td><b>Destination</b></td>
+    <th><b>Information</b></th>
+    <th><b>Source</b></th>
+    <th><b>Destination</b></th>
   </tr>
   <tr>
     <td>activationCommand</td>
