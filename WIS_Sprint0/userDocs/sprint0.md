@@ -1,5 +1,13 @@
 # Waste Incinerator Service
 
+## Sprint info
+<table>
+<tr><th>Sprint name</th><td>Sprint 0</td></tr>
+<tr><th>Previous sprint</th><td></td></tr>
+<tr><th>QAK model</th><td><a href="../src/sprint0.qak">sprint0.qak</a></td></tr>
+<tr><th>Developed by</th><td>Alessio Benenati<br/>Giulia Fattori</td></tr>
+</table>
+
 ## Requirements Analysis
 
 ### Structure
@@ -22,6 +30,7 @@ Analyzing the natural language requirements text, we identified the following en
   * MonitoringDevice
   * Sonar
   * Led
+* ServiceStatusGUI
 
 ### Interaction and Behavior
 From the requirements, we inferred the following information that needs to be modeled:
@@ -71,6 +80,8 @@ From the requirements, we inferred the following information that needs to be mo
 > [!NOTE]
 > We merged the Interactions and Behavior sections because at this stage of the project, for the majority of this information, we don't know yet if it will be modeled as POJOs' methods or messages between actors.
 
+### Discussion on components 
+
 #### Service Area Model
 The **ServiceArea** is modeled as an Euclidean space delimited by its edges (similar to what has been done in the [BoundaryWalk](resources/slides/BoundaryWalkProjectDoc.pdf) and [RobotCleaner](resources/slides/RobotCleanerProjectDoc.pdf) projects):
 
@@ -85,7 +96,6 @@ Given this model, we have that **Home**, **BurnIn**, **BurnOut**, **WasteIn**, a
 ![ServiceAreaModel_02](resources/imgs/ServiceAreaModel_02.png)
 
 #### DDRRobot Model
-
 The **OpRobot**, defined in the requirements as the robot controlled by the WIS, makes use of a DDRRobot (and its control software) provided by the customer. We link the [detailed definition of DDRRobot](resources/slides/BasicRobot24ProjectDoc.pdf) and its [qak control software](resources/projects/basicrobot.qak).
 
 ![robotsUnibo](resources/imgs/robotsUnibo.jpg)
@@ -104,3 +114,42 @@ However, there are **no specifications** about where to inject the business logi
 The following diagram illustrates the structure based on requirements:
 
 ![wis_systemarch](resources/imgs/wis_systemarch.png)
+
+### Test Plans
+<table>
+<tr>
+  <th><b>Test Name</b></th>
+  <th><b>Initial Condition</b></th>
+  <th><b>Expected Behavior</b></th>
+</tr>
+<tr>
+  <td><b>test_ok_3_rp</b></td>
+  <td>The OpRobot is at home, the Incinerator is not active, the WasteStorage contains 3 RPs, and the AshStorage is empty.</td>
+  <td>The OpRobot waits until the Incinerator receives the activation command, then completes 3 cycles (move to WasteStorage, load an RP, move to Incinerator, burn the RP, move to AshStorage, unload ash) and returns to home since there are no more RPs to load.</td>
+</tr>
+<tr> 
+  <td><b>test_ko_no_activation</b></td>
+  <td>The OpRobot is at home, the Incinerator is not active, the WasteStorage contains 3 RPs, the AshStorage is empty, and the system is configured so that the Incinerator will not receive the activation command.</td>
+  <td>The OpRobot waits at home.</td>
+</tr>
+<tr> 
+  <td><b>test_ko_waste_storage_empty</b></td>
+  <td>The OpRobot is at home, the Incinerator is not active, the WasteStorage is empty, and the AshStorage is empty.</td>
+  <td>The OpRobot waits at home.</td>
+</tr>
+<tr>
+  <td><b>test_ko_ash_storage_full</b></td>
+  <td>The OpRobot is at home, the Incinerator is not active, the WasteStorage contains 3 RPs, and the AshStorage is full.</td>
+  <td>The OpRobot waits at home.</td>
+</tr>
+<tr>
+  <td><b>test_ko_incinerator_burning</b></td>
+  <td>The OpRobot is at home, the Incinerator is active and burning, the WasteStorage contains 3 RPs, and the AshStorage is empty.</td>
+  <td>The OpRobot waits at home.</td>
+</tr>
+</table>
+
+
+### Future Sprints
+In the next sprint, we will focus on the OpRobot's behavior, analyzing its relations with the other components.<br/> In particular, we will focus on the interactions between OpRobot and WIS, defining the responsibilities of both.<br/>
+Our goal is also to connect the OpRobot to a virtual environment (the 'VirtualRobot' provided by the customer) so that it will be simple to switch to a physical OpRobot at any time by only changing a configuration parameter. 

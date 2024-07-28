@@ -309,7 +309,7 @@ QActor wis_state_observer context ctx_wis{
 	
  }
  
- QActor wis_incinerator_scheduler context ctx_wis{
+ QActor wis_incinerator_scheduler context ctx_wis{ 
  	 	State s0 initial{ 
  		println("$name starts") color yellow
 	}Transition t0 whenTime 5000 -> request_activation   
