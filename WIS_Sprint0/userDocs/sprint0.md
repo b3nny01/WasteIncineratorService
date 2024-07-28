@@ -102,7 +102,7 @@ The **OpRobot**, defined in the requirements as the robot controlled by the WIS,
 
 #### WIS, WasteStorage, Incinerator, and AshStorage Models
 **WasteStorage**, **Incinerator**, and **AshStorage** need to exchange messages according to the requirements, so they are modeled as actors.
-**Scale** can be modeled either as an actor or a POJO inside WasteStorage. For now, we will represent it as a POJO and **defer the discussion to a later moment**.
+**Scale** can be modeled either as an actor or a POJO/variable inside WasteStorage. For now, we will represent it as a variable and **defer the discussion to a later moment**.
 The same applies to the **MonitoringDevice**, **Sonar**, and **Led**, which will be modeled as POJOs inside AshStorage for now.
 
 In the first prototype of the model, the OpRobot will contain the majority of the business logic for the realization of a 'WIS cycle' (move to waste storage, load an RP, move to incinerator, burn the RP, move to ash storage, unload ash).
