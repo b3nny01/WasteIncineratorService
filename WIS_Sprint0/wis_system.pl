@@ -2,7 +2,6 @@
 % wis_system description   
 %====================================================================================
 dispatch( actor_state, actor_state(P,V) ).
-event( activation_e, activation_e(N) ).
 request( activation_req, activation_req(A) ).
 reply( activation_repl, activation_repl(N) ).  %%for activation_req
 request( conditions_verified_req, conditions_verified_req(N) ).
