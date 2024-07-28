@@ -1,6 +1,6 @@
 System wis_system
 
-// Message types have been chosen only to produce a first working prototype of the system so they are not 
+// NOTE: message types have been chosen only to produce a first working prototype of the system so they are not 
 // fixed and have to be discussed in future sprints
 
 Dispatch	actor_state					: actor_state(P,V)
@@ -21,10 +21,11 @@ Request ash_req						: ash_req(N)
 Reply	ash_repl					: ash_repl(N) for ash_req
 
 
-
-
-
 Context ctx_wis ip [ host="localhost" port=8020]  
+
+
+// NOTE: the following model is already working but yet a prototype, some parts are still extremely simplified
+// (for instance OpRobot movements) and some are completely unimplemented (error handling)
 
 QActor incinerator context ctx_wis{     
  	[#
