@@ -1,4 +1,4 @@
-System wis_system
+System wis_system  
 
 // NOTE: message types have been chosen only to produce a first working prototype of the system so they are not 
 // fixed and have to be discussed in future sprints
@@ -25,7 +25,7 @@ Context ctx_wis ip [ host="localhost" port=8020]
 
 
 // NOTE: the following model is already working but yet a prototype, some parts are still extremely simplified
-// (for instance OpRobot movements) and some are completely unimplemented (error handling)
+// (for instance OpRobot movements) and some are completely unimplemented (error handlingW	)
 
 QActor incinerator context ctx_wis{     
  	[#

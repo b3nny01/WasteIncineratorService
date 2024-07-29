@@ -36,7 +36,7 @@ At the end of each Sprint we produced an executable version of the system coveri
             <a href="./WIS_Sprint0/">WIS_Sprint0</a>
         </td>
         <td>
-            requirements and problem analysis
+            requirements analysis
         </td>
         <td>
             <a href="./WIS_Sprint0/src/sprint0.qak">sprint0.qak</a>
