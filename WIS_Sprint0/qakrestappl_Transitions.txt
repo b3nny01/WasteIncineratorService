@@ -1,1 +1,1 @@
-{"actor":"wis_state_observer", "msgType":"dispatch", "curstate":"waiting_for_updates", "nextstate":"update_state", "msgId":"actor_state"}
+{"actor":"incinerator", "msgType":"dispatch", "curstate":"idle", "nextstate":"handleActivation", "msgId":"activationCommand"}
