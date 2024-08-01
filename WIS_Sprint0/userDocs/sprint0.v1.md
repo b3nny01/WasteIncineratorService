@@ -13,11 +13,11 @@
 </table>       
 
 ## QAK
-The majority of the project has been modelled using QAK (Quasi Actor Kotlin), a meta-model created at UNIBO.
-QAK has its own DSL developed using xText that compiles directly into kotlin code.<br/>
-QAK allowed us to design the application with an higher level of abstraction, introducing two main concepts:
-* Actors: active entities having its own behaviour (similarly to processes) capable of sending and receiving messages.
-* Interactions: abstractions of the main communications strategies (requests, dispatches and events).
+The majority of the project has been modeled using QAK (Quasi Actor Kotlin), a meta-model created at UNIBO.
+QAK has its own DSL developed using xText that compiles directly into Kotlin code.<br/>
+QAK allowed us to design the application with a higher level of abstraction, introducing two main concepts:
+* Actors: active entities having their own behavior (similarly to processes) capable of sending and receiving messages.
+* Interactions: abstractions of the main communications strategies (requests, dispatches, events).
 
 We chose to use QAK because it helps bridge the abstraction gap, allowing us to maintain a higher level of technology independence during the initial phases of development.<br/>
 You can find a detailed description of QAK  [here](resources/slides/qak.pdf).
@@ -48,7 +48,7 @@ Analyzing the natural language requirements text, we identified the following en
 * ServiceStatusGUI
 
 ### Interaction
-From the requirements, we inferred the following messages that needs to be modeled:
+From the requirements, we inferred the following messages that need to be modeled:
 
 <table>
   <tr>
@@ -122,7 +122,7 @@ The level of ash present in AshStorage at any given time is measured by the Moni
 The **OpRobot**, defined in the requirements as the robot controlled by the WIS, makes use of a DDRRobot (and its control software) provided by the customer. We link the [detailed definition of DDRRobot](resources/slides/BasicRobot24ProjectDoc.pdf) and its [qak control software](resources/projects/basicrobot.qak).
 
 #### Service Area Model
-The service area is modeled as a Euclidean space enclosed by boundaries, flat and rectangular in shape, with sides of length `lf == lr` and `lu == ld`, measured in RD, a unit corresponding to the radius of the circle within which the provided robot (DDR Robot) can be contained. 
+The service area is modeled as a Euclidean space enclosed by boundaries, flat and rectangular, with sides of length `lf == lr` and `lu == ld`, measured in RD, a unit corresponding to the radius of the circle within which the provided robot (DDR Robot) can be contained. 
 
 To refer to any point in the room, a Cartesian coordinate system is used: two axes are identified, with `x` along `lu` and `y` along `lf`, originating from the top-left corner, which is the initial position of the robot, HOME, having coordinates (0, RD), (0, RD).<br/>
 
@@ -134,18 +134,18 @@ Having a measurement unit directly provided by the client allows us to formalize
 
 
 #### Incinerator
-Given its behaviour and its necessity to exchange messages the Incinerator will be modelled as an **Actor**.
+Given its behavior and its necessity to exchange messages, the Incinerator will be modeled as an **Actor**.
 
 #### WIS
-According to requirements WIS is a service, so it will be modelled as an **Actor**.
+According to requirements, WIS is a service, so it will be modeled as an **Actor**.
 
 #### MonitoringDevice
-Given its behaviour and its necessity to exchange messages the Incinerator will be modelled as an **Actor**.
+Given its behavior and its necessity to exchange messages, the MonitoringDevice will be modeled as an **Actor**.
 
 #### OpRobot
-According to requirements we do not have enough information to decide how to model the OpRobot (Actor or POJO) so we demand the discussion to future sprints.
+According to requirements, we do not have enough information to decide how to model the OpRobot (Actor or POJO) so we defer the discussion to future sprints.
 
-#### WasteStorage,AshStorage and Scale
+#### WasteStorage, AshStorage, and Scale
 Upon analyzing the requirements, we found that WasteStorage and AshStorage do not have any particular responsibilities, making it unnecessary to model them. The only entity that truly needs to be modeled is the Scale. However, at this stage of the project, we have yet to determine whether it will be modeled as a POJO, an Actor, or a variable. Therefore, this discussion will be deferred to future sprints.
 
 
@@ -163,7 +163,7 @@ Upon analyzing the requirements, we found that WasteStorage and AshStorage do no
 </tr>
 <tr> 
   <td><b>test_ok_4_rp</b></td>
-  <td>WasteStorage contains 4 RP, AshStorge is empty and can contain the ashses of 3 RPs, nobody empties AshStorage</td>
+  <td>WasteStorage contains 4 RP, AshStorge is empty and can contain the ashes of 3 RPs, nobody empties AshStorage</td>
   <td>After some time WasteStorage contains 1 RP and AshStorage is full</td>
 </tr>
 </table>
