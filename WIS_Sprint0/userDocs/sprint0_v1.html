@@ -104,7 +104,7 @@ QAK allowed us to design the application with a higher level of abstraction, int
 <li>Interactions: abstractions of the main communications strategies (requests, dispatches, events).</li>
 </ul>
 <p>We chose to use QAK because it helps bridge the abstraction gap, allowing us to maintain a higher level of technology independence during the initial phases of development.<br/>
-You can find a detailed description of QAK  <a href="resources/slides/QakActors24.html">here</a>.</p>
+You can find a detailed description of QAK  <a href="https://htmlpreview.github.io/?https://github.com/b3nny01/WasteIncineratorService/blob/main/resources/slides/QakActors24.html">here</a>.</p>
 <h2 id="requirements-analysis">Requirements Analysis</h2>
 <h3 id="structure">Structure</h3>
 <p>Analyzing the natural language requirements text, we identified the following entities that should be modeled:</p>
@@ -201,7 +201,7 @@ The container's capacity is equivalent to the ashes from 3-4 Roll Packets, and i
 The level of ash present in AshStorage at any given time is measured by the MonitoringDevice, so this container also does not have its own behavior or need to communicate with the rest of the system.</p>
 <h3 id="models">Models</h3>
 <h4 id="ddrrobot-model">DDRRobot Model</h4>
-<p>The <strong>OpRobot</strong>, defined in the requirements as the robot controlled by the WIS, makes use of a DDRRobot (and its control software) provided by the customer. We link the <a href="resources/slides/BasicRobot24.html">detailed definition of DDRRobot</a> and its <a href="resources/projects/basicrobot.qak">qak control software</a>.</p>
+<p>The <strong>OpRobot</strong>, defined in the requirements as the robot controlled by the WIS, makes use of a DDRRobot (and its control software) provided by the customer. We link the <a href="https://htmlpreview.github.io/?https://github.com/b3nny01/WasteIncineratorService/blob/main/resources/slides/BasicRobot24.html">detailed definition of DDRRobot</a> and its <a href="resources/projects/basicrobot.qak">qak control software</a>.</p>
 <h4 id="service-area-model">Service Area Model</h4>
 <p>Using the DDRRobot given by the customet we have that the service area is modeled as a Euclidean space enclosed by boundaries, flat and rectangular, with sides of length <code>lf == lr</code> and <code>lu == ld</code>, measured in RD, a unit corresponding to the radius of the circle within which the provided robot (DDR Robot) can be contained.<br/>
 To refer to any point in the room, a Cartesian coordinate system is used: two axes are identified, with <code>x</code> along <code>lu</code> and <code>y</code> along <code>lf</code>, originating from the top-left corner, which is the initial position of the robot, HOME, having coordinates (0, 0).<br/>

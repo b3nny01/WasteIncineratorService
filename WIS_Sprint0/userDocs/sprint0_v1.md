@@ -20,7 +20,7 @@ QAK allowed us to design the application with a higher level of abstraction, int
 * Interactions: abstractions of the main communications strategies (requests, dispatches, events).
 
 We chose to use QAK because it helps bridge the abstraction gap, allowing us to maintain a higher level of technology independence during the initial phases of development.<br/>
-You can find a detailed description of QAK  [here](resources/slides/QakActors24.html).
+You can find a detailed description of QAK  [here](https://htmlpreview.github.io/?https://github.com/b3nny01/WasteIncineratorService/blob/main/resources/slides/QakActors24.html).
 
 
 ## Requirements Analysis
@@ -119,7 +119,7 @@ The level of ash present in AshStorage at any given time is measured by the Moni
 
 ### Models
 #### DDRRobot Model
-The **OpRobot**, defined in the requirements as the robot controlled by the WIS, makes use of a DDRRobot (and its control software) provided by the customer. We link the [detailed definition of DDRRobot](resources/slides/BasicRobot24.html) and its [qak control software](resources/projects/basicrobot.qak).
+The **OpRobot**, defined in the requirements as the robot controlled by the WIS, makes use of a DDRRobot (and its control software) provided by the customer. We link the [detailed definition of DDRRobot](https://htmlpreview.github.io/?https://github.com/b3nny01/WasteIncineratorService/blob/main/resources/slides/BasicRobot24.html) and its [qak control software](resources/projects/basicrobot.qak).
 
 #### Service Area Model
 Using the DDRRobot given by the customet we have that the service area is modeled as a Euclidean space enclosed by boundaries, flat and rectangular, with sides of length `lf == lr` and `lu == ld`, measured in RD, a unit corresponding to the radius of the circle within which the provided robot (DDR Robot) can be contained.<br/>
