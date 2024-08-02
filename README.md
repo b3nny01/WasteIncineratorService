@@ -2,7 +2,7 @@
 
 ## Intro
 WasteIncineratorService is the final project assigned by Prof. [anatali](https://github.com/anatali) for the major course of Software Engineering.<br/>
-You can find the requirements of the application [here](resources/slides/TemaFinale24.html).
+You can find the requirements of the application [here](https://htmlpreview.github.io/?https://github.com/b3nny01/WasteIncineratorService/blob/main/resources/slides/TemaFinale24.html).
 
 
 ## QAK
@@ -14,7 +14,7 @@ QAK allowed us to design the application with a higher level of abstraction, int
 * Interactions: abstractions of the main communications strategies (requests, dispatches, events).
 
 We chose to use QAK because it helps bridge the abstraction gap, allowing us to maintain a higher level of technology independence during the initial phases of development.<br/>
-You can find a detailed description of QAK  [here](resources/slides/QakActors24.html).
+You can find a detailed description of QAK  [here](https://htmlpreview.github.io/?https://github.com/b3nny01/WasteIncineratorService/blob/main/resources/slides/QakActors24.html).
 
 ## Development process
 We adopted a Scrub inspired development process, where the main assignement was divided in a series of sub-problems each faced during in a Sprint.<br/>
@@ -49,8 +49,8 @@ At the end of each Sprint we produced an executable version of the system coveri
         </td>
         <td>
             <img src="resources/imgs/readmeLogo.svg" height="15px"/> <a href="./WIS_Sprint0/userDocs/sprint0_v1.md">sprint0.md</a><br/>
-            <img src="resources/imgs/pdfLogo.png" height="15px"/> <a href="./WIS_Sprint0/userDocs/sprint0_v1.pdf" title="sprint0.pdf" download>sprint0.pdf</a>
-            <img src="resources/imgs/htmlLogo.png" height="15px"/> <a href="./WIS_Sprint0/userDocs/sprint0_v1.html" title="sprint0.html" download>sprint0.html</a>
+            <img src="resources/imgs/pdfLogo.png" height="15px"/> <a href="https://htmlpreview.github.io/?https://github.com/b3nny01/WasteIncineratorService/blob/main/WIS_Sprint0/userDocs/sprint0_v1.pdf" title="sprint0.pdf" download>sprint0.pdf</a><br/>
+            <img src="resources/imgs/htmlLogo.png" height="15px"/> <a href="https://htmlpreview.github.io/?https://github.com/b3nny01/WasteIncineratorService/blob/main/WIS_Sprint0/userDocs/sprint0_v1.html" title="sprint0.html" download>sprint0.html</a>
         </td>
     </tr>
 </table>
