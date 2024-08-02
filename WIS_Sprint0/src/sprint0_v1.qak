@@ -21,7 +21,7 @@ QActor wis context ctx_wis{
 	State s0 initial{ 
  		println("$name STARTS") color blue
  		subscribeTo incinerator for endOfBurning
- 		subscribeTo monitoringdevice for ashLevel
+ 		subscribeTo monitoring_device for ashLevel
  		delay 500
 	}
 	Goto activation
@@ -100,7 +100,7 @@ QActor incinerator context ctx_wis{
 }
 
 
-QActor monitoringdevice context ctx_monitoringdev{
+QActor monitoring_device context ctx_monitoringdev{
 	State s0 initial{ 
  		println("$name STARTS") color green
 		delay 500

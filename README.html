@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>README.md</title>
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+    
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+</head>
+
+<body>
+    <h1 id="wasteincineratorservice">WasteIncineratorService</h1>
+<h2 id="intro">Intro</h2>
+<p>WasteIncineratorService is the final project assigned by Prof. <a href="https://github.com/anatali">anatali</a> for the major course of Software Engineering.<br/>
+You can find the requirements of the application <a href="resources/slides/TemaFinale24.html">here</a>.</p>
+<h2 id="qak">QAK</h2>
+<p>The majority of the project has been modeled using QAK (Quasi Actor Kotlin), a meta-model created at UNIBO.
+QAK has its own DSL developed using xText that compiles directly into Kotlin code.<br/>
+QAK allowed us to design the application with a higher level of abstraction, introducing the following main concepts:</p>
+<ul>
+<li>Actor: active entity modelled as finite state machines capable of sending and receiving messages.</li>
+<li>Context: an environment that contains some actors and abilitates them to communicate with other actors both in the same or in another context</li>
+<li>Interactions: abstractions of the main communications strategies (requests, dispatches, events).</li>
+</ul>
+<p>We chose to use QAK because it helps bridge the abstraction gap, allowing us to maintain a higher level of technology independence during the initial phases of development.<br/>
+You can find a detailed description of QAK  <a href="resources/slides/QakActors24.html">here</a>.</p>
+<h2 id="development-process">Development process</h2>
+<p>We adopted a Scrub inspired development process, where the main assignement was divided in a series of sub-problems each faced during in a Sprint.<br/>
+At the end of each Sprint we produced an executable version of the system covering some of the requirements.</p>
+<h3 id="sprints">Sprints</h3>
+<table>
+    <tr>
+        <th>
+            <b>Sprint Name</b>
+        </th>
+        <th>
+            <b>Description</b>
+        </th>
+        <th>
+            <b>QAK</b>
+        </th>
+        <th>
+            <b>UserDoc</tb>
+        </th>
+    </tr>
+    <tr>
+        <td>
+            <a href="./WIS_Sprint0/">WIS_Sprint0</a>
+        </td>
+        <td>
+            requirements analysis
+        </td>
+        <td>
+            <a href="./WIS_Sprint0/src/sprint0_v1.qak">sprint0.qak</a>
+        </td>
+        <td>
+            <img src="resources/imgs/readmeLogo.svg" height="15px"/> <a href="./WIS_Sprint0/userDocs/sprint0_v1.md">sprint0.md</a><br/>
+            <img src="resources/imgs/pdfLogo.png" height="15px"/> <a href="./WIS_Sprint0/userDocs/sprint0_v1.pdf" title="sprint0.pdf" download>sprint0.pdf</a>
+            <img src="resources/imgs/htmlLogo.png" height="15px"/> <a href="./WIS_Sprint0/userDocs/sprint0_v1.html" title="sprint0.html" download>sprint0.html</a>
+        </td>
+    </tr>
+</table>
+<h2 id="usage">Usage</h2>
+<h2 id="credits">Credits</h2>
+
+</body>
+
+</html>
