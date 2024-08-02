@@ -49,7 +49,7 @@ At the end of each Sprint we produced an executable version of the system coveri
         </td>
         <td>
             <img src="resources/imgs/readmeLogo.svg" height="15px"/> <a href="WIS_Sprint0/userDocs/sprint0_v1.md">sprint0.md</a><br/>
-            <img src="resources/imgs/pdfLogo.png" height="15px"/> <a href="WIS_Sprint0/userDocs/sprint0_v1.pdf" title="sprint0.pdf" download>sprint0.pdf</a><br/>
+            <img src="resources/imgs/pdfLogo.png" height="15px"/> <a href="https://nbviewer.org/github/b3nny01/WasteIncineratorService/blob/main/WIS_Sprint0/userDocs/sprint0_v1.pdf" title="sprint0.pdf" download>sprint0.pdf</a><br/>
             <img src="resources/imgs/htmlLogo.png" height="15px"/> <a href="https://htmlpreview.github.io/?https://github.com/b3nny01/WasteIncineratorService/blob/main/WIS_Sprint0/userDocs/sprint0_v1.html" title="sprint0.html" download>sprint0.html</a>
         </td>
     </tr>
