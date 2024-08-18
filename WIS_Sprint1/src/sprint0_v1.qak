@@ -1,0 +1,122 @@
+System wis_system  
+
+// NOTE: message types have been chosen only to produce a first working prototype of the system so they are not 
+// fixed and have to be discussed in future sprints
+
+Dispatch	actor_state					: actor_state(P,V)
+
+Dispatch	activationCommand			: activationCommand(A)
+
+Event 	    endOfBurning				: endOfBurning(E)
+
+Event		ashLevel					: ashLevel(L)
+
+
+Context ctx_wis ip [ host="localhost" port=8020]  
+Context ctx_monitoringdev ip [ host="localhost" port=8022]  
+
+
+
+QActor wis context ctx_wis{
+	State s0 initial{ 
+ 		println("$name STARTS") color blue
+ 		subscribeTo incinerator for endOfBurning
+ 		subscribeTo monitoring_device for ashLevel
+ 		delay 500
+	}
+	Goto activation
+	
+	State activation{
+		println("$name sends activation message to incinerator") color blue
+		forward incinerator -m activationCommand : activationCommand(1)
+	}
+	Transition t0 whenEvent endOfBurning -> handleEndBurning
+				  whenEvent ashLevel 	 -> handleAshLevel
+				  
+	State handleEndBurning{
+		println("$name | incinerator completed burning cycle") color blue
+	}
+	
+	State handleAshLevel{
+		onMsg(ashLevel : ashLevel(A)) {
+			[# 
+				var LEVEL = payloadArg(0)
+			#]
+			println("$name | current ash level in AshStorage = $LEVEL") color blue
+		}
+	}
+}
+
+QActor incinerator context ctx_wis{     
+ 	[#
+ 		var ACTIVE	   = false;
+ 		var BURNING    = false;
+ 		var BURNOUT_FREE = true;		
+ 	 #]
+ 	 
+ 	State s0 initial{ 
+ 		println("$name STARTS") color red
+		delay 500
+	}
+	Goto idle
+	
+	State idle{
+		println("$name: idle") color red
+	}
+	Transition t0 whenMsg activationCommand -> handleActivation
+	
+	State handleActivation{
+		[# 
+			var RESULT=false
+		#]
+		onMsg (activationCommand : activationCommand(A)){
+			[#
+				ACTIVE=payloadArg(0).toBoolean()
+				RESULT=true
+			#]
+		}
+		println("$name: handling activation request, result:$RESULT") color red
+	} 
+	Goto endOfBurning
+	
+	State startBurning{
+		[#
+			BURNING = true
+		#]
+		println("$name: starting incineration process, burning:$BURNING") color red
+		delay 5000
+	}
+	Goto endOfBurning
+	
+	State endOfBurning{
+		[#
+			BURNING = false
+		#]
+		println("$name: ending incineration process, burning:$BURNING") color red
+		emit endOfBurning : endOfBurning(10)
+	}
+	Goto idle
+	
+}
+
+
+QActor monitoring_device context ctx_monitoringdev{
+	State s0 initial{ 
+ 		println("$name STARTS") color green
+		delay 500
+	}
+	Goto measureLevel
+	
+	State measureLevel{
+		// sonar working
+		emit ashLevel : ashLevel(10)
+		delay 2000
+	}
+	Goto measureLevel
+}
+
+
+
+
+
+
