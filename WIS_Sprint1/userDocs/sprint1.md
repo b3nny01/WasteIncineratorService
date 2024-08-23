@@ -27,4 +27,10 @@ When considering how to divide the business logic between components, we identif
 * **Distributed Solution**: Here, the OpRobot is designed as an Actor that interacts with WIS. The OpRobot requests WIS, which observes the system's state, to confirm whether conditions for movement are met. If they are, the OpRobot initiates an 'OpRobot Cycle,' which includes obtaining an RP, incinerating it, and transporting the ashes to ashStorage.
 
 
+### Pro e Contro
+* Centralizzato: 
+    * + logica di buinsess concentrata
+    * - (poco estendibile)
+
+
 ## Future Sprints

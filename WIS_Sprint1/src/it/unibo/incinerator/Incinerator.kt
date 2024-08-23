@@ -28,8 +28,10 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						CommUtils.outred("$name STARTS")
+						CommUtils.outred("$name starts")
 						delay(500) 
+						updateResourceRep( "actor_state(incinerator_burning,$BURNING)"  
+						)
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -45,45 +47,47 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t02",targetState="handleActivation",cond=whenDispatch("activationCommand"))
+					 transition(edgeName="t00",targetState="handle_activation",cond=whenDispatch("incinerator_activation"))
+					transition(edgeName="t01",targetState="handle_burn_req",cond=whenRequest("burn_req"))
 				}	 
-				state("handleActivation") { //this:State
+				state("handle_activation") { //this:State
 					action { //it:State
-						 
-									var RESULT=false
-						if( checkMsgContent( Term.createTerm("activationCommand(A)"), Term.createTerm("activationCommand(A)"), 
+						if( checkMsgContent( Term.createTerm("incinerator_activation(A)"), Term.createTerm("incinerator_activation(A)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
 												ACTIVE=payloadArg(0).toBoolean()
-												RESULT=true
+								updateResourceRep( "actor_state(incinerator_active,$ACTIVE)"  
+								)
 						}
-						CommUtils.outred("$name: handling activation request, result:$RESULT")
+						CommUtils.outred("$name: handling activation request, active: $ACTIVE")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="endOfBurning", cond=doswitch() )
+					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
 				}	 
-				state("startBurning") { //this:State
+				state("handle_burn_req") { //this:State
 					action { //it:State
 						
-									BURNING = true
-						CommUtils.outred("$name: starting incineration process, burning:$BURNING")
+									var R=false
+									if(!BURNING && ACTIVE){
+										BURNING=true
+										R=true
+									}
+									
+						CommUtils.outred("$name: handling burn request, result:$BURNING")
+						if(  BURNING  
+						 ){updateResourceRep( "actor_state(incinerator_burning,$BURNING)"  
+						)
 						delay(5000) 
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition( edgeName="goto",targetState="endOfBurning", cond=doswitch() )
-				}	 
-				state("endOfBurning") { //this:State
-					action { //it:State
-						
-									BURNING = false
-						CommUtils.outred("$name: ending incineration process, burning:$BURNING")
-						emit("endOfBurning", "endOfBurning(10)" ) 
+						 
+										BURNING=false
+										BURNOUT_FREE=false
+						updateResourceRep( "actor_state(incinerator_burning,$BURNING)"  
+						)
+						}
+						answer("burn_req", "burn_repl", "burn_repl($R)"   )  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

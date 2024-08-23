@@ -4,48 +4,38 @@ System wis_system
 // fixed and have to be discussed in future sprints
 
 Dispatch	actor_state					: actor_state(P,V)
+Dispatch 	incinerator_activation		: incinerator_activation(A)
 
-Dispatch	activationCommand			: activationCommand(A)
+Request 	conditions_verified_req		: conditions_verified_req(N)
+Reply 		conditions_verified_repl	: conditions_verified_repl(R) for conditions_verified_req
 
-Event 	    endOfBurning				: endOfBurning(E)
+Event load_rp						: load_rp(N)
+Event unload_ash					: unload_rp(N)
 
-Event		ashLevel					: ashLevel(L)
+Request burn_req					: burn_req(N)
+Reply 	burn_repl					: burn_repl(N) for burn_req
 
+//Inglobamento endosimbitico di robotpos
 
-Context ctx_wis ip [ host="localhost" port=8020]  
-Context ctx_monitoringdev ip [ host="localhost" port=8022]  
+Request engage        : engage(OWNER, STEPTIME)	
+Reply   engagedone    : engagedone(ARG)    for engage
+Reply   engagerefused : engagerefused(ARG) for engage
 
+Dispatch disengage    : disengage(ARG)
 
+Request moverobot    :  moverobot(TARGETX, TARGETY)  
+Reply moverobotdone  :  moverobotok(ARG)                    for moverobot
+Reply moverobotfailed:  moverobotfailed(PLANDONE, PLANTODO) for moverobot
+ 
+ 
+Context ctx_wis ip [ host="localhost" port=8022]  
+Context ctx_basic_robot ip [host= "127.0.0.1" port=8020]
 
-QActor wis context ctx_wis{
-	State s0 initial{ 
- 		println("$name STARTS") color blue
- 		subscribeTo incinerator for endOfBurning
- 		subscribeTo monitoring_device for ashLevel
- 		delay 500
-	}
-	Goto activation
-	
-	State activation{
-		println("$name sends activation message to incinerator") color blue
-		forward incinerator -m activationCommand : activationCommand(1)
-	}
-	Transition t0 whenEvent endOfBurning -> handleEndBurning
-				  whenEvent ashLevel 	 -> handleAshLevel
-				  
-	State handleEndBurning{
-		println("$name | incinerator completed burning cycle") color blue
-	}
-	
-	State handleAshLevel{
-		onMsg(ashLevel : ashLevel(A)) {
-			[# 
-				var LEVEL = payloadArg(0)
-			#]
-			println("$name | current ash level in AshStorage = $LEVEL") color blue
-		}
-	}
-}
+ExternalQActor robotpos context ctx_basic_robot
+ExternalQActor engager context ctx_basic_robot
+
+// NOTE: the following model is already working but yet a prototype, some parts are still extremely simplified
+// (for instance OpRobot movements) and some are completely unimplemented (error handlingW	)
 
 QActor incinerator context ctx_wis{     
  	[#
@@ -55,68 +45,264 @@ QActor incinerator context ctx_wis{
  	 #]
  	 
  	State s0 initial{ 
- 		println("$name STARTS") color red
+ 		println("$name starts") color red
 		delay 500
-	}
-	Goto idle
+		updateResource  [# "actor_state(incinerator_burning,$BURNING)" #]
+	}Goto idle
 	
 	State idle{
 		println("$name: idle") color red
-	}
-	Transition t0 whenMsg activationCommand -> handleActivation
+	}Transition t0
+	whenMsg incinerator_activation -> handle_activation
+	whenRequest burn_req -> handle_burn_req
 	
-	State handleActivation{
-		[# 
-			var RESULT=false
-		#]
-		onMsg (activationCommand : activationCommand(A)){
+	State handle_activation{
+		onMsg (incinerator_activation:incinerator_activation(A)){
 			[#
 				ACTIVE=payloadArg(0).toBoolean()
-				RESULT=true
+			#]
+			updateResource  [# "actor_state(incinerator_active,$ACTIVE)" #]
+		}
+		println("$name: handling activation request, active: $ACTIVE") color red
+	} Goto idle
+	
+	State handle_burn_req{
+		[#
+			var R=false
+			if(!BURNING && ACTIVE){
+				BURNING=true
+				R=true
+			}
+			
+		#]
+		println("$name: handling burn request, result:$BURNING") color red
+
+		if[# BURNING #]{
+			updateResource  [# "actor_state(incinerator_burning,$BURNING)" #]
+			delay 5000 // burning simulation
+			[# 
+				BURNING=false
+				BURNOUT_FREE=false
+			#]
+			updateResource  [# "actor_state(incinerator_burning,$BURNING)" #]
+		}
+		replyTo burn_req with burn_repl : burn_repl($R)
+	}Goto idle
+}
+ 
+QActor scale context ctx_wis{
+ 	[#
+ 		var ROLL_PACKETS=10
+ 	 #]
+ 	 
+ 	State s0 initial{ 
+ 		println("$name starts") color blue
+		delay 500
+		updateResource [# "actor_state(waste_storage_rps,$ROLL_PACKETS)" #]
+	}Goto idle
+	
+	State idle{
+		println("$name: idle") color blue
+	}Transition t0 
+	whenEvent load_rp -> handle_load_rp 
+	
+	State handle_load_rp{
+		[#
+			var R=false
+			if(ROLL_PACKETS>0){
+				ROLL_PACKETS--
+			}
+		#]
+		updateResource [# "actor_state(waste_storage_rps,$ROLL_PACKETS)" #]
+	}Goto idle
+	
+ }
+ 
+QActor monitoring_device context ctx_wis{
+ 	[#
+ 		var ASH_LEVEL=0
+ 		val MAX_ASH_LEVEL=3
+ 	 #]
+ 	
+ 	 State s0 initial{ 
+ 		println("$name starts") color magenta
+		delay 500
+		updateResource [# "actor_state(ash_storage_level,$ASH_LEVEL)" #]
+	} Goto idle
+	
+		
+	State idle{
+		println("$name: idle") color magenta
+	}Transition t0 
+	whenEvent unload_ash -> handle_unload_ash
+	
+	State handle_unload_ash{
+		[#
+			var R=false
+			if(ASH_LEVEL<MAX_ASH_LEVEL){
+				R=true
+				ASH_LEVEL++
+			}
+			
+		#]
+		println("$name: handling ash request, result:$R") color magenta
+		
+		updateResource [# "actor_state(ash_storage_level,$ASH_LEVEL)" #]
+	}Goto idle
+	
+}
+
+QActor wis context ctx_wis{
+	[#
+		var POSITION="home"
+		var OK=false;
+	#]
+	State s0 initial{ 
+ 		println("$name starts") color green
+		delay 500
+		request engager -m engage:engage(wis,300)
+	}Goto activate_incinerator
+	
+	State activate_incinerator{
+		[#
+			val AR=true	
+		#]
+		println("$name: requesting incinerator activation") color yellow
+		forward incinerator -m incinerator_activation : incinerator_activation($AR)
+	}Goto check_start_conditions
+	
+	State check_start_conditions{
+		delay 500
+		println("$name: checking conditions") color green
+		request wis_state_observer -m conditions_verified_req:conditions_verified_req
+	}Transition t0
+	whenReply conditions_verified_repl->handle_start_conditions_verified_repl
+	
+	State handle_start_conditions_verified_repl{
+		onMsg(conditions_verified_repl:conditions_verified_repl(R)){
+			[#
+				OK=payloadArg(0).toBoolean()
 			#]
 		}
-		println("$name: handling activation request, result:$RESULT") color red
-	} 
-	Goto endOfBurning
+		println("$name: conditions verified: $OK") color green
+	}Goto move_to_waste_storage if [# OK #] else check_start_conditions
 	
-	State startBurning{
-		[#
-			BURNING = true
-		#]
-		println("$name: starting incineration process, burning:$BURNING") color red
-		delay 5000
-	}
-	Goto endOfBurning
 	
-	State endOfBurning{
-		[#
-			BURNING = false
-		#]
-		println("$name: ending incineration process, burning:$BURNING") color red
-		emit endOfBurning : endOfBurning(10)
-	}
-	Goto idle
+	// loading an rp
+	State move_to_waste_storage{
+		println("$name: moving to waste storage...") color green
+		//delay 2000
+		request robotpos -m moverobot:moverobot(1,3)
+		
+	} Goto load_rp
 	
-}
-
-
-QActor monitoring_device context ctx_monitoringdev{
-	State s0 initial{ 
- 		println("$name STARTS") color green
-		delay 500
-	}
-	Goto measureLevel
-	
-	State measureLevel{
-		// sonar working
-		emit ashLevel : ashLevel(10)
+	State load_rp{
+		println("$name: loading an rp") color green
+		emit load_rp : load_rp
+	}Goto move_to_incinerator
+		
+	// burning the rp
+	State move_to_incinerator{
+		println("$name: moving to incinerator...") color green
 		delay 2000
-	}
-	Goto measureLevel
+	}Goto request_to_burn 
+	
+	State request_to_burn{
+		println("$name: requesting to burn an rp") color green
+		request incinerator -m burn_req : burn_req
+	}Transition t0
+	whenReply burn_repl -> handle_burn_repl
+	
+	State handle_burn_repl{
+		[#
+			OK=payloadArg(0).toBoolean()	
+		#]
+		println("$name: burn request result: $OK") color green
+	}Goto move_to_ash_storage
+	
+	
+	// unload ashes
+	State move_to_ash_storage{
+		println("$name: moving to ash storage...") color green
+		delay 2000
+	}Goto unload_ash
+	
+	 State unload_ash{
+	 	println("$name: unloading ash...") color green
+	 	emit unload_ash : unload_ash
+	 }Goto check_continue_conditions
+	 
+	 State check_continue_conditions{
+		println("$name: checking conditions") color green
+		request wis_state_observer -m conditions_verified_req:conditions_verified_req
+	}Transition t0
+	whenReply conditions_verified_repl->handle_continue_conditions_verified_repl
+	
+	State handle_continue_conditions_verified_repl{
+		onMsg(conditions_verified_repl:conditions_verified_repl(R)){
+			[#
+				OK=payloadArg(0).toBoolean()
+			#]
+		}
+		println("$name: conditions verified: $OK") color green
+	}Goto move_to_waste_storage if [#OK#] else move_to_home
+	
+	State move_to_home{
+		println("moving to home...") color green
+		delay 2000
+	}Goto check_start_conditions
 }
 
+QActor wis_state_observer context ctx_wis{
+ 	[#
+ 		var RP = 0
+ 		var A = false
+ 		var B = false 
+ 		var L = 0
+ 		val LMAX = 3
+ 	
+ 	#]
+ 	
+ 	State s0 initial{ 
+ 		println("$name starts") color yellow
+		observeResource scale msgid actor_state
+		observeResource incinerator msgid actor_state
+		observeResource monitoring_device msgid actor_state
+		
+	} Goto waiting_for_updates
+	
+	State waiting_for_updates{
+		println("$name: waiting for updates...") color yellow
+	}Transition t0 
+		whenMsg actor_state -> update_state
+		whenRequest conditions_verified_req -> handle_conditions_verified_req
+		
+	State update_state{
+		onMsg(actor_state:actor_state(P,V)){
+			[#
+				val P=payloadArg(0);
+				val V=payloadArg(1);
+				when (P){
+					"incinerator_active" -> A=V.toBoolean()
+					"incinerator_burning"-> B=V.toBoolean()
+					"waste_storage_rps"  -> RP=V.toInt()
+					"ash_storage_level"  -> L=V.toInt()
+				}
+			#]
+			println("$name: $P updated") color yellow
+		}
+	} Goto waiting_for_updates
 
 
+	State handle_conditions_verified_req{
+		[#
+			val RESULT=(RP>0) && (A && !B) && (L<LMAX)
+		#]
+		println("$name: current state { RP:$RP, B:$B, L:$L }, conditions verified: $RESULT") color yellow
+		replyTo conditions_verified_req with conditions_verified_repl : conditions_verified_repl($RESULT)
+	}Goto waiting_for_updates
+	
+ }
 
-
-
+ 
+ 

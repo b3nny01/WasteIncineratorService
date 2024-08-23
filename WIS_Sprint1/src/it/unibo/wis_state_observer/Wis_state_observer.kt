@@ -24,7 +24,7 @@ class Wis_state_observer ( name: String, scope: CoroutineScope, isconfined: Bool
 		
 		 		var RP = 0
 		 		var A = false
-		 		var B = false
+		 		var B = false 
 		 		var L = 0
 		 		val LMAX = 3
 		 	
@@ -32,9 +32,9 @@ class Wis_state_observer ( name: String, scope: CoroutineScope, isconfined: Bool
 				state("s0") { //this:State
 					action { //it:State
 						CommUtils.outyellow("$name starts")
-						observeResource("localhost","8020","ctx_wis","waste_storage","actor_state")
-						observeResource("localhost","8020","ctx_wis","incinerator","actor_state")
-						observeResource("localhost","8020","ctx_wis","ash_storage","actor_state")
+						observeResource("localhost","8022","ctx_wis","scale","actor_state")
+						observeResource("localhost","8022","ctx_wis","incinerator","actor_state")
+						observeResource("localhost","8022","ctx_wis","monitoring_device","actor_state")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -50,8 +50,8 @@ class Wis_state_observer ( name: String, scope: CoroutineScope, isconfined: Bool
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t09",targetState="update_state",cond=whenDispatch("actor_state"))
-					transition(edgeName="t010",targetState="handle_conditions_verified_req",cond=whenRequest("conditions_verified_req"))
+					 transition(edgeName="t07",targetState="update_state",cond=whenDispatch("actor_state"))
+					transition(edgeName="t08",targetState="handle_conditions_verified_req",cond=whenRequest("conditions_verified_req"))
 				}	 
 				state("update_state") { //this:State
 					action { //it:State
@@ -79,7 +79,7 @@ class Wis_state_observer ( name: String, scope: CoroutineScope, isconfined: Bool
 					action { //it:State
 						
 									val RESULT=(RP>0) && (A && !B) && (L<LMAX)
-						CommUtils.outblack("$name: current state { RP:$RP, B:$B, L:$L }, conditions verified: $RESULT")
+						CommUtils.outyellow("$name: current state { RP:$RP, B:$B, L:$L }, conditions verified: $RESULT")
 						answer("conditions_verified_req", "conditions_verified_repl", "conditions_verified_repl($RESULT)"   )  
 						//genTimer( actor, state )
 					}
