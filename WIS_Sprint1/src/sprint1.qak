@@ -15,7 +15,7 @@ Event unload_ash					: unload_rp(N)
 Request burn_req					: burn_req(N)
 Reply 	burn_repl					: burn_repl(N) for burn_req
 
-//Inglobamento endosimbitico di robotpos
+//Inglobamento endosimbitico di robotpos 
 
 Request engage        : engage(OWNER, STEPTIME)	
 Reply   engagedone    : engagedone(ARG)    for engage
@@ -152,22 +152,44 @@ QActor monitoring_device context ctx_wis{
 	
 }
 
-QActor wis context ctx_wis{
+QActor wis context ctx_wis {
+	import "main.resources.position.Position"
 	[#
-		var POSITION="home"
 		var OK=false;
+		val LOCATIONS=mapOf("home" 			to Position(0,0),
+							"waste storage" to Position(0,4),
+							"burn in"		to Position(3,1),
+							"burn out"		to Position(5,3),
+							"ash storage"	to Position(6,4)
+		)
 	#]
 	State s0 initial{ 
  		println("$name starts") color green
+	}Goto engage_robot 
+
+	State engage_robot{
 		delay 500
-		request engager -m engage:engage(wis,300)
-	}Goto activate_incinerator
+		println("$name: engaging robot") color yellow
+		request engager -m engage:engage(wis,330)
+	}Transition t0 whenReply engagedone -> handle_engage_robot_repl
+	
+	State handle_engage_robot_repl{
+		[#
+			OK = false	
+		#]
+		onMsg (engagedone:engagedone(ARG)){
+			[#
+				OK=true	
+			#]
+		}
+		println("$name: robot engaged: $OK") color yellow
+	} Goto activate_incinerator if [# OK #] else engage_robot
 	
 	State activate_incinerator{
 		[#
 			val AR=true	
 		#]
-		println("$name: requesting incinerator activation") color yellow
+		println("$name: activating incinerator") color yellow
 		forward incinerator -m incinerator_activation : incinerator_activation($AR)
 	}Goto check_start_conditions
 	
@@ -190,26 +212,58 @@ QActor wis context ctx_wis{
 	
 	// loading an rp
 	State move_to_waste_storage{
-		println("$name: moving to waste storage...") color green
-		//delay 2000
-		request robotpos -m moverobot:moverobot(1,3)
-		
-	} Goto load_rp
+		[#
+			val DEST="waste storage"
+			val X=LOCATIONS[DEST]?.x
+			val Y=LOCATIONS[DEST]?.y
+		#]
+		println("$name: moving to $DEST...") color green
+		request robotpos -m moverobot:moverobot($X,$Y)
+	} Transition t0
+	whenReply moverobotdone -> load_rp
+	whenReply moverobotfailed -> move_to_waste_storage
 	
 	State load_rp{
 		println("$name: loading an rp") color green
 		emit load_rp : load_rp
-	}Goto move_to_incinerator
+		delay 1000
+	}Goto move_to_burn_in
 		
 	// burning the rp
-	State move_to_incinerator{
-		println("$name: moving to incinerator...") color green
-		delay 2000
-	}Goto request_to_burn 
+	State move_to_burn_in{
+		[#
+			val DEST="burn in"
+			val X=LOCATIONS[DEST]?.x
+			val Y=LOCATIONS[DEST]?.y
+		#]
+		println("$name: moving to $DEST...") color green
+		request robotpos -m moverobot:moverobot($X,$Y)
+	}Transition t0
+	whenReply moverobotdone -> request_to_burn
+	whenReply moverobotfailed -> move_to_burn_in 
 	
 	State request_to_burn{
 		println("$name: requesting to burn an rp") color green
 		request incinerator -m burn_req : burn_req
+		delay 1000
+
+	}Goto return_to_home
+	
+	State return_to_home{
+		[#
+			val DEST="home"
+			val X=LOCATIONS[DEST]?.x
+			val Y=LOCATIONS[DEST]?.y
+		#]
+		println("$name: moving to $DEST...") color green
+		request robotpos -m moverobot:moverobot($X,$Y) 
+	}
+	Transition t0
+	whenReply moverobotdone -> wait_for_burn_repl
+	whenReply moverobotfailed -> return_to_home
+	
+	State wait_for_burn_repl{
+		println("$name: waiting end of burning...") color green
 	}Transition t0
 	whenReply burn_repl -> handle_burn_repl
 	
@@ -218,18 +272,41 @@ QActor wis context ctx_wis{
 			OK=payloadArg(0).toBoolean()	
 		#]
 		println("$name: burn request result: $OK") color green
-	}Goto move_to_ash_storage
+	}Goto move_to_burn_out
 	
+	State move_to_burn_out{
+		[#
+			val DEST="burn out"
+			val X=LOCATIONS[DEST]?.x
+			val Y=LOCATIONS[DEST]?.y
+		#]
+		println("$name: moving to $DEST...") color green
+		request robotpos -m moverobot:moverobot($X,$Y) 
+	}Transition t0
+	whenReply moverobotdone->load_ash
+	whenReply moverobotfailed->move_to_burn_out
+	
+	State load_ash{
+		println("$name: loading ash") color green
+		delay 1000
+	}Goto move_to_ash_storage
 	
 	// unload ashes
 	State move_to_ash_storage{
-		println("$name: moving to ash storage...") color green
-		delay 2000
-	}Goto unload_ash
+		[#
+			val DEST="ash storage"
+			val X=LOCATIONS[DEST]?.x
+			val Y=LOCATIONS[DEST]?.y
+		#]
+		println("$name: moving to $DEST...") color green
+		request robotpos -m moverobot:moverobot($X,$Y)
+	}Transition t0
+	whenReply moverobotdone -> unload_ash
 	
 	 State unload_ash{
 	 	println("$name: unloading ash...") color green
 	 	emit unload_ash : unload_ash
+	 	delay 1000
 	 }Goto check_continue_conditions
 	 
 	 State check_continue_conditions{
@@ -248,9 +325,16 @@ QActor wis context ctx_wis{
 	}Goto move_to_waste_storage if [#OK#] else move_to_home
 	
 	State move_to_home{
-		println("moving to home...") color green
-		delay 2000
-	}Goto check_start_conditions
+		[#
+			val DEST="home"
+			val X=LOCATIONS[DEST]?.x
+			val Y=LOCATIONS[DEST]?.y
+		#]
+		println("$name: moving to $DEST...") color green
+		request robotpos -m moverobot:moverobot($X,$Y)
+	}Transition t0
+	whenReply moverobotdone -> check_start_conditions
+	whenReply moverobotfailed -> move_to_home
 }
 
 QActor wis_state_observer context ctx_wis{

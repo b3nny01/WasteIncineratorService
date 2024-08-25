@@ -50,8 +50,8 @@ class Wis_state_observer ( name: String, scope: CoroutineScope, isconfined: Bool
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t07",targetState="update_state",cond=whenDispatch("actor_state"))
-					transition(edgeName="t08",targetState="handle_conditions_verified_req",cond=whenRequest("conditions_verified_req"))
+					 transition(edgeName="t019",targetState="update_state",cond=whenDispatch("actor_state"))
+					transition(edgeName="t020",targetState="handle_conditions_verified_req",cond=whenRequest("conditions_verified_req"))
 				}	 
 				state("update_state") { //this:State
 					action { //it:State
