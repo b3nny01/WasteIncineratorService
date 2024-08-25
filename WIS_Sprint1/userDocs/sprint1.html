@@ -109,6 +109,23 @@ in this sprint we will focus on the relationship between WIS and OpRobot, our go
 <li><strong>Centralized Solution</strong>: In this approach, the OpRobot functions as a simple POJO, acting as an executor for WIS. WIS takes responsibility for monitoring the system's state and instructs the OpRobot to move accordingly.</li>
 <li><strong>Distributed Solution</strong>: Here, the OpRobot is designed as an Actor that interacts with WIS. The OpRobot requests WIS, which observes the system's state, to confirm whether conditions for movement are met. If they are, the OpRobot initiates an 'OpRobot Cycle,' which includes obtaining an RP, incinerating it, and transporting the ashes to ashStorage.</li>
 </ul>
+<h3 id="pro-e-contro">Pro e Contro</h3>
+<ul>
+<li>Centralizzato:
+<ul>
+<li>
+<ul>
+<li>logica di buinsess concentrata</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>(poco estendibile)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
 <h2 id="future-sprints">Future Sprints</h2>
 
 </body>
