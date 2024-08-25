@@ -41,7 +41,7 @@ At the end of each Sprint we produced an executable version of the system coveri
         <td>
             <a href="./WIS_Sprint0/">WIS_Sprint0</a>
         </td>
-        <td>
+        <td width="300px">
             requirements analysis
         </td>
         <td>
@@ -57,7 +57,7 @@ At the end of each Sprint we produced an executable version of the system coveri
         <td>
             <a href="./WIS_Sprint1/">WIS_Sprint1</a>
         </td>
-        <td>
+        <td width="300px">
             OpRobot and WIS respondibilities and buisness logic, first working prototype in virtual environment.
         </td>
         <td>
