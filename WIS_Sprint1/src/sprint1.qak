@@ -4,6 +4,7 @@ System wis_system
 // fixed and have to be discussed in future sprints
 
 Dispatch	actor_state					: actor_state(P,V)
+
 Dispatch 	incinerator_activation		: incinerator_activation(A)
 
 Request 	conditions_verified_req		: conditions_verified_req(N)
@@ -15,7 +16,7 @@ Event unload_ash					: unload_rp(N)
 Request burn_req					: burn_req(N)
 Reply 	burn_repl					: burn_repl(N) for burn_req
 
-//Inglobamento endosimbitico di robotpos 
+// Interfaccia BasicRobot
 
 Request engage        : engage(OWNER, STEPTIME)	
 Reply   engagedone    : engagedone(ARG)    for engage
@@ -41,7 +42,6 @@ QActor incinerator context ctx_wis{
  	[#
  		var ACTIVE	   = false;
  		var BURNING    = false;
- 		var BURNOUT_FREE = true;		
  	 #]
  	 
  	State s0 initial{ 
@@ -82,7 +82,6 @@ QActor incinerator context ctx_wis{
 			delay 5000 // burning simulation
 			[# 
 				BURNING=false
-				BURNOUT_FREE=false
 			#]
 			updateResource  [# "actor_state(incinerator_burning,$BURNING)" #]
 		}
@@ -358,9 +357,9 @@ QActor wis_state_observer context ctx_wis{
 	State waiting_for_updates{
 		println("$name: waiting for updates...") color yellow
 	}Transition t0 
-		whenMsg actor_state -> update_state
+		whenMsg actor_state -> update_state	
 		whenRequest conditions_verified_req -> handle_conditions_verified_req
-		
+				
 	State update_state{
 		onMsg(actor_state:actor_state(P,V)){
 			[#

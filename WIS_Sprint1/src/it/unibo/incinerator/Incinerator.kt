@@ -24,7 +24,6 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 		
 		 		var ACTIVE	   = false;
 		 		var BURNING    = false;
-		 		var BURNOUT_FREE = true;		
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -83,7 +82,6 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 						delay(5000) 
 						 
 										BURNING=false
-										BURNOUT_FREE=false
 						updateResourceRep( "actor_state(incinerator_burning,$BURNING)"  
 						)
 						}
