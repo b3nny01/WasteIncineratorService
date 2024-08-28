@@ -19,15 +19,14 @@ reply( moverobotfailed, moverobotfailed(PLANDONE,PLANTODO) ).  %%for moverobot
 %====================================================================================
 context(ctx_wis, "localhost",  "TCP", "8022").
 context(ctx_basic_robot, "127.0.0.1",  "TCP", "8020").
- qactor( robotpos, ctx_basic_robot, "external").
-  qactor( engager, ctx_basic_robot, "external").
+ qactor( basicrobot, ctx_basic_robot, "external").
   qactor( incinerator, ctx_wis, "it.unibo.incinerator.Incinerator").
  static(incinerator).
   qactor( scale, ctx_wis, "it.unibo.scale.Scale").
  static(scale).
   qactor( monitoring_device, ctx_wis, "it.unibo.monitoring_device.Monitoring_device").
  static(monitoring_device).
+  qactor( op_robot, ctx_wis, "it.unibo.op_robot.Op_robot").
+ static(op_robot).
   qactor( wis, ctx_wis, "it.unibo.wis.Wis").
  static(wis).
-  qactor( wis_state_observer, ctx_wis, "it.unibo.wis_state_observer.Wis_state_observer").
- static(wis_state_observer).

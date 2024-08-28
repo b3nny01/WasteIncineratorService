@@ -13,7 +13,6 @@ import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
 
 //User imports JAN2024
-import main.resources.position.Position
 
 class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : ActorBasicFsm( name, scope, confined=isconfined ){
 
@@ -23,55 +22,25 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
 		
-				var OK=false;
-				val LOCATIONS=mapOf("home" 			to Position(0,0),
-									"waste storage" to Position(0,4),
-									"burn in"		to Position(3,1),
-									"burn out"		to Position(5,3),
-									"ash storage"	to Position(6,4)
-				)
+		 		var RP = 0
+		 		var A = false
+		 		var B = false 
+		 		var L = 0
+		 		val LMAX = 3
+		 	
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						CommUtils.outgreen("$name starts")
+						CommUtils.outyellow("$name starts")
+						observeResource("localhost","8022","ctx_wis","scale","actor_state")
+						observeResource("localhost","8022","ctx_wis","incinerator","actor_state")
+						observeResource("localhost","8022","ctx_wis","monitoring_device","actor_state")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="engage_robot", cond=doswitch() )
-				}	 
-				state("engage_robot") { //this:State
-					action { //it:State
-						delay(500) 
-						CommUtils.outyellow("$name: engaging robot")
-						request("engage", "engage(wis,330)" ,"engager" )  
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition(edgeName="t04",targetState="handle_engage_robot_repl",cond=whenReply("engagedone"))
-				}	 
-				state("handle_engage_robot_repl") { //this:State
-					action { //it:State
-						
-									OK = false	
-						if( checkMsgContent( Term.createTerm("engagedone(ARG)"), Term.createTerm("engagedone(ARG)"), 
-						                        currentMsg.msgContent()) ) { //set msgArgList
-								
-												OK=true	
-						}
-						CommUtils.outyellow("$name: robot engaged: $OK")
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition( edgeName="goto",targetState="activate_incinerator", cond=doswitchGuarded({ OK  
-					}) )
-					transition( edgeName="goto",targetState="engage_robot", cond=doswitchGuarded({! ( OK  
-					) }) )
+					 transition( edgeName="goto",targetState="activate_incinerator", cond=doswitch() )
 				}	 
 				state("activate_incinerator") { //this:State
 					action { //it:State
@@ -84,230 +53,53 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="check_start_conditions", cond=doswitch() )
+					 transition( edgeName="goto",targetState="waiting_for_updates", cond=doswitch() )
 				}	 
-				state("check_start_conditions") { //this:State
+				state("waiting_for_updates") { //this:State
 					action { //it:State
-						delay(500) 
-						CommUtils.outgreen("$name: checking conditions")
-						request("conditions_verified_req", "conditions_verified_req" ,"wis_state_observer" )  
+						CommUtils.outyellow("$name: waiting for updates...")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t05",targetState="handle_start_conditions_verified_repl",cond=whenReply("conditions_verified_repl"))
+					 transition(edgeName="t019",targetState="update_state",cond=whenDispatch("actor_state"))
+					transition(edgeName="t020",targetState="handle_conditions_verified_req",cond=whenRequest("conditions_verified_req"))
 				}	 
-				state("handle_start_conditions_verified_repl") { //this:State
+				state("update_state") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("conditions_verified_repl(R)"), Term.createTerm("conditions_verified_repl(R)"), 
+						if( checkMsgContent( Term.createTerm("actor_state(P,V)"), Term.createTerm("actor_state(P,V)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
-												OK=payloadArg(0).toBoolean()
+												val P=payloadArg(0);
+												val V=payloadArg(1);
+												when (P){
+													"incinerator_active" -> A=V.toBoolean()
+													"incinerator_burning"-> B=V.toBoolean()
+													"waste_storage_rps"  -> RP=V.toInt()
+													"ash_storage_level"  -> L=V.toInt()
+												}
+								CommUtils.outyellow("$name: $P updated")
 						}
-						CommUtils.outgreen("$name: conditions verified: $OK")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="move_to_waste_storage", cond=doswitchGuarded({ OK  
-					}) )
-					transition( edgeName="goto",targetState="check_start_conditions", cond=doswitchGuarded({! ( OK  
-					) }) )
+					 transition( edgeName="goto",targetState="waiting_for_updates", cond=doswitch() )
 				}	 
-				state("move_to_waste_storage") { //this:State
+				state("handle_conditions_verified_req") { //this:State
 					action { //it:State
 						
-									val DEST="waste storage"
-									val X=LOCATIONS[DEST]?.x
-									val Y=LOCATIONS[DEST]?.y
-						CommUtils.outgreen("$name: moving to $DEST...")
-						request("moverobot", "moverobot($X,$Y)" ,"robotpos" )  
+									val RESULT=(RP>0) && (A && !B) && (L<LMAX)
+						CommUtils.outyellow("$name: current state { RP:$RP, B:$B, L:$L }, conditions verified: $RESULT")
+						answer("conditions_verified_req", "conditions_verified_repl", "conditions_verified_repl($RESULT)"   )  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t06",targetState="load_rp",cond=whenReply("moverobotdone"))
-					transition(edgeName="t07",targetState="move_to_waste_storage",cond=whenReply("moverobotfailed"))
-				}	 
-				state("load_rp") { //this:State
-					action { //it:State
-						CommUtils.outgreen("$name: loading an rp")
-						emit("load_rp", "load_rp" ) 
-						delay(1000) 
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition( edgeName="goto",targetState="move_to_burn_in", cond=doswitch() )
-				}	 
-				state("move_to_burn_in") { //this:State
-					action { //it:State
-						
-									val DEST="burn in"
-									val X=LOCATIONS[DEST]?.x
-									val Y=LOCATIONS[DEST]?.y
-						CommUtils.outgreen("$name: moving to $DEST...")
-						request("moverobot", "moverobot($X,$Y)" ,"robotpos" )  
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition(edgeName="t08",targetState="request_to_burn",cond=whenReply("moverobotdone"))
-					transition(edgeName="t09",targetState="move_to_burn_in",cond=whenReply("moverobotfailed"))
-				}	 
-				state("request_to_burn") { //this:State
-					action { //it:State
-						CommUtils.outgreen("$name: requesting to burn an rp")
-						request("burn_req", "burn_req" ,"incinerator" )  
-						delay(1000) 
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition( edgeName="goto",targetState="return_to_home", cond=doswitch() )
-				}	 
-				state("return_to_home") { //this:State
-					action { //it:State
-						
-									val DEST="home"
-									val X=LOCATIONS[DEST]?.x
-									val Y=LOCATIONS[DEST]?.y
-						CommUtils.outgreen("$name: moving to $DEST...")
-						request("moverobot", "moverobot($X,$Y)" ,"robotpos" )  
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition(edgeName="t010",targetState="wait_for_burn_repl",cond=whenReply("moverobotdone"))
-					transition(edgeName="t011",targetState="return_to_home",cond=whenReply("moverobotfailed"))
-				}	 
-				state("wait_for_burn_repl") { //this:State
-					action { //it:State
-						CommUtils.outgreen("$name: waiting end of burning...")
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition(edgeName="t012",targetState="handle_burn_repl",cond=whenReply("burn_repl"))
-				}	 
-				state("handle_burn_repl") { //this:State
-					action { //it:State
-						
-									OK=payloadArg(0).toBoolean()	
-						CommUtils.outgreen("$name: burn request result: $OK")
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition( edgeName="goto",targetState="move_to_burn_out", cond=doswitch() )
-				}	 
-				state("move_to_burn_out") { //this:State
-					action { //it:State
-						
-									val DEST="burn out"
-									val X=LOCATIONS[DEST]?.x
-									val Y=LOCATIONS[DEST]?.y
-						CommUtils.outgreen("$name: moving to $DEST...")
-						request("moverobot", "moverobot($X,$Y)" ,"robotpos" )  
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition(edgeName="t013",targetState="load_ash",cond=whenReply("moverobotdone"))
-					transition(edgeName="t014",targetState="move_to_burn_out",cond=whenReply("moverobotfailed"))
-				}	 
-				state("load_ash") { //this:State
-					action { //it:State
-						CommUtils.outgreen("$name: loading ash")
-						delay(1000) 
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition( edgeName="goto",targetState="move_to_ash_storage", cond=doswitch() )
-				}	 
-				state("move_to_ash_storage") { //this:State
-					action { //it:State
-						
-									val DEST="ash storage"
-									val X=LOCATIONS[DEST]?.x
-									val Y=LOCATIONS[DEST]?.y
-						CommUtils.outgreen("$name: moving to $DEST...")
-						request("moverobot", "moverobot($X,$Y)" ,"robotpos" )  
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition(edgeName="t015",targetState="unload_ash",cond=whenReply("moverobotdone"))
-				}	 
-				state("unload_ash") { //this:State
-					action { //it:State
-						CommUtils.outgreen("$name: unloading ash...")
-						emit("unload_ash", "unload_ash" ) 
-						delay(1000) 
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition( edgeName="goto",targetState="check_continue_conditions", cond=doswitch() )
-				}	 
-				state("check_continue_conditions") { //this:State
-					action { //it:State
-						CommUtils.outgreen("$name: checking conditions")
-						request("conditions_verified_req", "conditions_verified_req" ,"wis_state_observer" )  
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition(edgeName="t016",targetState="handle_continue_conditions_verified_repl",cond=whenReply("conditions_verified_repl"))
-				}	 
-				state("handle_continue_conditions_verified_repl") { //this:State
-					action { //it:State
-						if( checkMsgContent( Term.createTerm("conditions_verified_repl(R)"), Term.createTerm("conditions_verified_repl(R)"), 
-						                        currentMsg.msgContent()) ) { //set msgArgList
-								
-												OK=payloadArg(0).toBoolean()
-						}
-						CommUtils.outgreen("$name: conditions verified: $OK")
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition( edgeName="goto",targetState="move_to_waste_storage", cond=doswitchGuarded({OK 
-					}) )
-					transition( edgeName="goto",targetState="move_to_home", cond=doswitchGuarded({! (OK 
-					) }) )
-				}	 
-				state("move_to_home") { //this:State
-					action { //it:State
-						
-									val DEST="home"
-									val X=LOCATIONS[DEST]?.x
-									val Y=LOCATIONS[DEST]?.y
-						CommUtils.outgreen("$name: moving to $DEST...")
-						request("moverobot", "moverobot($X,$Y)" ,"robotpos" )  
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition(edgeName="t017",targetState="check_start_conditions",cond=whenReply("moverobotdone"))
-					transition(edgeName="t018",targetState="move_to_home",cond=whenReply("moverobotfailed"))
+					 transition( edgeName="goto",targetState="waiting_for_updates", cond=doswitch() )
 				}	 
 			}
 		}

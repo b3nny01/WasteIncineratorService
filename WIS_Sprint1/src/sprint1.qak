@@ -32,8 +32,7 @@ Reply moverobotfailed:  moverobotfailed(PLANDONE, PLANTODO) for moverobot
 Context ctx_wis ip [ host="localhost" port=8022]  
 Context ctx_basic_robot ip [host= "127.0.0.1" port=8020]
 
-ExternalQActor robotpos context ctx_basic_robot
-ExternalQActor engager context ctx_basic_robot
+ExternalQActor basicrobot context ctx_basic_robot
 
 // NOTE: the following model is already working but yet a prototype, some parts are still extremely simplified
 // (for instance OpRobot movements) and some are completely unimplemented (error handlingW	)
@@ -151,7 +150,7 @@ QActor monitoring_device context ctx_wis{
 	
 }
 
-QActor wis context ctx_wis {
+QActor op_robot context ctx_wis {
 	import "main.resources.position.Position"
 	[#
 		var OK=false;
@@ -169,7 +168,7 @@ QActor wis context ctx_wis {
 	State engage_robot{
 		delay 500
 		println("$name: engaging robot") color yellow
-		request engager -m engage:engage(wis,330)
+		request basicrobot -m engage:engage(wis,330)
 	}Transition t0 whenReply engagedone -> handle_engage_robot_repl
 	
 	State handle_engage_robot_repl{
@@ -182,20 +181,12 @@ QActor wis context ctx_wis {
 			#]
 		}
 		println("$name: robot engaged: $OK") color yellow
-	} Goto activate_incinerator if [# OK #] else engage_robot
-	
-	State activate_incinerator{
-		[#
-			val AR=true	
-		#]
-		println("$name: activating incinerator") color yellow
-		forward incinerator -m incinerator_activation : incinerator_activation($AR)
-	}Goto check_start_conditions
+	} Goto check_start_conditions if [# OK #] else engage_robot
 	
 	State check_start_conditions{
 		delay 500
 		println("$name: checking conditions") color green
-		request wis_state_observer -m conditions_verified_req:conditions_verified_req
+		request wis -m conditions_verified_req:conditions_verified_req
 	}Transition t0
 	whenReply conditions_verified_repl->handle_start_conditions_verified_repl
 	
@@ -217,7 +208,7 @@ QActor wis context ctx_wis {
 			val Y=LOCATIONS[DEST]?.y
 		#]
 		println("$name: moving to $DEST...") color green
-		request robotpos -m moverobot:moverobot($X,$Y)
+		request basicrobot -m moverobot:moverobot($X,$Y)
 	} Transition t0
 	whenReply moverobotdone -> load_rp
 	whenReply moverobotfailed -> move_to_waste_storage
@@ -236,7 +227,7 @@ QActor wis context ctx_wis {
 			val Y=LOCATIONS[DEST]?.y
 		#]
 		println("$name: moving to $DEST...") color green
-		request robotpos -m moverobot:moverobot($X,$Y)
+		request basicrobot -m moverobot:moverobot($X,$Y)
 	}Transition t0
 	whenReply moverobotdone -> request_to_burn
 	whenReply moverobotfailed -> move_to_burn_in 
@@ -255,7 +246,7 @@ QActor wis context ctx_wis {
 			val Y=LOCATIONS[DEST]?.y
 		#]
 		println("$name: moving to $DEST...") color green
-		request robotpos -m moverobot:moverobot($X,$Y) 
+		request basicrobot -m moverobot:moverobot($X,$Y) 
 	}
 	Transition t0
 	whenReply moverobotdone -> wait_for_burn_repl
@@ -280,7 +271,7 @@ QActor wis context ctx_wis {
 			val Y=LOCATIONS[DEST]?.y
 		#]
 		println("$name: moving to $DEST...") color green
-		request robotpos -m moverobot:moverobot($X,$Y) 
+		request basicrobot -m moverobot:moverobot($X,$Y) 
 	}Transition t0
 	whenReply moverobotdone->load_ash
 	whenReply moverobotfailed->move_to_burn_out
@@ -298,7 +289,7 @@ QActor wis context ctx_wis {
 			val Y=LOCATIONS[DEST]?.y
 		#]
 		println("$name: moving to $DEST...") color green
-		request robotpos -m moverobot:moverobot($X,$Y)
+		request basicrobot -m moverobot:moverobot($X,$Y)
 	}Transition t0
 	whenReply moverobotdone -> unload_ash
 	
@@ -310,7 +301,7 @@ QActor wis context ctx_wis {
 	 
 	 State check_continue_conditions{
 		println("$name: checking conditions") color green
-		request wis_state_observer -m conditions_verified_req:conditions_verified_req
+		request wis -m conditions_verified_req:conditions_verified_req
 	}Transition t0
 	whenReply conditions_verified_repl->handle_continue_conditions_verified_repl
 	
@@ -330,13 +321,13 @@ QActor wis context ctx_wis {
 			val Y=LOCATIONS[DEST]?.y
 		#]
 		println("$name: moving to $DEST...") color green
-		request robotpos -m moverobot:moverobot($X,$Y)
+		request basicrobot -m moverobot:moverobot($X,$Y)
 	}Transition t0
 	whenReply moverobotdone -> check_start_conditions
 	whenReply moverobotfailed -> move_to_home
 }
 
-QActor wis_state_observer context ctx_wis{
+QActor wis context ctx_wis{
  	[#
  		var RP = 0
  		var A = false
@@ -352,7 +343,15 @@ QActor wis_state_observer context ctx_wis{
 		observeResource incinerator msgid actor_state
 		observeResource monitoring_device msgid actor_state
 		
-	} Goto waiting_for_updates
+	} Goto activate_incinerator	
+	
+	State activate_incinerator{
+		[#
+			val AR=true	
+		#]
+		println("$name: activating incinerator") color yellow
+		forward incinerator -m incinerator_activation : incinerator_activation($AR)
+	}Goto waiting_for_updates
 	
 	State waiting_for_updates{
 		println("$name: waiting for updates...") color yellow
