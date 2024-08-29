@@ -1,8 +1,2 @@
-{"actor":"engager", "msgType":"dispatch", "curstate":"s0", "nextstate":"disengageRobot", "msgId":"disengage"}
-{"actor":"basicrobot", "msgType":"dispatch", "curstate":"work", "nextstate":"execcmd", "msgId":"cmd"}
-{"actor":"basicrobot", "msgType":"dispatch", "curstate":"work", "nextstate":"endwork", "msgId":"end"}
-{"actor":"planexec", "msgType":"dispatch", "curstate":"nextMove", "nextstate":"planend", "msgId":"nomoremove"}
-{"actor":"planexec", "msgType":"dispatch", "curstate":"nextMove", "nextstate":"nextMove", "msgId":"nextmove"}
-{"actor":"planexec", "msgType":"dispatch", "curstate":"planinterruptedalarm", "nextstate":"nonextmovesincealarm", "msgId":"nextmove"}
-{"actor":"robotpos", "msgType":"dispatch", "curstate":"waitclientrequest", "nextstate":"checkTheOwnerForSet", "msgId":"setrobotstate"}
-{"actor":"robotpos", "msgType":"dispatch", "curstate":"waitclientrequest", "nextstate":"checkTheOwnerForSetDir", "msgId":"setdirection"}
+{"actor":"incinerator", "msgType":"dispatch", "curstate":"idle", "nextstate":"handle_activation", "msgId":"incinerator_activation"}
+{"actor":"wis", "msgType":"dispatch", "curstate":"waiting_for_updates", "nextstate":"update_state", "msgId":"actor_state"}
