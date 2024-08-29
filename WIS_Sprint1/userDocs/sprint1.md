@@ -66,3 +66,5 @@ Lastly you have to activate the WIS system, by opening a third terminal inside t
 gradlew run
 ```
 ## Future Sprints
+In the next sprint, we will focus on the MonitoringDevice's behavior.<br/>
+Our goal is to connect the OpRobot to a virtual environment (the 'VirtualRobot' provided by the customer) so that it will be simple to switch to a physical OpRobot at any time by only changing a configuration parameter. 
