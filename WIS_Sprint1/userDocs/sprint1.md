@@ -41,9 +41,9 @@ For these reasons, it is more convenient to apply the **Single Responsibility Pr
 
 ### System Architecture
 
-based on the Problem Analysis carried on we implemented an executable version of the system covering the discussed features, we attach here a visual representation of the system architecture:
+Based on the Problem Analysis carried on we implemented an executable version of the system covering the discussed features, we attach here a visual representation of the system architecture:
 
-<img src="">**PUT IMAGE**
+![System Architecture](resources/imgs/wis_system.png)
 
 ### Usage
 To test the system you will have to activate the Virtual Environment first.
@@ -53,14 +53,14 @@ docker compose -f virtualRobot23.yaml up
 ```
 **n.b.** if you have an older version of docker, you may have to type `docker-compose` instead of `docker compose`
 
-After that you will have to activate the BasicRobot, that will act as a mediator between the VirtualRobot and the WasteIncineratorService application.
+After, you will have to activate the BasicRobot, which will act as a mediator between the VirtualRobot and the WasteIncineratorService application.
 To do so open another terminal inside the `unibo.basicrobot24` folder and type 
 
 ```
 gradlew run
 ```
 
-Lastly you have to activate the WIS system, by opening a third terminal inside the `WIS_Sprint1` folder and running
+Lastly, you have to activate the WIS system, by opening a third terminal inside the `WIS_Sprint1` folder and running
 
 ```
 gradlew run
