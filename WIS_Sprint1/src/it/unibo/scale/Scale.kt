@@ -22,7 +22,7 @@ class Scale ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
 		
-		 		var ROLL_PACKETS=10
+		 		var ROLL_PACKETS=3
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State

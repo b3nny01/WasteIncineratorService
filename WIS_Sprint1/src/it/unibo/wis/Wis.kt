@@ -64,7 +64,8 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					sysaction { //it:State
 					}	 	 
 					 transition(edgeName="t019",targetState="update_state",cond=whenDispatch("actor_state"))
-					transition(edgeName="t020",targetState="handle_conditions_verified_req",cond=whenRequest("conditions_verified_req"))
+					transition(edgeName="t020",targetState="handle_system_state_req",cond=whenRequest("system_state_req"))
+					transition(edgeName="t021",targetState="handle_conditions_verified_req",cond=whenRequest("conditions_verified_req"))
 				}	 
 				state("update_state") { //this:State
 					action { //it:State
@@ -81,6 +82,17 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 												}
 								CommUtils.outyellow("$name: $P updated")
 						}
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="waiting_for_updates", cond=doswitch() )
+				}	 
+				state("handle_system_state_req") { //this:State
+					action { //it:State
+						CommUtils.outyellow("$name: current state { RP:$RP,A:$A, B:$B, L:$L }")
+						answer("system_state_req", "system_state_repl", "system_state_repl($RP,$A,$B,$L)"   )  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

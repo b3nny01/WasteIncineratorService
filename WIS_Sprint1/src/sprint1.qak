@@ -1,4 +1,4 @@
-System wis_system  
+System wis_system   
 
 // NOTE: message types have been chosen only to produce a first working prototype of the system so they are not 
 // fixed and have to be discussed in future sprints
@@ -9,6 +9,9 @@ Dispatch 	incinerator_activation		: incinerator_activation(A)
 
 Request 	conditions_verified_req		: conditions_verified_req(N)
 Reply 		conditions_verified_repl	: conditions_verified_repl(R) for conditions_verified_req
+
+Request 	system_state_req			: system_state_req(N)
+Reply 		system_state_repl			: system_state_repl(RP,A,B,L) for system_state_req
 
 Event load_rp						: load_rp(N)
 Event unload_ash					: unload_rp(N)
@@ -46,6 +49,7 @@ QActor incinerator context ctx_wis{
  	State s0 initial{ 
  		println("$name starts") color red
 		delay 500
+		updateResource  [# "actor_state(incinerator_active,$ACTIVE)" #]
 		updateResource  [# "actor_state(incinerator_burning,$BURNING)" #]
 	}Goto idle
 	
@@ -90,7 +94,7 @@ QActor incinerator context ctx_wis{
  
 QActor scale context ctx_wis{
  	[#
- 		var ROLL_PACKETS=10
+ 		var ROLL_PACKETS=3
  	 #]
  	 
  	State s0 initial{ 
@@ -357,6 +361,7 @@ QActor wis context ctx_wis{
 		println("$name: waiting for updates...") color yellow
 	}Transition t0 
 		whenMsg actor_state -> update_state	
+		whenRequest system_state_req -> handle_system_state_req
 		whenRequest conditions_verified_req -> handle_conditions_verified_req
 				
 	State update_state{
@@ -375,6 +380,10 @@ QActor wis context ctx_wis{
 		}
 	} Goto waiting_for_updates
 
+	State handle_system_state_req{
+		println("$name: current state { RP:$RP,A:$A, B:$B, L:$L }") color yellow
+		replyTo system_state_req with system_state_repl : system_state_repl($RP,$A,$B,$L)
+	}Goto waiting_for_updates
 
 	State handle_conditions_verified_req{
 		[#
@@ -384,7 +393,7 @@ QActor wis context ctx_wis{
 		replyTo conditions_verified_req with conditions_verified_repl : conditions_verified_repl($RESULT)
 	}Goto waiting_for_updates
 	
- }
+ } 
 
  
  

@@ -29,6 +29,8 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 					action { //it:State
 						CommUtils.outred("$name starts")
 						delay(500) 
+						updateResourceRep( "actor_state(incinerator_active,$ACTIVE)"  
+						)
 						updateResourceRep( "actor_state(incinerator_burning,$BURNING)"  
 						)
 						//genTimer( actor, state )

@@ -5,6 +5,8 @@ dispatch( actor_state, actor_state(P,V) ).
 dispatch( incinerator_activation, incinerator_activation(A) ).
 request( conditions_verified_req, conditions_verified_req(N) ).
 reply( conditions_verified_repl, conditions_verified_repl(R) ).  %%for conditions_verified_req
+request( system_state_req, system_state_req(N) ).
+reply( system_state_repl, system_state_repl(RP,A,B,L) ).  %%for system_state_req
 event( load_rp, load_rp(N) ).
 event( unload_ash, unload_rp(N) ).
 request( burn_req, burn_req(N) ).
