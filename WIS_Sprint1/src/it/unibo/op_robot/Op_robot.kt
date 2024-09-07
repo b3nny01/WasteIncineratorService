@@ -77,20 +77,24 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					action { //it:State
 						delay(500) 
 						CommUtils.outgreen("$name: checking conditions")
-						request("conditions_verified_req", "conditions_verified_req" ,"wis" )  
+						request("system_state_req", "system_state_req" ,"wis" )  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t05",targetState="handle_start_conditions_verified_repl",cond=whenReply("conditions_verified_repl"))
+					 transition(edgeName="t05",targetState="handle_start_conditions_verified_repl",cond=whenReply("system_state_repl"))
 				}	 
 				state("handle_start_conditions_verified_repl") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("conditions_verified_repl(R)"), Term.createTerm("conditions_verified_repl(R)"), 
+						if( checkMsgContent( Term.createTerm("system_state_repl(RP,A,B,L)"), Term.createTerm("system_state_repl(RP,A,B,L)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
-												OK=payloadArg(0).toBoolean()
+												val RP=payloadArg(0).toInt()
+												val A=payloadArg(1).toBoolean()
+												val B=payloadArg(2).toBoolean()
+												val L=payloadArg(3).toDouble()
+												OK=(RP>0) && (A && !B) && (L<1.0)
 						}
 						CommUtils.outgreen("$name: conditions verified: $OK")
 						//genTimer( actor, state )
@@ -254,20 +258,24 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 				state("check_continue_conditions") { //this:State
 					action { //it:State
 						CommUtils.outgreen("$name: checking conditions")
-						request("conditions_verified_req", "conditions_verified_req" ,"wis" )  
+						request("system_state_req", "system_state_req" ,"wis" )  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t016",targetState="handle_continue_conditions_verified_repl",cond=whenReply("conditions_verified_repl"))
+					 transition(edgeName="t016",targetState="handle_continue_conditions_verified_repl",cond=whenReply("system_state_repl"))
 				}	 
 				state("handle_continue_conditions_verified_repl") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("conditions_verified_repl(R)"), Term.createTerm("conditions_verified_repl(R)"), 
+						if( checkMsgContent( Term.createTerm("system_state_repl(RP,A,B,L)"), Term.createTerm("system_state_repl(RP,A,B,L)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
-												OK=payloadArg(0).toBoolean()
+												val RP=payloadArg(0).toInt()
+												val A=payloadArg(1).toBoolean();
+												val B=payloadArg(2).toBoolean();
+												val L=payloadArg(3).toDouble();
+												OK=(RP>0) && (A && !B) && (L<1.0)
 						}
 						CommUtils.outgreen("$name: conditions verified: $OK")
 						//genTimer( actor, state )

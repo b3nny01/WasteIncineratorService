@@ -7,11 +7,10 @@ Dispatch	actor_state					: actor_state(P,V)
 
 Dispatch 	incinerator_activation		: incinerator_activation(A)
 
-Request 	conditions_verified_req		: conditions_verified_req(N)
-Reply 		conditions_verified_repl	: conditions_verified_repl(R) for conditions_verified_req
-
 Request 	system_state_req			: system_state_req(N)
 Reply 		system_state_repl			: system_state_repl(RP,A,B,L) for system_state_req
+
+Dispatch	system_state				: system_state(RP,A,B,L)
 
 Event load_rp						: load_rp(N)
 Event unload_ash					: unload_rp(N)
@@ -19,8 +18,7 @@ Event unload_ash					: unload_rp(N)
 Request burn_req					: burn_req(N)
 Reply 	burn_repl					: burn_repl(N) for burn_req
 
-// Interfaccia BasicRobot
-
+//BasicRobot interface=======================================================================
 Request engage        : engage(OWNER, STEPTIME)	
 Reply   engagedone    : engagedone(ARG)    for engage
 Reply   engagerefused : engagerefused(ARG) for engage
@@ -30,16 +28,25 @@ Dispatch disengage    : disengage(ARG)
 Request moverobot    :  moverobot(TARGETX, TARGETY)  
 Reply moverobotdone  :  moverobotok(ARG)                    for moverobot
 Reply moverobotfailed:  moverobotfailed(PLANDONE, PLANTODO) for moverobot
- 
- 
-Context ctx_wis ip [ host="localhost" port=8022]  
-Context ctx_basic_robot ip [host= "127.0.0.1" port=8020]
+//===========================================================================================
 
+//Tester interface===========================================================================
+Request test_req : test_req(N)
+Reply test_repl: test_repl(N) for test_req
+//===========================================================================================
+ 
+//Contexts===================================================================================
+Context ctx_wis 		ip 	[	host="localhost"	port=8022]  
+Context ctx_basic_robot ip 	[	host= "127.0.0.1"	port=8020]
+//===========================================================================================
+
+//BasicRobot declaration=====================================================================
 ExternalQActor basicrobot context ctx_basic_robot
+//===========================================================================================
 
-// NOTE: the following model is already working but yet a prototype, some parts are still extremely simplified
-// (for instance OpRobot movements) and some are completely unimplemented (error handlingW	)
-
+//WIS system=================================================================================
+//NOTE: the following model is already working but yet a prototype, some parts are still extremely simplified
+//(for instance OpRobot movements) and some are completely unimplemented (error handling)
 QActor incinerator context ctx_wis{     
  	[#
  		var ACTIVE	   = false;
@@ -122,13 +129,16 @@ QActor scale context ctx_wis{
  
 QActor monitoring_device context ctx_wis{
  	[#
- 		var ASH_LEVEL=0
- 		val MAX_ASH_LEVEL=3
+ 		var CURR_ASH_LEVEL = 0.0
+ 		val MAX_ASH_LEVEL = 3.0
  	 #]
  	
  	 State s0 initial{ 
  		println("$name starts") color magenta
 		delay 500
+		[#
+			val ASH_LEVEL=CURR_ASH_LEVEL/MAX_ASH_LEVEL	
+		#]
 		updateResource [# "actor_state(ash_storage_level,$ASH_LEVEL)" #]
 	} Goto idle
 	
@@ -141,14 +151,16 @@ QActor monitoring_device context ctx_wis{
 	State handle_unload_ash{
 		[#
 			var R=false
-			if(ASH_LEVEL<MAX_ASH_LEVEL){
+			if(CURR_ASH_LEVEL<MAX_ASH_LEVEL){
 				R=true
-				ASH_LEVEL++
+				CURR_ASH_LEVEL++
 			}
 			
 		#]
 		println("$name: handling ash request, result:$R") color magenta
-		
+		[#
+			val ASH_LEVEL=CURR_ASH_LEVEL/MAX_ASH_LEVEL	
+		#]
 		updateResource [# "actor_state(ash_storage_level,$ASH_LEVEL)" #]
 	}Goto idle
 	
@@ -190,14 +202,18 @@ QActor op_robot context ctx_wis {
 	State check_start_conditions{
 		delay 500
 		println("$name: checking conditions") color green
-		request wis -m conditions_verified_req:conditions_verified_req
+		request wis -m system_state_req:system_state_req
 	}Transition t0
-	whenReply conditions_verified_repl->handle_start_conditions_verified_repl
+	whenReply system_state_repl->handle_start_conditions_verified_repl
 	
 	State handle_start_conditions_verified_repl{
-		onMsg(conditions_verified_repl:conditions_verified_repl(R)){
+		onMsg(system_state_repl:system_state_repl(RP,A,B,L)){
 			[#
-				OK=payloadArg(0).toBoolean()
+				val RP=payloadArg(0).toInt()
+				val A=payloadArg(1).toBoolean()
+				val B=payloadArg(2).toBoolean()
+				val L=payloadArg(3).toDouble()
+				OK=(RP>0) && (A && !B) && (L<1.0)
 			#]
 		}
 		println("$name: conditions verified: $OK") color green
@@ -305,14 +321,18 @@ QActor op_robot context ctx_wis {
 	 
 	 State check_continue_conditions{
 		println("$name: checking conditions") color green
-		request wis -m conditions_verified_req:conditions_verified_req
+		request wis -m system_state_req:system_state_req
 	}Transition t0
-	whenReply conditions_verified_repl->handle_continue_conditions_verified_repl
+	whenReply system_state_repl->handle_continue_conditions_verified_repl
 	
 	State handle_continue_conditions_verified_repl{
-		onMsg(conditions_verified_repl:conditions_verified_repl(R)){
+		onMsg(system_state_repl:system_state_repl(RP,A,B,L)){
 			[#
-				OK=payloadArg(0).toBoolean()
+				val RP=payloadArg(0).toInt()
+				val A=payloadArg(1).toBoolean();
+				val B=payloadArg(2).toBoolean();
+				val L=payloadArg(3).toDouble();
+				OK=(RP>0) && (A && !B) && (L<1.0)
 			#]
 		}
 		println("$name: conditions verified: $OK") color green
@@ -336,9 +356,7 @@ QActor wis context ctx_wis{
  		var RP = 0
  		var A = false
  		var B = false 
- 		var L = 0
- 		val LMAX = 3
- 	
+ 		var L = 0.0
  	#]
  	
  	State s0 initial{ 
@@ -362,7 +380,6 @@ QActor wis context ctx_wis{
 	}Transition t0 
 		whenMsg actor_state -> update_state	
 		whenRequest system_state_req -> handle_system_state_req
-		whenRequest conditions_verified_req -> handle_conditions_verified_req
 				
 	State update_state{
 		onMsg(actor_state:actor_state(P,V)){
@@ -373,7 +390,7 @@ QActor wis context ctx_wis{
 					"incinerator_active" -> A=V.toBoolean()
 					"incinerator_burning"-> B=V.toBoolean()
 					"waste_storage_rps"  -> RP=V.toInt()
-					"ash_storage_level"  -> L=V.toInt()
+					"ash_storage_level"  -> L=V.toDouble()
 				}
 			#]
 			println("$name: $P updated") color yellow
@@ -384,16 +401,62 @@ QActor wis context ctx_wis{
 		println("$name: current state { RP:$RP,A:$A, B:$B, L:$L }") color yellow
 		replyTo system_state_req with system_state_repl : system_state_repl($RP,$A,$B,$L)
 	}Goto waiting_for_updates
-
-	State handle_conditions_verified_req{
-		[#
-			val RESULT=(RP>0) && (A && !B) && (L<LMAX)
-		#]
-		println("$name: current state { RP:$RP, B:$B, L:$L }, conditions verified: $RESULT") color yellow
-		replyTo conditions_verified_req with conditions_verified_repl : conditions_verified_repl($RESULT)
-	}Goto waiting_for_updates
-	
- } 
-
+ }  
+//===========================================================================================
  
+//Tester=====================================================================================
+//QActor test_observer context ctx_tester
+//{
+// 	[#
+// 		var RP = 0
+// 		var A = false
+// 		var B = false 
+// 		var L = 0
+// 		var TESTING=false
+// 	#]
+// 	
+// 	State s0 initial{ 
+// 		println("$name starts") color yellow
+//		observeResource scale msgid actor_state
+//		observeResource incinerator msgid actor_state
+//		observeResource monitoring_device msgid actor_state
+//		
+//	} Goto waiting_for_updates
+//	
+//	State waiting_for_updates{
+//		println("$name: waiting for updates...") color yellow
+//		if[# TESTING && (RP==0 || L==1)#]
+//		{
+//			[#
+//				TESTING=false
+//			#]
+//			replyTo test_req with test_repl()
+//		}
+//	}Transition t0 
+//		whenMsg actor_state -> update_state
+//		whenRequest test_req->handle_test_start
+//				
+//	State update_state{
+//		onMsg(actor_state:actor_state(P,V)){
+//			[#
+//				val P=payloadArg(0);
+//				val V=payloadArg(1);
+//				when (P){
+//					"incinerator_active" -> A=V.toBoolean()
+//					"incinerator_burning"-> B=V.toBoolean()
+//					"waste_storage_rps"  -> RP=V.toInt()
+//					"ash_storage_level"  -> L=V.toInt()
+//				}
+//			#]
+//			println("$name: $P updated") color yellow
+//		}
+//	} Goto waiting_for_updates
+//
+//	State handle_test_start{
+//		[#
+//			TESTING=true;	
+//		#]
+//	}Goto waiting_for_updates
+//	
+// } 
  

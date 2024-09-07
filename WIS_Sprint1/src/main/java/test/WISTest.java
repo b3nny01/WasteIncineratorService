@@ -15,26 +15,26 @@ import unibo.basicomm23.msg.ProtocolType;
 import unibo.basicomm23.utils.CommUtils;
 import unibo.basicomm23.utils.ConnectionFactory;
 
-public class WISTest {
+public class WISTest{
 	private static Interaction connSupport;
 
-	@Before
-	public static void activateConsumer() {
-		CommUtils.outmagenta("activate ");
+	@BeforeClass
+	public static void activateSystem() {
+		CommUtils.outmagenta("activate");
 		it.unibo.ctx_wis.MainCtx_wisKt.main();
+		CommUtils.delay(1000);
 		connSupport = ConnectionFactory.createClientSupport(ProtocolType.tcp, "localhost", "8022");
 
 	}
 
 	@After
 	public void down() {
-		CommUtils.outmagenta("end of  a test ");
+		CommUtils.outmagenta("end of test =======================================================");
 	}
 
 	@Test
 	public void testIncinineratorActivation() {
-		CommUtils.outmagenta("testIncinineratorActivation ======================================= ");
-		CommUtils.delay(1000);
+		CommUtils.outmagenta("testIncinineratorActivation =======================================");
 		IApplMessage req = CommUtils.buildRequest("tester", "system_state_req", "system_state_req", "wis");
 		try {
 			IApplMessage reply = connSupport.request(req);
@@ -51,8 +51,8 @@ public class WISTest {
 
 	@Test
 	public void testOk3RP() {
-		CommUtils.outmagenta("testOk3RP ========================================================= ");
-		CommUtils.delay(100000);
+		CommUtils.outmagenta("testOk3RP =========================================================");
+		CommUtils.delay(100000);		
 		IApplMessage req = CommUtils.buildRequest("tester", "system_state_req", "system_state_req", "wis");
 		try {
 			IApplMessage reply = connSupport.request(req);

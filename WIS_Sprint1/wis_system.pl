@@ -3,10 +3,9 @@
 %====================================================================================
 dispatch( actor_state, actor_state(P,V) ).
 dispatch( incinerator_activation, incinerator_activation(A) ).
-request( conditions_verified_req, conditions_verified_req(N) ).
-reply( conditions_verified_repl, conditions_verified_repl(R) ).  %%for conditions_verified_req
 request( system_state_req, system_state_req(N) ).
 reply( system_state_repl, system_state_repl(RP,A,B,L) ).  %%for system_state_req
+dispatch( system_state, system_state(RP,A,B,L) ).
 event( load_rp, load_rp(N) ).
 event( unload_ash, unload_rp(N) ).
 request( burn_req, burn_req(N) ).
@@ -18,6 +17,8 @@ dispatch( disengage, disengage(ARG) ).
 request( moverobot, moverobot(TARGETX,TARGETY) ).
 reply( moverobotdone, moverobotok(ARG) ).  %%for moverobot
 reply( moverobotfailed, moverobotfailed(PLANDONE,PLANTODO) ).  %%for moverobot
+request( test_req, test_req(N) ).
+reply( test_repl, test_repl(N) ).  %%for test_req
 %====================================================================================
 context(ctx_wis, "localhost",  "TCP", "8022").
 context(ctx_basic_robot, "127.0.0.1",  "TCP", "8020").

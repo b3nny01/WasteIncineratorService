@@ -37,7 +37,7 @@ with Diagram('wis_systemArch', show=False, outformat='png', graph_attr=graphattr
      sys >> Edge( label='unload_ash', **evattr, decorate='true', fontcolor='darkgreen') >> monitoring_device
      op_robot >> Edge( label='load_rp', **eventedgeattr, decorate='true', fontcolor='red') >> sys
      op_robot >> Edge( label='unload_ash', **eventedgeattr, decorate='true', fontcolor='red') >> sys
-     op_robot >> Edge(color='magenta', style='solid', decorate='true', label='<conditions_verified_req<font color="darkgreen"> conditions_verified_repl</font> &nbsp; >',  fontcolor='magenta') >> wis
+     op_robot >> Edge(color='magenta', style='solid', decorate='true', label='<system_state_req<font color="darkgreen"> system_state_repl</font> &nbsp; >',  fontcolor='magenta') >> wis
      op_robot >> Edge(color='magenta', style='solid', decorate='true', label='<burn_req<font color="darkgreen"> burn_repl</font> &nbsp; >',  fontcolor='magenta') >> incinerator
      op_robot >> Edge(color='magenta', style='solid', decorate='true', label='<engage<font color="darkgreen"> engagedone engagerefused</font> &nbsp; moverobot<font color="darkgreen"> moverobotdone moverobotfailed</font> &nbsp; >',  fontcolor='magenta') >> basicrobot
      incinerator >> Edge(color='blue', style='solid',  decorate='true', label='<actor_state &nbsp; >',  fontcolor='blue') >> wis

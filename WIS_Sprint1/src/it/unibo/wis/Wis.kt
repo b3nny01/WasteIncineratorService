@@ -25,9 +25,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 		 		var RP = 0
 		 		var A = false
 		 		var B = false 
-		 		var L = 0
-		 		val LMAX = 3
-		 	
+		 		var L = 0.0
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -65,7 +63,6 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					}	 	 
 					 transition(edgeName="t019",targetState="update_state",cond=whenDispatch("actor_state"))
 					transition(edgeName="t020",targetState="handle_system_state_req",cond=whenRequest("system_state_req"))
-					transition(edgeName="t021",targetState="handle_conditions_verified_req",cond=whenRequest("conditions_verified_req"))
 				}	 
 				state("update_state") { //this:State
 					action { //it:State
@@ -78,7 +75,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 													"incinerator_active" -> A=V.toBoolean()
 													"incinerator_burning"-> B=V.toBoolean()
 													"waste_storage_rps"  -> RP=V.toInt()
-													"ash_storage_level"  -> L=V.toInt()
+													"ash_storage_level"  -> L=V.toDouble()
 												}
 								CommUtils.outyellow("$name: $P updated")
 						}
@@ -93,19 +90,6 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					action { //it:State
 						CommUtils.outyellow("$name: current state { RP:$RP,A:$A, B:$B, L:$L }")
 						answer("system_state_req", "system_state_repl", "system_state_repl($RP,$A,$B,$L)"   )  
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition( edgeName="goto",targetState="waiting_for_updates", cond=doswitch() )
-				}	 
-				state("handle_conditions_verified_req") { //this:State
-					action { //it:State
-						
-									val RESULT=(RP>0) && (A && !B) && (L<LMAX)
-						CommUtils.outyellow("$name: current state { RP:$RP, B:$B, L:$L }, conditions verified: $RESULT")
-						answer("conditions_verified_req", "conditions_verified_repl", "conditions_verified_repl($RESULT)"   )  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

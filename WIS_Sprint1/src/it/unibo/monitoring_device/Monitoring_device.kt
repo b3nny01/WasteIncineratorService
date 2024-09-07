@@ -22,13 +22,15 @@ class Monitoring_device ( name: String, scope: CoroutineScope, isconfined: Boole
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
 		
-		 		var ASH_LEVEL=0
-		 		val MAX_ASH_LEVEL=3
+		 		var CURR_ASH_LEVEL = 0.0
+		 		val MAX_ASH_LEVEL = 3.0
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
 						CommUtils.outmagenta("$name starts")
 						delay(500) 
+						
+									val ASH_LEVEL=CURR_ASH_LEVEL/MAX_ASH_LEVEL	
 						updateResourceRep( "actor_state(ash_storage_level,$ASH_LEVEL)"  
 						)
 						//genTimer( actor, state )
@@ -52,12 +54,14 @@ class Monitoring_device ( name: String, scope: CoroutineScope, isconfined: Boole
 					action { //it:State
 						
 									var R=false
-									if(ASH_LEVEL<MAX_ASH_LEVEL){
+									if(CURR_ASH_LEVEL<MAX_ASH_LEVEL){
 										R=true
-										ASH_LEVEL++
+										CURR_ASH_LEVEL++
 									}
 									
 						CommUtils.outmagenta("$name: handling ash request, result:$R")
+						
+									val ASH_LEVEL=CURR_ASH_LEVEL/MAX_ASH_LEVEL	
 						updateResourceRep( "actor_state(ash_storage_level,$ASH_LEVEL)"  
 						)
 						//genTimer( actor, state )
