@@ -21,7 +21,7 @@ class Monitoring_device ( name: String, scope: CoroutineScope, isconfined: Boole
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
-		
+		 
 		 		var CURR_ASH_LEVEL = 0.0
 		 		val MAX_ASH_LEVEL = 3.0
 		return { //this:ActionBasciFsm

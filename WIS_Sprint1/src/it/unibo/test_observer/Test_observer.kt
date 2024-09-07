@@ -21,6 +21,12 @@ class Test_observer ( name: String, scope: CoroutineScope, isconfined: Boolean=f
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
+		
+		 		var RP = 0
+		 		var A = false
+		 		var B = false 
+		 		var L = 0.0
+		 		var END=false
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -30,13 +36,83 @@ class Test_observer ( name: String, scope: CoroutineScope, isconfined: Boolean=f
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t022",targetState="start_observing",cond=whenRequest("test_req"))
+					 transition(edgeName="t021",targetState="start_test",cond=whenRequest("test_req"))
 				}	 
-				state("start_observing") { //this:State
+				state("start_test") { //this:State
 					action { //it:State
-						observeResource("localhost","8022","ctx_wis","scale","actor_state")
-						observeResource("localhost","8022","ctx_wis","incinerator","actor_state")
-						observeResource("localhost","8022","ctx_wis","monitoring_device","actor_state")
+						CommUtils.outcyan("$name: starting test")
+						observeResource("localhost","8022","ctx_wis","wis","system_state")
+						request("system_state_req", "system_state_req" ,"wis" )  
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t022",targetState="handle_system_state_repl",cond=whenReply("system_state_repl"))
+				}	 
+				state("handle_system_state_repl") { //this:State
+					action { //it:State
+						if( checkMsgContent( Term.createTerm("system_state_repl(RP,A,B,L)"), Term.createTerm("system_state_repl(RP,A,B,L)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								
+												RP=payloadArg(0).toInt()
+												A=payloadArg(1).toBoolean();
+												B=payloadArg(2).toBoolean();
+												L=payloadArg(3).toDouble();
+						}
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="check_end", cond=doswitch() )
+				}	 
+				state("check_end") { //this:State
+					action { //it:State
+						
+									END=(RP==0) || (L==1.0)	
+						CommUtils.outblack("$name: end of test: $END")
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="wait_for_updates", cond=doswitchGuarded({!END 
+					}) )
+					transition( edgeName="goto",targetState="end_test", cond=doswitchGuarded({! (!END 
+					) }) )
+				}	 
+				state("wait_for_updates") { //this:State
+					action { //it:State
+						CommUtils.outcyan("$name: waiting for updates...")
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t023",targetState="handle_update",cond=whenDispatch("system_state"))
+				}	 
+				state("handle_update") { //this:State
+					action { //it:State
+						if( checkMsgContent( Term.createTerm("system_state(RP,A,B,L)"), Term.createTerm("system_state(RP,A,B,L)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								
+												RP=payloadArg(0).toInt()
+												A=payloadArg(1).toBoolean()
+												B=payloadArg(2).toBoolean()
+												L=payloadArg(3).toDouble()
+						}
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="check_end", cond=doswitch() )
+				}	 
+				state("end_test") { //this:State
+					action { //it:State
+						CommUtils.outblack("$name: ending test")
+						answer("test_req", "test_repl", "test_repl($RP,$A,$B,$L)"   )  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

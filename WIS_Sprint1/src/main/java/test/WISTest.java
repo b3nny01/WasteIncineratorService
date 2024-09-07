@@ -48,40 +48,22 @@ public class WISTest{
 			fail("testIncinineratorActivation " + e.getMessage());
 		}
 	}
-
-	@Test
-	public void testOk3RP() {
-		CommUtils.outmagenta("testOk3RP =========================================================");
-		CommUtils.delay(100000);		
-		IApplMessage req = CommUtils.buildRequest("tester", "system_state_req", "system_state_req", "wis");
-		try {
-			IApplMessage reply = connSupport.request(req);
-			CommUtils.outblue("reply=" + reply);
-			String answer = reply.msgContent();
-
-			int wasteStorageRps = Integer.parseInt(answer.split("\\(")[1].split(",")[0].strip());
-			System.out.println("wasteStorageRps: " + wasteStorageRps);
-			assertEquals(wasteStorageRps, 0);
-
-		} catch (Exception e) {
-			fail("testOk3RP " + e.getMessage());
-		}
-	}
 	
 	@Test
 	public void testOk4RP() {
 		CommUtils.outmagenta("testOk4RP ========================================================= ");
-		CommUtils.delay(100000);
-		IApplMessage req = CommUtils.buildRequest("tester", "system_state_req", "system_state_req", "wis");
+		IApplMessage req = CommUtils.buildRequest("test", "test_req", "test_req", "test_observer");
 		try {
 			IApplMessage reply = connSupport.request(req);
 			CommUtils.outblue("reply=" + reply);
-			String answer = reply.msgContent();
-
-			int wasteStorageRps = Integer.parseInt(answer.split("\\(")[1].split(",")[0].strip());
-			System.out.println("wasteStorageRps: " + wasteStorageRps);
-			assertEquals(wasteStorageRps, 1);
-
+			String payload = reply.msgContent();
+			String[] payloadArgs= payload.split("\\(")[1].split("\\)")[0].split(",");
+			int rp = Integer.parseInt(payloadArgs[0]);
+			double l=Double.parseDouble(payloadArgs[3]);
+			
+			assertEquals(rp, 1);
+			assertEquals(l, 1.0,0.001);
+			
 		} catch (Exception e) {
 			fail("testOk4RP " + e.getMessage());
 		}

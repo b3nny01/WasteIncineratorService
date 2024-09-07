@@ -101,7 +101,7 @@ QActor incinerator context ctx_wis{
  
 QActor scale context ctx_wis{
  	[#
- 		var ROLL_PACKETS=3
+ 		var ROLL_PACKETS=4
  	 #]
  	 
  	State s0 initial{ 
@@ -128,7 +128,7 @@ QActor scale context ctx_wis{
  }
  
 QActor monitoring_device context ctx_wis{
- 	[#
+ 	[# 
  		var CURR_ASH_LEVEL = 0.0
  		val MAX_ASH_LEVEL = 3.0
  	 #]
@@ -393,6 +393,7 @@ QActor wis context ctx_wis{
 					"ash_storage_level"  -> L=V.toDouble()
 				}
 			#]
+			updateResource [# "system_state($RP,$A,$B,$L)" #]
 			println("$name: $P updated") color yellow
 		}
 	} Goto waiting_for_updates
@@ -405,58 +406,65 @@ QActor wis context ctx_wis{
 //===========================================================================================
  
 //Tester=====================================================================================
-//QActor test_observer context ctx_tester
-//{
-// 	[#
-// 		var RP = 0
-// 		var A = false
-// 		var B = false 
-// 		var L = 0
-// 		var TESTING=false
-// 	#]
-// 	
-// 	State s0 initial{ 
-// 		println("$name starts") color yellow
-//		observeResource scale msgid actor_state
-//		observeResource incinerator msgid actor_state
-//		observeResource monitoring_device msgid actor_state
-//		
-//	} Goto waiting_for_updates
-//	
-//	State waiting_for_updates{
-//		println("$name: waiting for updates...") color yellow
-//		if[# TESTING && (RP==0 || L==1)#]
-//		{
-//			[#
-//				TESTING=false
-//			#]
-//			replyTo test_req with test_repl()
-//		}
-//	}Transition t0 
-//		whenMsg actor_state -> update_state
-//		whenRequest test_req->handle_test_start
-//				
-//	State update_state{
-//		onMsg(actor_state:actor_state(P,V)){
-//			[#
-//				val P=payloadArg(0);
-//				val V=payloadArg(1);
-//				when (P){
-//					"incinerator_active" -> A=V.toBoolean()
-//					"incinerator_burning"-> B=V.toBoolean()
-//					"waste_storage_rps"  -> RP=V.toInt()
-//					"ash_storage_level"  -> L=V.toInt()
-//				}
-//			#]
-//			println("$name: $P updated") color yellow
-//		}
-//	} Goto waiting_for_updates
-//
-//	State handle_test_start{
-//		[#
-//			TESTING=true;	
-//		#]
-//	}Goto waiting_for_updates
-//	
-// } 
+QActor test_observer context ctx_wis
+{
+ 	[#
+ 		var RP = 0
+ 		var A = false
+ 		var B = false 
+ 		var L = 0.0
+ 		var END=false
+ 	#]
+ 	
+ 	State s0 initial{ 
+ 		println("$name starts") color cyan
+ 		
+	} Transition t0 whenRequest test_req->start_test
+	
+	State start_test{
+		println("$name: starting test") color cyan
+		observeResource wis msgid system_state
+		request wis -m system_state_req:system_state_req
+	}Transition t0 whenReply system_state_repl->handle_system_state_repl
+	
+	State handle_system_state_repl{
+		onMsg(system_state_repl:system_state_repl(RP,A,B,L)){
+			[#
+				RP=payloadArg(0).toInt()
+				A=payloadArg(1).toBoolean();
+				B=payloadArg(2).toBoolean();
+				L=payloadArg(3).toDouble();
+			#]
+		}
+	}Goto check_end
+	
+	State check_end{
+		[#
+			END=(RP==0) || (L==1.0)	
+		#]
+		println("$name: end of test: $END")
+			
+	}Goto wait_for_updates if[#!END#] else end_test
+	
+	State wait_for_updates{
+		println("$name: waiting for updates...") color cyan
+	}Transition t0 whenMsg system_state->handle_update
+	
+	State handle_update{
+		onMsg(system_state:system_state(RP,A,B,L)){
+			[#
+				RP=payloadArg(0).toInt()
+				A=payloadArg(1).toBoolean()
+				B=payloadArg(2).toBoolean()
+				L=payloadArg(3).toDouble()
+			#]
+		}
+	}Goto check_end
+	
+	State end_test{
+		println("$name: ending test")
+		replyTo test_req with test_repl : test_repl($RP,$A,$B,$L)
+	}
+	
+ } 
  

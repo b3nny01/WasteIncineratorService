@@ -77,6 +77,8 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 													"waste_storage_rps"  -> RP=V.toInt()
 													"ash_storage_level"  -> L=V.toDouble()
 												}
+								updateResourceRep( "system_state($RP,$A,$B,$L)"  
+								)
 								CommUtils.outyellow("$name: $P updated")
 						}
 						//genTimer( actor, state )

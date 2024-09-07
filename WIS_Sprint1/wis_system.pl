@@ -33,3 +33,5 @@ context(ctx_basic_robot, "127.0.0.1",  "TCP", "8020").
  static(op_robot).
   qactor( wis, ctx_wis, "it.unibo.wis.Wis").
  static(wis).
+  qactor( test_observer, ctx_wis, "it.unibo.test_observer.Test_observer").
+ static(test_observer).
