@@ -439,7 +439,7 @@ QActor test_observer context ctx_wis{
 		println("$name: starting test") color cyan
 		observeResource wis msgid system_state
 		request wis -m system_state_req:system_state_req
-	}Transition t0 whenReply system_state_repl->handle_system_state_repl
+	}Transition t0 whenReply system_state_repl -> handle_system_state_repl
 	
 	State handle_system_state_repl{
 		onMsg(system_state_repl:system_state_repl(RP,A,B,L)){
@@ -462,7 +462,7 @@ QActor test_observer context ctx_wis{
 	
 	State wait_for_updates{
 		println("$name: waiting for updates...") color cyan
-	}Transition t0 whenMsg system_state->handle_update
+	}Transition t0 whenMsg system_state -> handle_update
 	
 	State handle_update{
 		onMsg(system_state:system_state(RP,A,B,L)){
