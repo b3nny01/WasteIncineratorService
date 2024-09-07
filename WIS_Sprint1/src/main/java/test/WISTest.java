@@ -68,5 +68,4 @@ public class WISTest{
 			fail("testOk4RP " + e.getMessage());
 		}
 	}
-
 }

@@ -48,7 +48,7 @@ class Monitoring_device ( name: String, scope: CoroutineScope, isconfined: Boole
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t03",targetState="handle_unload_ash",cond=whenEvent("unload_ash"))
+					 transition(edgeName="t05",targetState="handle_unload_ash",cond=whenEvent("unload_ash"))
 				}	 
 				state("handle_unload_ash") { //this:State
 					action { //it:State

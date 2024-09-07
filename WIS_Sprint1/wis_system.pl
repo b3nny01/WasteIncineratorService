@@ -3,6 +3,7 @@
 %====================================================================================
 dispatch( actor_state, actor_state(P,V) ).
 dispatch( incinerator_activation, incinerator_activation(A) ).
+dispatch( set_rp_number, set_rp_number(V) ).
 request( system_state_req, system_state_req(N) ).
 reply( system_state_repl, system_state_repl(RP,A,B,L) ).  %%for system_state_req
 dispatch( system_state, system_state(RP,A,B,L) ).

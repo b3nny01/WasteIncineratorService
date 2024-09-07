@@ -51,7 +51,7 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t04",targetState="handle_engage_robot_repl",cond=whenReply("engagedone"))
+					 transition(edgeName="t06",targetState="handle_engage_robot_repl",cond=whenReply("engagedone"))
 				}	 
 				state("handle_engage_robot_repl") { //this:State
 					action { //it:State
@@ -83,7 +83,7 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t05",targetState="handle_start_conditions_verified_repl",cond=whenReply("system_state_repl"))
+					 transition(edgeName="t07",targetState="handle_start_conditions_verified_repl",cond=whenReply("system_state_repl"))
 				}	 
 				state("handle_start_conditions_verified_repl") { //this:State
 					action { //it:State
@@ -120,8 +120,8 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t06",targetState="load_rp",cond=whenReply("moverobotdone"))
-					transition(edgeName="t07",targetState="move_to_waste_storage",cond=whenReply("moverobotfailed"))
+					 transition(edgeName="t08",targetState="load_rp",cond=whenReply("moverobotdone"))
+					transition(edgeName="t09",targetState="move_to_waste_storage",cond=whenReply("moverobotfailed"))
 				}	 
 				state("load_rp") { //this:State
 					action { //it:State
@@ -148,8 +148,8 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t08",targetState="request_to_burn",cond=whenReply("moverobotdone"))
-					transition(edgeName="t09",targetState="move_to_burn_in",cond=whenReply("moverobotfailed"))
+					 transition(edgeName="t010",targetState="request_to_burn",cond=whenReply("moverobotdone"))
+					transition(edgeName="t011",targetState="move_to_burn_in",cond=whenReply("moverobotfailed"))
 				}	 
 				state("request_to_burn") { //this:State
 					action { //it:State
@@ -176,8 +176,8 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t010",targetState="wait_for_burn_repl",cond=whenReply("moverobotdone"))
-					transition(edgeName="t011",targetState="return_to_home",cond=whenReply("moverobotfailed"))
+					 transition(edgeName="t012",targetState="wait_for_burn_repl",cond=whenReply("moverobotdone"))
+					transition(edgeName="t013",targetState="return_to_home",cond=whenReply("moverobotfailed"))
 				}	 
 				state("wait_for_burn_repl") { //this:State
 					action { //it:State
@@ -187,7 +187,7 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t012",targetState="handle_burn_repl",cond=whenReply("burn_repl"))
+					 transition(edgeName="t014",targetState="handle_burn_repl",cond=whenReply("burn_repl"))
 				}	 
 				state("handle_burn_repl") { //this:State
 					action { //it:State
@@ -214,8 +214,8 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t013",targetState="load_ash",cond=whenReply("moverobotdone"))
-					transition(edgeName="t014",targetState="move_to_burn_out",cond=whenReply("moverobotfailed"))
+					 transition(edgeName="t015",targetState="load_ash",cond=whenReply("moverobotdone"))
+					transition(edgeName="t016",targetState="move_to_burn_out",cond=whenReply("moverobotfailed"))
 				}	 
 				state("load_ash") { //this:State
 					action { //it:State
@@ -241,7 +241,7 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t015",targetState="unload_ash",cond=whenReply("moverobotdone"))
+					 transition(edgeName="t017",targetState="unload_ash",cond=whenReply("moverobotdone"))
 				}	 
 				state("unload_ash") { //this:State
 					action { //it:State
@@ -264,7 +264,7 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t016",targetState="handle_continue_conditions_verified_repl",cond=whenReply("system_state_repl"))
+					 transition(edgeName="t018",targetState="handle_continue_conditions_verified_repl",cond=whenReply("system_state_repl"))
 				}	 
 				state("handle_continue_conditions_verified_repl") { //this:State
 					action { //it:State
@@ -301,8 +301,8 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t017",targetState="check_start_conditions",cond=whenReply("moverobotdone"))
-					transition(edgeName="t018",targetState="move_to_home",cond=whenReply("moverobotfailed"))
+					 transition(edgeName="t019",targetState="check_start_conditions",cond=whenReply("moverobotdone"))
+					transition(edgeName="t020",targetState="move_to_home",cond=whenReply("moverobotfailed"))
 				}	 
 			}
 		}

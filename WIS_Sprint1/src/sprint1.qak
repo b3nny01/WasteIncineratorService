@@ -7,6 +7,8 @@ Dispatch	actor_state					: actor_state(P,V)
 
 Dispatch 	incinerator_activation		: incinerator_activation(A)
 
+Dispatch	set_rp_number				: set_rp_number(V)
+
 Request 	system_state_req			: system_state_req(N)
 Reply 		system_state_repl			: system_state_repl(RP,A,B,L) for system_state_req
 
@@ -108,7 +110,20 @@ QActor scale context ctx_wis{
  		println("$name starts") color blue
 		delay 500
 		updateResource [# "actor_state(waste_storage_rps,$ROLL_PACKETS)" #]
-	}Goto idle
+	}
+	Transition t0 whenTime 1000 -> idle
+				  whenMsg set_rp_number -> handle_set_rp_number 
+	
+	State handle_set_rp_number{
+		onMsg(set_rp_number : set_rp_number(V)){
+			[#
+				ROLL_PACKETS= payloadArg(0).toInt()	
+			#]
+			updateResource [# "actor_state(waste_storage_rps,$ROLL_PACKETS)" #]
+			println("$name: setting RP number: $ROLL_PACKETS") color blue
+		}
+	}
+	Goto idle
 	
 	State idle{
 		println("$name: idle") color blue
@@ -364,7 +379,7 @@ QActor wis context ctx_wis{
 		observeResource scale msgid actor_state
 		observeResource incinerator msgid actor_state
 		observeResource monitoring_device msgid actor_state
-		
+		//forward scale -m set_rp_number : set_rp_number(4)
 	} Goto activate_incinerator	
 	
 	State activate_incinerator{
@@ -406,8 +421,7 @@ QActor wis context ctx_wis{
 //===========================================================================================
  
 //Tester=====================================================================================
-QActor test_observer context ctx_wis
-{
+QActor test_observer context ctx_wis{
  	[#
  		var RP = 0
  		var A = false
