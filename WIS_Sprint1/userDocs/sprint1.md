@@ -47,8 +47,25 @@ For this reason, we have decided to introduce two specific events, LoadRP and Un
 ### System Architecture
 
 based on the Problem Analysis carried on we implemented an executable version of the system covering the discussed features, we attach here a visual representation of the system architecture:
-
-<img src="resources/imgs/wis_systemarch.png"/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<img src="resources/imgs/wis_systemarch.png" width="1100px"/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
 
 ## Test Plan
 
@@ -66,7 +83,7 @@ based on the Problem Analysis carried on we implemented an executable version of
   <td>Once the system is inictialized, Incinerator is active</td>
 </tr>
 <tr> 
-  <td><b>TestOk4Rp</b></td>
+  <td><b>testOk4Rp</b></td>
   <td>WasteStorage contains 4 RP, AshStorge is empty and can contain the ashes of 3 RPs, nobody empties AshStorage</td>
   <td>After some time WasteStorage contains 1 RP and AshStorage is full</td>
 </tr>
