@@ -37,13 +37,40 @@ However, a more in-depth analysis reveals that the OpRobot actually needs to ver
 
 For these reasons, it is more convenient to apply the **Single Responsibility Principle** by incorporating the logic for controlling the DDRRobot into a dedicated actor, the **BasicRobot**, which communicates with the WIS to ensure that the initial conditions are verified.
 
+### LoadRP and UnloadAsh
+In a real system, the opRobot should be able to load and unload the RPs and their ashes, and such changes to the system would be detected by the respective sensors (Scale and MonitoringDevice) without the need to exchange messages at the software level.<br/>
+However, since the current prototype operates in a purely virtual environment, it is necessary to simulate these two actions by sending appropriate messages.<br/>
+For this reason, we have decided to introduce two specific events, LoadRP and UnloadAsh, which modify the state of the Scale and MonitoringDevice, respectively.
+
 ## Implementation
 
 ### System Architecture
 
 based on the Problem Analysis carried on we implemented an executable version of the system covering the discussed features, we attach here a visual representation of the system architecture:
 
-<img src="">**PUT IMAGE**
+<img src="resources/imgs/wis_systemarch.png"/>
+
+## Test Plan
+
+**Test Class**: [WISTest](../src/main/java/test/WISTest.java)
+
+<table>
+<tr>
+  <th><b>Test Name</b></th>
+  <th><b>Initial Condition</b></th>
+  <th><b>Expected Behavior</b></th>
+</tr>
+<tr>
+  <td><b>testIncinineratorActivation</b></td>
+  <td>WasteStorage contains 4 RP, AshStorge is empty, nobody empties AshStorage, Incinerator is inactive</td>
+  <td>Once the system is inictialized, Incinerator is active</td>
+</tr>
+<tr> 
+  <td><b>TestOk4Rp</b></td>
+  <td>WasteStorage contains 4 RP, AshStorge is empty and can contain the ashes of 3 RPs, nobody empties AshStorage</td>
+  <td>After some time WasteStorage contains 1 RP and AshStorage is full</td>
+</tr>
+</table>
 
 ### Usage
 To test the system you will have to activate the Virtual Environment first.
@@ -65,6 +92,8 @@ Lastly you have to activate the WIS system, by opening a third terminal inside t
 ```
 gradlew run
 ```
+**n.b.** Type `gradlew test` If you want to launch JUnit tests instead of activating the system demo
+
 ## Future Sprints
 In the next sprint, we will focus on the MonitoringDevice's behavior.<br/>
 Our goal is to connect the OpRobot to a virtual environment (the 'VirtualRobot' provided by the customer) so that it will be simple to switch to a physical OpRobot at any time by only changing a configuration parameter. 
