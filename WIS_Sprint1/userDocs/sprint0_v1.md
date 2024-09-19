@@ -158,12 +158,12 @@ Upon analyzing the requirements, we found that WasteStorage and AshStorage do no
   <th><b>Expected Behavior</b></th>
 </tr>
 <tr>
-  <td><b>test_ok_1_rp</b></td>
-  <td>WasteStorage contains 1 RP, AshStorge is empty, nobody empties AshStorage</td>
-  <td>After some time WasteStorage is empty and AshStorage level increased</td>
+  <td><b>testIncinineratorActivation</b></td>
+  <td>WasteStorage contains 4 RP, AshStorge is empty, nobody empties AshStorage, Incinerator is inactive</td>
+  <td>Once the system is inictialized, Incinerator is active</td>
 </tr>
 <tr> 
-  <td><b>test_ok_4_rp</b></td>
+  <td><b>TestOk4Rp</b></td>
   <td>WasteStorage contains 4 RP, AshStorge is empty and can contain the ashes of 3 RPs, nobody empties AshStorage</td>
   <td>After some time WasteStorage contains 1 RP and AshStorage is full</td>
 </tr>
