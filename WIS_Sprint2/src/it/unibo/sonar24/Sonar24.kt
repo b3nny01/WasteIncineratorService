@@ -28,20 +28,20 @@ class Sonar24 ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 						CommUtils.outmagenta("$name STARTS")
 						delay(1000) 
 						forward("sonarstart", "sonarstart(1)" ,"sonardevice" ) 
-						subscribeToLocalActor("distancefilter") 
+						subscribeToLocalActor("datacleaner") 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t00",targetState="handleObstacle",cond=whenEvent("obstacle"))
+					 transition(edgeName="t00",targetState="handleData",cond=whenEvent("sonardata"))
 				}	 
-				state("handleObstacle") { //this:State
+				state("handleData") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("obstacle(D)"), Term.createTerm("obstacle(D)"), 
+						if( checkMsgContent( Term.createTerm("distance(D)"), Term.createTerm("distance(D)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								  D = payloadArg(0).toInt()  
-								CommUtils.outmagenta("$name OBSTACLE DETECTED ($D)")
+								CommUtils.outmagenta("$name: ash storage distance: $D")
 								forward("actor_state", "actor_state(ash_storage_level,$D)" ,"wis" ) 
 						}
 						//genTimer( actor, state )
@@ -49,7 +49,7 @@ class Sonar24 ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t01",targetState="handleObstacle",cond=whenEvent("obstacle"))
+					 transition(edgeName="t01",targetState="handleData",cond=whenEvent("sonardata"))
 				}	 
 			}
 		}

@@ -78,7 +78,6 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 									}
 									
 						CommUtils.outred("$name: handling burn request, result:$BURNING")
-						forward("ledOn", "ledOn(1)" ,"wis" ) 
 						if(  BURNING  
 						 ){updateResourceRep( "actor_state(incinerator_burning,$BURNING)"  
 						)
@@ -87,7 +86,6 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 										BURNING=false
 						updateResourceRep( "actor_state(incinerator_burning,$BURNING)"  
 						)
-						forward("ledOff", "ledOff(1)" ,"wis" ) 
 						}
 						answer("burn_req", "burn_repl", "burn_repl($R)"   )  
 						//genTimer( actor, state )

@@ -21,7 +21,9 @@ class Datacleaner ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
-		 var D = 0;  
+		 
+				var CURRENT = 0
+				var PREVIOUS = 0
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -34,15 +36,16 @@ class Datacleaner ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t04",targetState="filter",cond=whenEvent("sonardata"))
+					 transition(edgeName="t02",targetState="filter",cond=whenEvent("sonardata"))
 				}	 
 				state("filter") { //this:State
 					action { //it:State
 						if( checkMsgContent( Term.createTerm("distance(D)"), Term.createTerm("distance(D)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								  D = payloadArg(0).toInt()  
-								if(  D < 100  
-								 ){emitLocalStreamEvent("sonardata", "distance($D)" ) 
+								  CURRENT = payloadArg(0).toInt()  
+								if(  CURRENT >= (PREVIOUS + 3) || CURRENT <= (PREVIOUS - 3)  
+								 ){emitLocalStreamEvent("sonardata", "distance($CURRENT)" ) 
+								 PREVIOUS = CURRENT  
 								}
 						}
 						//genTimer( actor, state )
@@ -50,7 +53,7 @@ class Datacleaner ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t05",targetState="filter",cond=whenEvent("sonardata"))
+					 transition(edgeName="t03",targetState="filter",cond=whenEvent("sonardata"))
 				}	 
 			}
 		}

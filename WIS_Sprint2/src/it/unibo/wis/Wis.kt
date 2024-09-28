@@ -26,7 +26,8 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 		 		var A = false
 		 		var B = false 
 		 		var L = 0.0
-		 		val DLIMT = 20.0
+		 		val DLIMT = 5.0
+		 		val DMAX = 30.0
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -77,18 +78,18 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 													"waste_storage_rps"  -> RP=V.toInt()
 													"ash_storage_level"  -> L=V.toDouble()
 												}
-												
-												//TODO: led che lampeggia quando la distanza è massima/container vuoto
-												if (L == DLIMT){
-								forward("ledBlink", "ledBlink($L)" ,"led" ) 
-								
-												}
-												
-												if (B){
-								forward("ledOn", "ledOn($B)" ,"led" ) 
-								
-												} else  
-								forward("ledOff", "ledOff($B)" ,"led" ) 
+								if(  (L == DLIMT || L >= DMAX)  
+								 ){forward("ledBlink", "ledBlink($L)" ,"led" ) 
+								CommUtils.outblack("$name: SENT BLINK TO LED")
+								}
+								if(  B  
+								 ){forward("ledOn", "ledOn($B)" ,"led" ) 
+								CommUtils.outblack("$name: SENT ON TO LED")
+								}
+								else
+								 {forward("ledOff", "ledOff($B)" ,"led" ) 
+								 CommUtils.outblack("$name: SENT OFF TO LED")
+								 }
 								updateResourceRep( "system_state($RP,$A,$B,$L)"  
 								)
 								CommUtils.outyellow("$name: $P updated")

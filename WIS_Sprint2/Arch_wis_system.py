@@ -43,7 +43,7 @@ with Diagram('wis_systemArch', show=False, outformat='png', graph_attr=graphattr
      op_robot >> Edge(color='magenta', style='solid', decorate='true', label='<burn_req<font color="darkgreen"> burn_repl</font> &nbsp; >',  fontcolor='magenta') >> incinerator
      op_robot >> Edge(color='magenta', style='solid', decorate='true', label='<engage<font color="darkgreen"> engagedone engagerefused</font> &nbsp; moverobot<font color="darkgreen"> moverobotdone moverobotfailed</font> &nbsp; >',  fontcolor='magenta') >> basicrobot
      test_observer >> Edge(color='magenta', style='solid', decorate='true', label='<system_state_req<font color="darkgreen"> system_state_repl</font> &nbsp; >',  fontcolor='magenta') >> wis
-     incinerator >> Edge(color='blue', style='solid',  decorate='true', label='<ledOn &nbsp; ledOff &nbsp; actor_state &nbsp; >',  fontcolor='blue') >> wis
+     incinerator >> Edge(color='blue', style='solid',  decorate='true', label='<actor_state &nbsp; >',  fontcolor='blue') >> wis
      wis >> Edge(color='blue', style='solid',  decorate='true', label='<system_state &nbsp; >',  fontcolor='blue') >> test_observer
      wis >> Edge(color='blue', style='solid',  decorate='true', label='<ledBlink &nbsp; ledOn &nbsp; ledOff &nbsp; >',  fontcolor='blue') >> led
      wis >> Edge(color='blue', style='solid',  decorate='true', label='<incinerator_activation &nbsp; >',  fontcolor='blue') >> incinerator

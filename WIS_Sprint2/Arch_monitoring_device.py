@@ -27,14 +27,12 @@ with Diagram('monitoring_deviceArch', show=False, outformat='png', graph_attr=gr
 ### see https://renenyffenegger.ch/notes/tools/Graphviz/attributes/label/HTML-like/index
      with Cluster('ctx_monitoring_device', graph_attr=nodeattr):
           sonar24=Custom('sonar24','./qakicons/symActorSmall.png')
-          distancefilter=Custom('distancefilter','./qakicons/symActorSmall.png')
           datacleaner=Custom('datacleaner','./qakicons/symActorSmall.png')
           sonardevice=Custom('sonardevice','./qakicons/symActorSmall.png')
           led=Custom('led','./qakicons/symActorSmall.png')
      with Cluster('ctx_wis', graph_attr=nodeattr):
           wis=Custom('wis(ext)','./qakicons/externalQActor.png')
-     distancefilter >> Edge( label='obstacle', **eventedgeattr, decorate='true', fontcolor='red') >> sonar24
-     datacleaner >> Edge( label='sonardata', **eventedgeattr, decorate='true', fontcolor='red') >> distancefilter
+     datacleaner >> Edge( label='sonardata', **eventedgeattr, decorate='true', fontcolor='red') >> sonar24
      sonardevice >> Edge( label='sonardata', **eventedgeattr, decorate='true', fontcolor='red') >> datacleaner
      sonar24 >> Edge(color='blue', style='solid',  decorate='true', label='<sonarstart &nbsp; >',  fontcolor='blue') >> sonardevice
      sonar24 >> Edge(color='blue', style='solid',  decorate='true', label='<actor_state &nbsp; >',  fontcolor='blue') >> wis

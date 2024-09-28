@@ -30,9 +30,9 @@ class Led ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t012",targetState="ledOn",cond=whenDispatch("ledOn"))
-					transition(edgeName="t013",targetState="ledOff",cond=whenDispatch("ledOff"))
-					transition(edgeName="t014",targetState="ledBlink",cond=whenDispatch("ledBlink"))
+					 transition(edgeName="t011",targetState="ledOn",cond=whenDispatch("ledOn"))
+					transition(edgeName="t012",targetState="ledOff",cond=whenDispatch("ledOff"))
+					transition(edgeName="t013",targetState="ledBlink",cond=whenDispatch("ledBlink"))
 				}	 
 				state("ledOn") { //this:State
 					action { //it:State
@@ -44,8 +44,8 @@ class Led ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t015",targetState="ledOff",cond=whenDispatch("ledOff"))
-					transition(edgeName="t016",targetState="ledBlink",cond=whenDispatch("ledBlink"))
+					 transition(edgeName="t014",targetState="ledOff",cond=whenDispatch("ledOff"))
+					transition(edgeName="t015",targetState="ledBlink",cond=whenDispatch("ledBlink"))
 				}	 
 				state("ledOff") { //this:State
 					action { //it:State
@@ -57,8 +57,8 @@ class Led ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t017",targetState="ledOn",cond=whenDispatch("ledOn"))
-					transition(edgeName="t018",targetState="ledBlink",cond=whenDispatch("ledBlink"))
+					 transition(edgeName="t016",targetState="ledOn",cond=whenDispatch("ledOn"))
+					transition(edgeName="t017",targetState="ledBlink",cond=whenDispatch("ledBlink"))
 				}	 
 				state("ledBlink") { //this:State
 					action { //it:State
@@ -70,8 +70,8 @@ class Led ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t019",targetState="ledOn",cond=whenDispatch("ledOn"))
-					transition(edgeName="t020",targetState="ledOff",cond=whenDispatch("ledOff"))
+					 transition(edgeName="t018",targetState="ledOn",cond=whenDispatch("ledOn"))
+					transition(edgeName="t019",targetState="ledOff",cond=whenDispatch("ledOff"))
 				}	 
 			}
 		}

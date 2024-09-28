@@ -35,7 +35,7 @@ class Sonardevice ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="startSonar", cond=doswitch() )
+					 transition(edgeName="t04",targetState="startSonar",cond=whenDispatch("sonarstart"))
 				}	 
 				state("startSonar") { //this:State
 					action { //it:State
@@ -80,10 +80,10 @@ class Sonardevice ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t06",targetState="stopSonar",cond=whenDispatch("sonarstop"))
-					transition(edgeName="t07",targetState="readSonarData",cond=whenDispatchGuarded("doread",{ working   
+					 transition(edgeName="t05",targetState="stopSonar",cond=whenDispatch("sonarstop"))
+					transition(edgeName="t06",targetState="readSonarData",cond=whenDispatchGuarded("doread",{ working   
 					}))
-					transition(edgeName="t08",targetState="endOfRead",cond=whenDispatchGuarded("doread",{ !working  
+					transition(edgeName="t07",targetState="endOfRead",cond=whenDispatchGuarded("doread",{ !working  
 					}))
 				}	 
 				state("endOfRead") { //this:State
@@ -99,8 +99,8 @@ class Sonardevice ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t09",targetState="startSonar",cond=whenDispatch("sonarstart"))
-					transition(edgeName="t010",targetState="stopSonar",cond=whenDispatch("sonarstop"))
+					 transition(edgeName="t08",targetState="startSonar",cond=whenDispatch("sonarstart"))
+					transition(edgeName="t09",targetState="stopSonar",cond=whenDispatch("sonarstop"))
 				}	 
 				state("stopSonar") { //this:State
 					action { //it:State
@@ -111,7 +111,7 @@ class Sonardevice ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t011",targetState="stopSonar",cond=whenDispatch("sonarstop"))
+					 transition(edgeName="t010",targetState="stopSonar",cond=whenDispatch("sonarstop"))
 				}	 
 			}
 		}

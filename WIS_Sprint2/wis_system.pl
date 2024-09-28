@@ -8,7 +8,7 @@ request( system_state_req, system_state_req(N) ).
 reply( system_state_repl, system_state_repl(RP,A,B,L) ).  %%for system_state_req
 dispatch( system_state, system_state(RP,A,B,L) ).
 event( load_rp, load_rp(N) ).
-event( unload_ash, unload_rp(N) ).
+event( unload_ash, unload_ash(N) ).
 request( burn_req, burn_req(N) ).
 reply( burn_repl, burn_repl(N) ).  %%for burn_req
 request( engage, engage(OWNER,STEPTIME) ).
@@ -21,7 +21,6 @@ reply( moverobotfailed, moverobotfailed(PLANDONE,PLANTODO) ).  %%for moverobot
 dispatch( ledOn, ledOn(X) ).
 dispatch( ledOff, ledOff(X) ).
 dispatch( ledBlink, ledBlink(X) ).
-dispatch( ash_level, ash_level(D) ).
 request( test_req, test_req(N) ).
 reply( test_repl, test_repl(N) ).  %%for test_req
 %====================================================================================
