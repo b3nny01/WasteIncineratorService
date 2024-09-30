@@ -95,12 +95,12 @@
 <tr><th>Developed by</th><td>Alessio Benenati<br/>Giulia Fattori</td></tr>
 </table>
 <h2 id="sprint-starting-condition-and-goals">Sprint Starting Condition and Goals</h2>
-<p>In the previous sprint we focused on requirements analysis and we produced a simple base archictecture of what could be inferred by the assignement text.
-in this sprint we will focus on the relationship between WIS and OpRobot, our goals are</p>
+<p>In the previous sprint, we focused on requirements analysis and produced a simple base architecture of what could be inferred from the assignment text.
+In this one we will focus on the relationship between WIS and OpRobot, our goals are:</p>
 <ul>
-<li>finding the best way to divide the buisness logic between the OpRobot and the WIS actor</li>
+<li>finding the best way to divide the business logic between the OpRobot and the WIS actor</li>
 <li>consequently choosing the right model (<strong>Actor</strong> or <strong>POJO</strong>) for the OpRobot</li>
-<li>producing a simple prototype of the system reproducing the functioning of this two entities</li>
+<li>producing a simple prototype of the system reproducing the functioning of these two entities</li>
 </ul>
 <h2 id="problem-analysis">Problem Analysis</h2>
 <h3 id="wis-and-system-observability">WIS and system observability</h3>
@@ -108,34 +108,16 @@ in this sprint we will focus on the relationship between WIS and OpRobot, our go
 <h3 id="wis-and-oprobot">WIS and OpRobot</h3>
 <p>Regarding the OpRobot the requirements do not provide enough information to determine with certainty how to model it. In particular, it is stated that the behavior actuator of the OpRobot is the DDRRobot, which is provided by the client as a <strong>service</strong> (<a href="/unibo.basicrobot24/">BasicRobot</a>). However, it is not specified whether this should be controlled by an autonomous actor or whether the WIS itself could control the BasicRobot.</p>
 <p>At first glance, one might think that having the WIS control the DDRRobot could be a good idea because the execution cycle of the OpRobot requires observing the system's state to verify the initial conditions, and this information is already present in the WIS as it acts as an observer.</p>
-<p>However, a more in-depth analysis reveals that the OpRobot actually needs to verify the initial conditions only at two specific moments (at the beginning and at the end of an execution cycle) and would not gain significant advantages from continuously observing the state of the entire system (which would significantly increase the complexity of the WIS actor, which would have to both control the DDRRobot and update its internal representation of the system's state).</p>
+<p>However, a more in-depth analysis reveals that OpRobot actually needs to verify the initial conditions only at two specific moments (at the beginning and the end of an execution cycle) and would not gain significant advantages from continuously observing the state of the entire system (which would significantly increase the complexity of the WIS actor, which would have to both control the DDRRobot and update its internal representation of the system's state).</p>
 <p>For these reasons, it is more convenient to apply the <strong>Single Responsibility Principle</strong> by incorporating the logic for controlling the DDRRobot into a dedicated actor, the <strong>BasicRobot</strong>, which communicates with the WIS to ensure that the initial conditions are verified.</p>
 <h3 id="loadrp-and-unloadash">LoadRP and UnloadAsh</h3>
-<p>In a real system, the opRobot should be able to load and unload the RPs and their ashes, and such changes to the system would be detected by the respective sensors (Scale and MonitoringDevice) without the need to exchange messages at the software level.<br/>
+<p>In a real system, the OpRobot should be able to load and unload the RPs and their ashes, and such changes to the system would be detected by the respective sensors (Scale and MonitoringDevice) without the need to exchange messages at the software level.<br/>
 However, since the current prototype operates in a purely virtual environment, it is necessary to simulate these two actions by sending appropriate messages.<br/>
 For this reason, we have decided to introduce two specific events, LoadRP and UnloadAsh, which modify the state of the Scale and MonitoringDevice, respectively.</p>
 <h2 id="implementation">Implementation</h2>
 <h3 id="system-architecture">System Architecture</h3>
-<p>based on the Problem Analysis carried on we implemented an executable version of the system covering the discussed features, we attach here a visual representation of the system architecture:
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
+<p>Based on the Problem Analysis carried out previously, we implemented an executable version of the system covering the discussed features; we attach here a visual representation of the system architecture:</p>
 <img src="resources/imgs/wis_systemarch.png" width="1100px"/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/></p>
 <h2 id="test-plan">Test Plan</h2>
 <p><strong>Test Class</strong>: <a href="../src/main/java/test/WISTest.java">WISTest</a></p>
 <table>
@@ -147,7 +129,7 @@ For this reason, we have decided to introduce two specific events, LoadRP and Un
 <tr>
   <td><b>testIncinineratorActivation</b></td>
   <td>WasteStorage contains 4 RP, AshStorge is empty, nobody empties AshStorage, Incinerator is inactive</td>
-  <td>Once the system is inictialized, Incinerator is active</td>
+  <td>Once the system is initialized, Incinerator is active</td>
 </tr>
 <tr> 
   <td><b>testOk4Rp</b></td>
@@ -160,18 +142,18 @@ For this reason, we have decided to introduce two specific events, LoadRP and Un
 To do so, open a terminal in the <code>unibo.basicrobot24</code> folder and type</p>
 <pre class="hljs"><code><div>docker compose -f virtualRobot23.yaml up
 </div></code></pre>
-<p><strong>n.b.</strong> if you have an older version of docker, you may have to type <code>docker-compose</code> instead of <code>docker compose</code></p>
-<p>After that you will have to activate the BasicRobot, that will act as a mediator between the VirtualRobot and the WasteIncineratorService application.
+<p><strong>N.B.</strong> If you have an older version of docker, you may have to type <code>docker-compose</code> instead of <code>docker compose</code></p>
+<p>After that, you will have to activate the BasicRobot, which will act as a mediator between the VirtualRobot and the WasteIncineratorService application.
 To do so open another terminal inside the <code>unibo.basicrobot24</code> folder and type</p>
 <pre class="hljs"><code><div>gradlew run
 </div></code></pre>
-<p>Lastly you have to activate the WIS system, by opening a third terminal inside the <code>WIS_Sprint1</code> folder and running</p>
+<p>Lastly, you have to activate the WIS system by opening a third terminal inside the <code>WIS_Sprint1</code> folder and running</p>
 <pre class="hljs"><code><div>gradlew run
 </div></code></pre>
-<p><strong>n.b.</strong> Type <code>gradlew test</code> If you want to launch JUnit tests instead of activating the system demo</p>
+<p><strong>N.B.</strong> Type <code>gradlew test</code> if you want to launch JUnit tests instead of activating the system demo.</p>
 <h2 id="future-sprints">Future Sprints</h2>
 <p>In the next sprint, we will focus on the MonitoringDevice's behavior.<br/>
-Our goal is to connect the OpRobot to a virtual environment (the 'VirtualRobot' provided by the customer) so that it will be simple to switch to a physical OpRobot at any time by only changing a configuration parameter.</p>
+Our goal is to connect the actual prototype of the system to a real monitoring device deployied on a raspberry.</p>
 
 </body>
 

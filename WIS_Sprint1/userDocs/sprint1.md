@@ -47,25 +47,9 @@ For this reason, we have decided to introduce two specific events, LoadRP and Un
 ### System Architecture
 
 Based on the Problem Analysis carried out previously, we implemented an executable version of the system covering the discussed features; we attach here a visual representation of the system architecture:
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
+
 <img src="resources/imgs/wis_systemarch.png" width="1100px"/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
+
 
 ## Test Plan
 
@@ -113,4 +97,4 @@ gradlew run
 
 ## Future Sprints
 In the next sprint, we will focus on the MonitoringDevice's behavior.<br/>
-Our goal is to connect the OpRobot to a virtual environment (the 'VirtualRobot' provided by the customer) so that it will be simple to switch to a physical OpRobot at any time by only changing a configuration parameter. 
+Our goal is to connect the actual prototype of the system to a real monitoring device deployied on a raspberry. 
