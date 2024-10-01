@@ -97,4 +97,4 @@ gradlew run
 
 ## Future Sprints
 In the next sprint, we will focus on the MonitoringDevice's behavior.<br/>
-Our goal is to connect the actual prototype of the system to a real monitoring device deployied on a raspberry. 
+Our goal is to connect the actual prototype of the system to a real monitoring device deployed on a real raspberry. 
