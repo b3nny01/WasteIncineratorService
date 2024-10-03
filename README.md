@@ -69,6 +69,22 @@ At the end of each Sprint we produced an executable version of the system coveri
             <img src="resources/imgs/htmlLogo.png" height="15px"/> <a href="https://htmlpreview.github.io/?https://github.com/b3nny01/WasteIncineratorService/blob/main/WIS_Sprint1/userDocs/sprint1.html" title="sprint1.html" download>sprint1.html</a>
         </td>
     </tr>
+    <tr>
+        <td>
+            <a href="./WIS_Sprint2/">WIS_Sprint2</a>
+        </td>
+        <td width="300px">
+            Monitoring device, prototype connection to a physical raspberry.
+        </td>
+        <td>
+            <a href="./WIS_Sprint1/src/sprint1.qak">sprint1.qak</a>
+        </td>
+        <td>
+            <img src="resources/imgs/readmeLogo.svg" height="15px"/> <a href="WIS_Sprint1/userDocs/sprint1.md">sprint1.md</a><br/>
+            <img src="resources/imgs/pdfLogo.png" height="15px"/> <a href="https://nbviewer.org/github/b3nny01/WasteIncineratorService/blob/main/WIS_Sprint1/userDocs/sprint1.pdf" title="sprint1.pdf" download>sprint1.pdf</a><br/>
+            <img src="resources/imgs/htmlLogo.png" height="15px"/> <a href="https://htmlpreview.github.io/?https://github.com/b3nny01/WasteIncineratorService/blob/main/WIS_Sprint1/userDocs/sprint1.html" title="sprint1.html" download>sprint1.html</a>
+        </td>
+    </tr>
 </table>
 
 ## Usage
