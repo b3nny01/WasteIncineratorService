@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>sprint0_v0.md</title>
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+    
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+</head>
+
+<body>
+    <h1 id="waste-incinerator-service">Waste Incinerator Service</h1>
+<h2 id="sprint-info">Sprint info</h2>
+<table>
+<tr><th>Sprint name</th><td>Sprint 0</td></tr>
+<tr><th>Previous sprint</th><td></td></tr>
+<tr><th>QAK model</th><td><a href="../src/sprint0.qak">sprint0.qak</a></td></tr>
+<tr><th>Developed by</th><td>Alessio Benenati<br/>Giulia Fattori</td></tr>
+<tr><th>Repo Site</th><td><a href="https://github.com/b3nny01/WasteIncineratorService">WasteIncineratorService</td><tr>
+</table>
+<h2 id="requirements-analysis">Requirements Analysis</h2>
+<h3 id="structure">Structure</h3>
+<p>Analyzing the natural language requirements text, we identified the following entities that should be modeled:</p>
+<ul>
+<li>ServiceArea
+<ul>
+<li>Home</li>
+<li>BurnIn port</li>
+<li>BurnOut port</li>
+<li>WasteIn</li>
+<li>AshOut</li>
+</ul>
+</li>
+<li>OpRobot</li>
+<li>DDRRobot</li>
+<li>WIS</li>
+<li>Incinerator</li>
+<li>WasteStorage
+<ul>
+<li>Scale</li>
+<li>RP</li>
+<li>WRP</li>
+</ul>
+</li>
+<li>AshStorage
+<ul>
+<li>MonitoringDevice</li>
+<li>Sonar</li>
+<li>Led</li>
+</ul>
+</li>
+<li>ServiceStatusGUI</li>
+</ul>
+<h3 id="interaction-and-behavior">Interaction and Behavior</h3>
+<p>From the requirements, we inferred the following information that needs to be modeled:</p>
+<table>
+  <tr>
+    <th><b>Information</b></th>
+    <th><b>Source</b></th>
+    <th><b>Destination</b></th>
+  </tr>
+  <tr>
+    <td>activationCommand</td>
+    <td>unspecified</td>
+    <td>Incinerator</td>
+  </tr>
+  <tr>
+    <td>isBurning</td>
+    <td>Incinerator</td>
+    <td>unspecfied</td>
+  </tr>
+    <td>ashLevel</td>
+    <td>Sonar</td>
+    <td>unspecified</td>
+  </tr>
+  <tr>
+    <td>loadRP</td>
+    <td>WasteStorage</td>
+    <td>OpRobot</td>
+  </tr>
+  <tr>
+    <td>burnRp</td>
+    <td>OpRobot</td>
+    <td>Incinerator</td>
+  </tr>
+  <tr>
+    <td>loadAsh</td>
+    <td>unspecified (OpRobot || Incinerator || WIS)</td>
+    <td>unspecified (OpRobot || Incinerator || WIS)</td>
+  </tr>
+  <tr>
+    <td>unloadAsh</td>
+    <td>OpRobot</td>
+    <td>AshStorage</td>
+  </tr>
+</table>
+<blockquote>
+<p>[!NOTE]
+We merged the Interactions and Behavior sections because at this stage of the project, for the majority of this information, we don't know yet if it will be modeled as POJOs' methods or messages between actors.</p>
+</blockquote>
+<h3 id="discussion-on-components">Discussion on components</h3>
+<h4 id="service-area-model">Service Area Model</h4>
+<p>The <strong>ServiceArea</strong> is modeled as an Euclidean space delimited by its edges (similar to what has been done in the <a href="resources/slides/BoundaryWalkProjectDoc.pdf">BoundaryWalk</a> and <a href="resources/slides/RobotCleanerProjectDoc.pdf">RobotCleaner</a> projects):</p>
+<ul>
+<li>The <strong>perimeter edge</strong> has length <code>lf + ld + lr + lu</code>.</li>
+<li>Being the ServiceArea rectangular, we have <code>lf = lr</code> and <code>ld = lu</code>.</li>
+<li>We define <code>DR = 2R</code>, where <code>R</code> is the radius of the DDRRobot's circumscribable circle.</li>
+</ul>
+<p><img src="resources/imgs/ServiceAreaModel_01.png" alt="ServiceAreaModel_01"></p>
+<p>Given this model, we have that <strong>Home</strong>, <strong>BurnIn</strong>, <strong>BurnOut</strong>, <strong>WasteIn</strong>, and <strong>AshOut</strong> are all modeled as cells in the ServiceArea:</p>
+<p><img src="resources/imgs/ServiceAreaModel_02.png" alt="ServiceAreaModel_02"></p>
+<h4 id="ddrrobot-model">DDRRobot Model</h4>
+<p>The <strong>OpRobot</strong>, defined in the requirements as the robot controlled by the WIS, makes use of a DDRRobot (and its control software) provided by the customer. We link the <a href="resources/slides/BasicRobot24ProjectDoc.pdf">detailed definition of DDRRobot</a> and its <a href="resources/projects/basicrobot.qak">qak control software</a>.</p>
+<p><img src="resources/imgs/robotsUnibo.jpg" alt="robotsUnibo"></p>
+<h4 id="wis-wastestorage-incinerator-and-ashstorage-models">WIS, WasteStorage, Incinerator, and AshStorage Models</h4>
+<p><strong>WasteStorage</strong>, <strong>Incinerator</strong>, and <strong>AshStorage</strong> need to exchange messages according to the requirements, so they are modeled as actors.
+<strong>Scale</strong> can be modeled either as an actor or a POJO/variable inside WasteStorage. For now, we will represent it as a variable and <strong>defer the discussion to a later moment</strong>.
+The same applies to the <strong>MonitoringDevice</strong>, <strong>Sonar</strong>, and <strong>Led</strong>, which will be modeled as POJOs inside AshStorage for now.</p>
+<p>In the first prototype of the model, the OpRobot will contain the majority of the business logic for the realization of a 'WIS cycle' (move to waste storage, load an RP, move to incinerator, burn the RP, move to ash storage, unload ash).
+However, there are <strong>no specifications</strong> about where to inject the business logic (injecting all business logic into WIS could also be an option), so we <strong>defer this discussion to the Problem Analysis</strong>.</p>
+<p><strong>WIS</strong> will be divided into two sub-components: a <strong>WISStateObserver</strong> that will act as an observer of WasteStorage, AshStorage, and Incinerator, checking that the constraints are satisfied, and a <strong>WISIncineratorScheduler</strong> that will activate the incinerator.
+<strong>This organization of WIS is not evident from the requirements; hence, it may change in future sprints.</strong></p>
+<p>The following diagram illustrates the structure based on requirements:</p>
+<p><img src="resources/imgs/wis_systemarch.png" alt="wis_systemarch"></p>
+<h3 id="test-plans">Test Plans</h3>
+<table>
+<tr>
+  <th><b>Test Name</b></th>
+  <th><b>Initial Condition</b></th>
+  <th><b>Expected Behavior</b></th>
+</tr>
+<tr>
+  <td><b>test_ok_3_rp</b></td>
+  <td>The OpRobot is at home, the Incinerator is not active, the WasteStorage contains 3 RPs, and the AshStorage is empty.</td>
+  <td>The OpRobot waits until the Incinerator receives the activation command, then completes 3 cycles (move to WasteStorage, load an RP, move to Incinerator, burn the RP, move to AshStorage, unload ash) and returns to home since there are no more RPs to load.</td>
+</tr>
+<tr> 
+  <td><b>test_ko_no_activation</b></td>
+  <td>The OpRobot is at home, the Incinerator is not active, the WasteStorage contains 3 RPs, the AshStorage is empty, and the system is configured so that the Incinerator will not receive the activation command.</td>
+  <td>The OpRobot waits at home.</td>
+</tr>
+<tr> 
+  <td><b>test_ko_waste_storage_empty</b></td>
+  <td>The OpRobot is at home, the Incinerator is not active, the WasteStorage is empty, and the AshStorage is empty.</td>
+  <td>The OpRobot waits at home.</td>
+</tr>
+<tr>
+  <td><b>test_ko_ash_storage_full</b></td>
+  <td>The OpRobot is at home, the Incinerator is not active, the WasteStorage contains 3 RPs, and the AshStorage is full.</td>
+  <td>The OpRobot waits at home.</td>
+</tr>
+<tr>
+  <td><b>test_ko_incinerator_burning</b></td>
+  <td>The OpRobot is at home, the Incinerator is active and burning, the WasteStorage contains 3 RPs, and the AshStorage is empty.</td>
+  <td>The OpRobot waits at home.</td>
+</tr>
+</table>
+<h3 id="future-sprints">Future Sprints</h3>
+<p>In the next sprint, we will focus on the OpRobot's behavior, analyzing its relations with the other components.<br/> In particular, we will focus on the interactions between OpRobot and WIS, defining the responsibilities of both.<br/>
+Our goal is also to connect the OpRobot to a virtual environment (the 'VirtualRobot' provided by the customer) so that it will be simple to switch to a physical OpRobot at any time by only changing a configuration parameter.</p>
+
+</body>
+
+</html>
