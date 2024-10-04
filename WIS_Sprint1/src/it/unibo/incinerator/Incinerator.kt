@@ -21,79 +21,16 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
-		
-		 		var ACTIVE	   = false;
-		 		var BURNING    = false;
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						CommUtils.outred("$name starts")
-						delay(500) 
-						updateResourceRep( "actor_state(incinerator_active,$ACTIVE)"  
-						)
-						updateResourceRep( "actor_state(incinerator_burning,$BURNING)"  
-						)
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
-				}	 
-				state("idle") { //this:State
-					action { //it:State
-						CommUtils.outred("$name: idle")
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition(edgeName="t00",targetState="handle_activation",cond=whenDispatch("incinerator_activation"))
-					transition(edgeName="t01",targetState="handle_burn_req",cond=whenRequest("burn_req"))
-				}	 
-				state("handle_activation") { //this:State
-					action { //it:State
-						if( checkMsgContent( Term.createTerm("incinerator_activation(A)"), Term.createTerm("incinerator_activation(A)"), 
-						                        currentMsg.msgContent()) ) { //set msgArgList
-								
-												ACTIVE=payloadArg(0).toBoolean()
-								updateResourceRep( "actor_state(incinerator_active,$ACTIVE)"  
-								)
-						}
-						CommUtils.outred("$name: handling activation request, active: $ACTIVE")
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
-				}	 
-				state("handle_burn_req") { //this:State
-					action { //it:State
-						
-									var R=false
-									if(!BURNING && ACTIVE){
-										BURNING=true
-										R=true
-									}
-									
-						CommUtils.outred("$name: handling burn request, result:$BURNING")
-						if(  BURNING  
-						 ){updateResourceRep( "actor_state(incinerator_burning,$BURNING)"  
-						)
+						CommUtils.outyellow("$name starts")
 						delay(5000) 
-						 
-										BURNING=false
-						updateResourceRep( "actor_state(incinerator_burning,$BURNING)"  
-						)
-						}
-						answer("burn_req", "burn_repl", "burn_repl($R)"   )  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
 				}	 
 			}
 		}

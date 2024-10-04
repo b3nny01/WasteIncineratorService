@@ -1,0 +1,61 @@
+System monitoring_device    
+
+Dispatch 	sonarstart  : sonarstart(X)
+Dispatch 	sonarstop   : sonarstop(X)
+
+Event 		sonardata   : distance(D)
+
+Dispatch	actor_state	: actor_state(P,V)
+
+Dispatch 	doread 	    : doread(X)
+
+Dispatch 	ledOn       : ledOn(X)       
+Dispatch 	ledOff 	    : ledOff(X) 
+Dispatch	ledBlink    : ledBlink(X) 
+
+Event 		unload_ash	: unload_ash(N) 
+
+Context ctx_monitoring_device ip [ host= "localhost" 	port=8012 ]
+Context ctx_wis   		   	  ip [ host= "10.0.0.1"		port=8022 ] 
+
+
+ExternalQActor wis context ctx_wis
+
+QActor monitoring_device context ctx_monitoring_device{
+ 	[# 
+ 		var CURR_ASH_LEVEL = 0.0
+ 		val MAX_ASH_LEVEL = 3.0
+ 	 #]
+ 	
+ 	 State s0 initial{ 
+ 		println("$name starts") color magenta
+		delay 500
+		[#
+			val ASH_LEVEL=CURR_ASH_LEVEL/MAX_ASH_LEVEL	
+		#]
+		updateResource [# "actor_state(ash_storage_level,$ASH_LEVEL)" #]
+	} Goto idle
+	
+		
+	State idle{
+		println("$name: idle") color magenta
+	}Transition t0 
+	whenEvent unload_ash -> handle_unload_ash
+	
+	State handle_unload_ash{
+		[#
+			var R=false
+			if(CURR_ASH_LEVEL<MAX_ASH_LEVEL){
+				R=true
+				CURR_ASH_LEVEL++
+			}
+			
+		#]
+		println("$name: handling ash request, result:$R") color magenta
+		[#
+			val ASH_LEVEL=CURR_ASH_LEVEL/MAX_ASH_LEVEL	
+		#]
+		updateResource [# "actor_state(ash_storage_level,$ASH_LEVEL)" #]
+	}Goto idle
+	
+}

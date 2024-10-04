@@ -1,4 +1,4 @@
-System wis_system
+System wis_system   
 
 // NOTE: message types have been chosen only to produce a first working prototype of the system so they are not 
 // fixed and have to be discussed in future sprints
@@ -45,13 +45,12 @@ Reply test_repl: test_repl(N) for test_req
 //Contexts===================================================================================
 Context ctx_wis 			  ip 	[	host="localhost"		port=8022]  
 Context ctx_basic_robot 	  ip 	[	host= "127.0.0.1"		port=8020]
-Context ctx_monitoring_device ip 	[ 	host= "192.168.1.63" 	port=8012]
+Context ctx_monitoring_device ip 	[ 	host= "10.0.0.3"	 	port=8012]
 //===========================================================================================
 
 //ExternalActors declaration=================================================================
-ExternalQActor basicrobot 		context ctx_basic_robot
-ExternalQActor sonar24 			context ctx_monitoring_device
-ExternalQActor led 				context ctx_monitoring_device
+ExternalQActor basicrobot 			context ctx_basic_robot
+ExternalQActor monitoring_device 	context ctx_monitoring_device
 //===========================================================================================
 
 //WIS system=================================================================================
@@ -199,7 +198,7 @@ QActor op_robot context ctx_wis {
 				val A=payloadArg(1).toBoolean()
 				val B=payloadArg(2).toBoolean()
 				val L=payloadArg(3).toDouble()
-				OK=(RP>0) && (A && !B) && (L>DLIMT)
+				OK=(RP>0) && (A && !B) && (L<1.0)
 			#]
 		}
 		println("$name: conditions verified: $OK") color green
@@ -351,6 +350,7 @@ QActor wis context ctx_wis{
  		println("$name starts") color yellow
 		observeResource scale msgid actor_state
 		observeResource incinerator msgid actor_state
+		observeResource monitoring_device msgid actor_state
 	} Goto activate_incinerator	
 	
 	State activate_incinerator{
@@ -368,6 +368,7 @@ QActor wis context ctx_wis{
 		whenRequest system_state_req -> handle_system_state_req
 				
 	State update_state{
+		printCurrentMessage
 		onMsg(actor_state:actor_state(P,V)){
 			[#
 				val P=payloadArg(0);
@@ -379,22 +380,19 @@ QActor wis context ctx_wis{
 					"ash_storage_level"  -> L=V.toDouble()
 				}
 			#]
-			
-			//TODO: conditions not working, to fix
-			if [# (L == DLIMT || L >= DMAX) #]{
-				forward led -m ledBlink : ledBlink($L)
-				println("$name: SENT BLINK TO LED")
-			}
-			if [# B #] {
-				forward led -m ledOn : ledOn($B)
-				println("$name: SENT ON TO LED")
-			} else {
-				forward led -m ledOff : ledOff($B)
-				println("$name: SENT OFF TO LED")
-			}
-			
-			
-					
+//			//TODO: conditions not working, to fix
+//			if [# (L == DLIMT || L >= DMAX) #]{
+//				forward led -m ledBlink : ledBlink($L)
+//				println("$name: SENT BLINK TO LED")
+//			}
+//			if [# B #] {
+//				forward led -m ledOn : ledOn($B)
+//				println("$name: SENT ON TO LED")
+//			} else {
+//				forward led -m ledOff : ledOff($B)
+//				println("$name: SENT OFF TO LED")
+//			}
+								
 			updateResource [# "system_state($RP,$A,$B,$L)" #]
 			println("$name: $P updated") color yellow
 		}

@@ -95,7 +95,7 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 												val A=payloadArg(1).toBoolean()
 												val B=payloadArg(2).toBoolean()
 												val L=payloadArg(3).toDouble()
-												OK=(RP>0) && (A && !B) && (L>DLIMT)
+												OK=(RP>0) && (A && !B) && (L<1.0)
 						}
 						CommUtils.outgreen("$name: conditions verified: $OK")
 						//genTimer( actor, state )

@@ -34,8 +34,7 @@ with Diagram('wis_systemArch', show=False, outformat='png', graph_attr=graphattr
      with Cluster('ctx_basic_robot', graph_attr=nodeattr):
           basicrobot=Custom('basicrobot(ext)','./qakicons/externalQActor.png')
      with Cluster('ctx_monitoring_device', graph_attr=nodeattr):
-          sonar24=Custom('sonar24(ext)','./qakicons/externalQActor.png')
-          led=Custom('led(ext)','./qakicons/externalQActor.png')
+          monitoring_device=Custom('monitoring_device(ext)','./qakicons/externalQActor.png')
      sys >> Edge( label='load_rp', **evattr, decorate='true', fontcolor='darkgreen') >> scale
      op_robot >> Edge( label='load_rp', **eventedgeattr, decorate='true', fontcolor='red') >> sys
      op_robot >> Edge( label='unload_ash', **eventedgeattr, decorate='true', fontcolor='red') >> sys
@@ -45,7 +44,7 @@ with Diagram('wis_systemArch', show=False, outformat='png', graph_attr=graphattr
      test_observer >> Edge(color='magenta', style='solid', decorate='true', label='<system_state_req<font color="darkgreen"> system_state_repl</font> &nbsp; >',  fontcolor='magenta') >> wis
      incinerator >> Edge(color='blue', style='solid',  decorate='true', label='<actor_state &nbsp; >',  fontcolor='blue') >> wis
      wis >> Edge(color='blue', style='solid',  decorate='true', label='<system_state &nbsp; >',  fontcolor='blue') >> test_observer
-     wis >> Edge(color='blue', style='solid',  decorate='true', label='<ledBlink &nbsp; ledOn &nbsp; ledOff &nbsp; >',  fontcolor='blue') >> led
+     monitoring_device >> Edge(color='blue', style='solid',  decorate='true', label='<actor_state &nbsp; >',  fontcolor='blue') >> wis
      wis >> Edge(color='blue', style='solid',  decorate='true', label='<incinerator_activation &nbsp; >',  fontcolor='blue') >> incinerator
      scale >> Edge(color='blue', style='solid',  decorate='true', label='<actor_state &nbsp; >',  fontcolor='blue') >> wis
 diag
