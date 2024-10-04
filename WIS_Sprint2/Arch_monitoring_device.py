@@ -34,6 +34,6 @@ with Diagram('monitoring_deviceArch', show=False, outformat='png', graph_attr=gr
           wis=Custom('wis(ext)','./qakicons/externalQActor.png')
      datacleaner >> Edge( label='sonardata', **eventedgeattr, decorate='true', fontcolor='red') >> sonar24
      sonardevice >> Edge( label='sonardata', **eventedgeattr, decorate='true', fontcolor='red') >> datacleaner
+     wis >> Edge(color='blue', style='solid',  decorate='true', label='<ledState &nbsp; >',  fontcolor='blue') >> led
      sonar24 >> Edge(color='blue', style='solid',  decorate='true', label='<sonarstart &nbsp; >',  fontcolor='blue') >> sonardevice
-     sonar24 >> Edge(color='blue', style='solid',  decorate='true', label='<actor_state &nbsp; >',  fontcolor='blue') >> wis
 diag

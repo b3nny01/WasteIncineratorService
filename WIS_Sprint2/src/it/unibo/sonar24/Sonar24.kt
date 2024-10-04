@@ -42,7 +42,8 @@ class Sonar24 ( name: String, scope: CoroutineScope, isconfined: Boolean=false  
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								  D = payloadArg(0).toInt()  
 								CommUtils.outmagenta("$name: ash storage distance: $D")
-								forward("actor_state", "actor_state(ash_storage_level,$D)" ,"wis" ) 
+								updateResourceRep( "actor_state(ash_storage_level,$D)"  
+								)
 						}
 						//genTimer( actor, state )
 					}

@@ -25,53 +25,35 @@ class Led ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 				state("s0") { //this:State
 					action { //it:State
 						CommUtils.outred("$name START")
+						observeResource("192.168.1.67","8022","ctx_wis","wis","ledState")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t011",targetState="ledOn",cond=whenDispatch("ledOn"))
-					transition(edgeName="t012",targetState="ledOff",cond=whenDispatch("ledOff"))
-					transition(edgeName="t013",targetState="ledBlink",cond=whenDispatch("ledBlink"))
+					 transition(edgeName="t011",targetState="handleUpdateState",cond=whenDispatch("ledState"))
 				}	 
-				state("ledOn") { //this:State
+				state("handleUpdateState") { //this:State
 					action { //it:State
 						CommUtils.outred("$name in ${currentState.stateName} | $currentMsg | ${Thread.currentThread().getName()} n=${Thread.activeCount()}")
 						 	   
-						 Runtime.getRuntime().exec("python ledOn24.py") 
+						if( checkMsgContent( Term.createTerm("ledState(X)"), Term.createTerm("ledState(X)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								
+												val S=payloadArg(0);
+												when (S){
+													"blink" -> Runtime.getRuntime().exec("python ledBlink24.py")
+													"on"	-> Runtime.getRuntime().exec("python ledOn24.py")
+													"off"  	-> Runtime.getRuntime().exec("python ledOff24.py")
+													else 	-> Runtime.getRuntime().exec("python ledOff24.py")
+												}
+						}
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t014",targetState="ledOff",cond=whenDispatch("ledOff"))
-					transition(edgeName="t015",targetState="ledBlink",cond=whenDispatch("ledBlink"))
-				}	 
-				state("ledOff") { //this:State
-					action { //it:State
-						CommUtils.outred("$name in ${currentState.stateName} | $currentMsg | ${Thread.currentThread().getName()} n=${Thread.activeCount()}")
-						 	   
-						 Runtime.getRuntime().exec("python ledOff24.py") 
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition(edgeName="t016",targetState="ledOn",cond=whenDispatch("ledOn"))
-					transition(edgeName="t017",targetState="ledBlink",cond=whenDispatch("ledBlink"))
-				}	 
-				state("ledBlink") { //this:State
-					action { //it:State
-						CommUtils.outred("$name in ${currentState.stateName} | $currentMsg | ${Thread.currentThread().getName()} n=${Thread.activeCount()}")
-						 	   
-						 Runtime.getRuntime().exec("python ledBlink24.py") 
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition(edgeName="t018",targetState="ledOn",cond=whenDispatch("ledOn"))
-					transition(edgeName="t019",targetState="ledOff",cond=whenDispatch("ledOff"))
+					 transition(edgeName="t012",targetState="handleUpdateState",cond=whenDispatch("ledState"))
 				}	 
 			}
 		}

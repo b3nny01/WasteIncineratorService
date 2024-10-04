@@ -34,6 +34,8 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 						CommUtils.outyellow("$name starts")
 						observeResource("localhost","8022","ctx_wis","scale","actor_state")
 						observeResource("localhost","8022","ctx_wis","incinerator","actor_state")
+						delay(500) 
+						observeResource("192.168.1.63","8012","ctx_monitoring_device","sonar24","actor_state")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -67,6 +69,8 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 				}	 
 				state("update_state") { //this:State
 					action { //it:State
+						CommUtils.outblack("$name in ${currentState.stateName} | $currentMsg | ${Thread.currentThread().getName()} n=${Thread.activeCount()}")
+						 	   
 						if( checkMsgContent( Term.createTerm("actor_state(P,V)"), Term.createTerm("actor_state(P,V)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
@@ -79,16 +83,18 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 													"ash_storage_level"  -> L=V.toDouble()
 												}
 								if(  (L == DLIMT || L >= DMAX)  
-								 ){forward("ledBlink", "ledBlink($L)" ,"led" ) 
-								CommUtils.outblack("$name: SENT BLINK TO LED")
-								}
-								if(  B  
-								 ){forward("ledOn", "ledOn($B)" ,"led" ) 
-								CommUtils.outblack("$name: SENT ON TO LED")
+								 ){updateResourceRep( "ledState(blink)"  
+								)
 								}
 								else
-								 {forward("ledOff", "ledOff($B)" ,"led" ) 
-								 CommUtils.outblack("$name: SENT OFF TO LED")
+								 {if(  B  
+								  ){updateResourceRep( "ledState(on)"  
+								 )
+								 }
+								 else
+								  {updateResourceRep( "ledState(off)"  
+								  )
+								  }
 								 }
 								updateResourceRep( "system_state($RP,$A,$B,$L)"  
 								)

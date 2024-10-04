@@ -27,15 +27,13 @@ Reply   engagerefused : engagerefused(ARG) for engage
 
 Dispatch disengage    : disengage(ARG)
 
-Request moverobot    :  moverobot(TARGETX, TARGETY)  
-Reply moverobotdone  :  moverobotok(ARG)                    for moverobot
-Reply moverobotfailed:  moverobotfailed(PLANDONE, PLANTODO) for moverobot
+Request moverobot     :  moverobot(TARGETX, TARGETY)  
+Reply moverobotdone   :  moverobotok(ARG)                    for moverobot
+Reply moverobotfailed :  moverobotfailed(PLANDONE, PLANTODO) for moverobot
 //===========================================================================================
 
 //MonitoringDevice interface=================================================================
-Dispatch 	ledOn      : ledOn(X)       
-Dispatch 	ledOff 	   : ledOff(X) 
-Dispatch	ledBlink   : ledBlink(X)
+Dispatch ledState : ledState(X)
 
 //Tester interface===========================================================================
 Request test_req : test_req(N)
@@ -351,6 +349,8 @@ QActor wis context ctx_wis{
  		println("$name starts") color yellow
 		observeResource scale msgid actor_state
 		observeResource incinerator msgid actor_state
+		delay 500
+		observeResource sonar24 msgid actor_state
 	} Goto activate_incinerator	
 	
 	State activate_incinerator{
@@ -368,6 +368,7 @@ QActor wis context ctx_wis{
 		whenRequest system_state_req -> handle_system_state_req
 				
 	State update_state{
+		printCurrentMessage color black
 		onMsg(actor_state:actor_state(P,V)){
 			[#
 				val P=payloadArg(0);
@@ -380,21 +381,16 @@ QActor wis context ctx_wis{
 				}
 			#]
 			
-			//TODO: conditions not working, to fix
 			if [# (L == DLIMT || L >= DMAX) #]{
-				forward led -m ledBlink : ledBlink($L)
-				println("$name: SENT BLINK TO LED")
-			}
-			if [# B #] {
-				forward led -m ledOn : ledOn($B)
-				println("$name: SENT ON TO LED")
+				updateResource [# "ledState(blink)" #]
 			} else {
-				forward led -m ledOff : ledOff($B)
-				println("$name: SENT OFF TO LED")
+				if [# B #] {
+					updateResource [# "ledState(on)" #]
+				} else {
+					updateResource [# "ledState(off)" #]
+				}
 			}
 			
-			
-					
 			updateResource [# "system_state($RP,$A,$B,$L)" #]
 			println("$name: $P updated") color yellow
 		}

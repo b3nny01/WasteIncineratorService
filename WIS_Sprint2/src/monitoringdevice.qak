@@ -9,11 +9,7 @@ Dispatch	actor_state	: actor_state(P,V)
 
 Dispatch 	doread 	    : doread(X)
 
-Dispatch 	ledOn       : ledOn(X)       
-Dispatch 	ledOff 	    : ledOff(X) 
-Dispatch	ledBlink    : ledBlink(X)
-
-Event 		unload_ash	: unload_ash(N)
+Dispatch 	ledState 	: ledState(X)
 
 Context ctx_monitoring_device ip [ host= "localhost" 	port=8012 ]
 Context ctx_wis   		   	  ip [ host= "192.168.1.67" port=8022 ]
@@ -36,7 +32,7 @@ QActor sonar24 context ctx_monitoring_device{
 		 onMsg(sonardata : distance(D)) {
 		 	[#  D = payloadArg(0).toInt() #]
 		 	println("$name: ash storage distance: $D") color magenta
- 			forward wis -m actor_state : actor_state(ash_storage_level,$D)
+ 			updateResource [# "actor_state(ash_storage_level,$D)" #]
     	}
 	}	
 	Transition t0 whenEvent sonardata -> handleData
@@ -152,29 +148,23 @@ QActor led context ctx_monitoring_device{
 	
 	State s0 initial{
 		println("$name START") color red
+		observeResource wis msgid ledState
 	}
-	Transition t0 whenMsg ledOn -> ledOn
-				  whenMsg ledOff -> ledOff
-				  whenMsg ledBlink -> ledBlink
+	Transition t0 whenMsg ledState -> handleUpdateState
 				 
-	State ledOn{
+	State handleUpdateState{
 		printCurrentMessage color red
-		[# Runtime.getRuntime().exec("python ledOn24.py")#]
+		onMsg( ledState : ledState(X) ) {
+			[#
+				val S=payloadArg(0);
+				when (S){
+					"blink" -> Runtime.getRuntime().exec("python ledBlink24.py")
+					"on"	-> Runtime.getRuntime().exec("python ledOn24.py")
+					"off"  	-> Runtime.getRuntime().exec("python ledOff24.py")
+					else 	-> Runtime.getRuntime().exec("python ledOff24.py")
+				}
+			#]
+		}
 	}
-	Transition t0 whenMsg ledOff -> ledOff
-				  whenMsg ledBlink -> ledBlink
-	
-	State ledOff{
-		printCurrentMessage color red
-		[# Runtime.getRuntime().exec("python ledOff24.py")#]
-	}
-	Transition t0 whenMsg ledOn -> ledOn
-				  whenMsg ledBlink -> ledBlink
-				  
-	State ledBlink{
-		printCurrentMessage color red
-		[# Runtime.getRuntime().exec("python ledBlink24.py")#]
-	}
-	Transition t0 whenMsg ledOn -> ledOn
-				  whenMsg ledOff -> ledOff
+	Transition t0 whenMsg ledState -> handleUpdateState
 }

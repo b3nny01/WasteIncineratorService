@@ -18,9 +18,7 @@ dispatch( disengage, disengage(ARG) ).
 request( moverobot, moverobot(TARGETX,TARGETY) ).
 reply( moverobotdone, moverobotok(ARG) ).  %%for moverobot
 reply( moverobotfailed, moverobotfailed(PLANDONE,PLANTODO) ).  %%for moverobot
-dispatch( ledOn, ledOn(X) ).
-dispatch( ledOff, ledOff(X) ).
-dispatch( ledBlink, ledBlink(X) ).
+dispatch( ledState, ledState(X) ).
 request( test_req, test_req(N) ).
 reply( test_repl, test_repl(N) ).  %%for test_req
 %====================================================================================
