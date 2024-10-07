@@ -5,43 +5,38 @@
 ## Sprint info 
 
 <table>
-<tr><th>Sprint name</th><td>Sprint 1</td></tr>
-<tr><th>Previous sprint</th><td><a href="/WIS_Sprint0">Sprint 0</a></td></tr>
+<tr><th>Sprint name</th><td>Sprint 2</td></tr>
+<tr><th>Previous sprint</th><td><a href="/WIS_Sprint1">Sprint 1</a></td></tr>
 <tr><th>Next sprint</th><td></td></tr>
-<tr><th>QAK model</th><td><a href="../src/sprint1.qak">sprint1.qak</a></td></tr>
+<tr><th>QAK model</th><td><a href="../src/sprint2.qak">sprint2.qak</a></td></tr>
 <tr><th>Developed by</th><td>Alessio Benenati<br/>Giulia Fattori</td></tr>
 <tr><th>Repo Site</th><td><a href="https://github.com/b3nny01/WasteIncineratorService">WasteIncineratorService</td><tr>
 </table>
 
 ## Sprint Starting Condition and Goals
 
-In the previous sprint, we focused on requirements analysis and produced a simple base architecture of what could be inferred from the assignment text.
-In this one we will focus on the relationship between WIS and OpRobot, our goals are:
-
-- finding the best way to divide the business logic between the OpRobot and the WIS actor
-- consequently choosing the right model (**Actor** or **POJO**) for the OpRobot
-- producing a simple prototype of the system reproducing the functioning of these two entities
+In the previous sprint, we focused on studying the requirements related to the application logic of OpRobot and WIS.**In this sprint, the focus is on the MonitoringDevice**, specifically aiming to **connect the virtual system** produced in sprint 1 **to a real MonitoringDevice** deployed on a physical Raspberry Pi.
 
 ## Problem Analysis
 
-### WIS and system observability
+### MonitoringDevice subcomponents
 
-Based on the requirements, the user interacts with the WIS not to change the system's state but to monitor it. From this, it can be deduced that the WIS must be able to retrieve information on the state of each system component. For this purpose, **it makes sense to make the WIS an observer of each component**.
+In the previous sprints, we hid the complexity of the monitoring device in a single mock actor without worrying about its subcomponents (LED and Sonar).  
+A more in-depth study of the component's application logic reveals two possible approaches:  
+- Developing a single MonitoringDevice actor responsible for both managing the LED and emitting data from the Sonar.  
+- Breaking down the MonitoringDevice into two distinct actors, the LED and the Sonar.  
 
-### WIS and OpRobot
+The second solution allows for greater decoupling between the two components, especially considering their different nature (the Sonar is a "producer" of information while the LED acts as a "consumer").  
+For this reason, it is recommended to **decompose the MonitoringDevice into its two subcomponents (LED and Sonar) and implement them as two independent actors in the same context**.
 
-**Regarding the OpRobot the requirements do not provide enough information to determine with certainty how to model it**. In particular, it is stated that the behavior actuator of the OpRobot is the DDRRobot, which is provided by the client as a **service** ([BasicRobot](/unibo.basicrobot24/)). However, it is not specified whether this should be controlled by an autonomous actor or whether the WIS itself could control the BasicRobot.
+### Analysis Architecture
+Below, we present a comparison between the system architecture derived from the problem analysis in sprint 1 and the one resulting from sprint 2.
 
-At first glance, one might think that having the WIS control the DDRRobot could be a good idea because the execution cycle of the OpRobot requires observing the system's state to verify the initial conditions, and this information is already present in the WIS as it acts as an observer.
+**Sprint 1 Architecture**
+<img src="./resources/imgs/wis_system_1.png" width="550px">
 
-However, a more in-depth analysis reveals that OpRobot actually needs to verify the initial conditions only at two specific moments (at the beginning and the end of an execution cycle) and would not gain significant advantages from continuously observing the state of the entire system (which would significantly increase the complexity of the WIS actor, which would have to both control the DDRRobot and update its internal representation of the system's state).
-
-For these reasons, it is more convenient to **apply the Single Responsibility Principle by incorporating the logic for controlling the DDRRobot into a dedicated actor, the BasicRobot**, which communicates with the WIS to ensure that the initial conditions are verified.
-
-### LoadRP and UnloadAsh
-In a real system, **the OpRobot should be able to load and unload the RPs and their ashes**, and such changes to the system would be detected by the respective sensors (Scale and MonitoringDevice) without the need to exchange messages at the software level.<br/>
-However, **since the current prototype operates in a purely virtual environment, it is necessary to simulate these two actions** by sending appropriate messages.<br/>
-For this reason, we have decided to introduce two specific events, LoadRP and UnloadAsh, which modify the state of the Scale and MonitoringDevice, respectively.
+**Sprint 2 Architecture**
+<img src="./resources/imgs/wis_system_1.png" width="550px">
 
 ## Project
 
@@ -49,10 +44,17 @@ For this reason, we have decided to introduce two specific events, LoadRP and Un
 
 Based on the Problem Analysis carried out previously, we implemented an executable version of the system covering the discussed features; we attach here a visual representation of the system architecture:
 
-<img src="resources/imgs/wis_systemarch.png" width="1100px"/>
+<img src="resources/imgs/wis_system.png" width="1100px"/>
 
 ## Implementation
-During the implementation phase no particular need of additions to the inital project emerged, so the system architecture remained unchanged.
+
+### Sonar Pipeline
+During the implementation, we encountered the high sensitivity of the Sonar, which often produces "noisy" data. For this reason, it became necessary to introduce a "Filtering Pipeline" to eliminate spurious data.  
+
+Specifically, this pipeline is composed of three actors:
+- **SonarDevice**, which handles the actual reading of all data from the physical sonar.
+- **DataCleaner**, which monitors the SonarDevice and filters the relevant results for the problem, aiming to minimize the effect of measurement errors.
+- **Sonar**, which serves as the "interface" towards the WIS.
 
 ## Test Plan
 
