@@ -179,7 +179,7 @@ distributions {
     }
 } 
 
-task run0(type: JavaExec) {
+task run0(type: JavaExec) { 
     group = "Execution"
     description = "Run the main class with JavaExecTask"
     classpath = sourceSets.main.runtimeClasspath

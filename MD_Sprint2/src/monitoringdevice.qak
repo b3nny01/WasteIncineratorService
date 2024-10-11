@@ -1,0 +1,220 @@
+System monitoring_device 
+
+Dispatch 	sonarstart  : sonarstart(X)
+Dispatch 	sonarstop   : sonarstop(X)
+Event 		sonardata   : distance(D)
+
+Dispatch	actor_state	: actor_state(P,V)
+Dispatch	system_state				: system_state(RP,A,B,L)
+
+Dispatch 	doread 	    : doread(X)
+
+Dispatch 	update_led_mode 	: update_led_mode(M)
+
+
+
+Context ctx_monitoring_device ip [ host= "localhost" 	port=8012 ]
+Context ctx_wis   		   	  ip [ host= "10.0.0.1" port=8022 ] 
+
+ExternalQActor wis context ctx_wis
+
+
+QActor sonar24 context ctx_monitoring_device{ 
+	
+	[# 
+		val MAX_D=10.0
+	#]
+	State s0 initial{
+		println("$name starts") color magenta
+		delay 1000
+		forward sonar_device -m sonarstart : sonarstart(1)			
+		subscribeTo datacleaner for sonardata
+	}
+	Transition t0 whenEvent sonardata -> handleData
+	
+	State handleData{
+		 onMsg(sonardata : distance(D)) {
+		 	[#  
+		 		val D = payloadArg(0).toDouble()
+		 		val ASH_LEVEL=(MAX_D-D)/MAX_D 
+		 	#]
+		 	println("$name: ash level: $ASH_LEVEL") color magenta
+ 			updateResource [# "actor_state(ash_storage_level,$ASH_LEVEL)" #]
+    	}
+	}	
+	Transition t0 whenEvent sonardata -> handleData
+}
+
+
+QActor datacleaner context ctx_monitoring_device{
+	
+	[# 
+		var CURRENT=0
+		var PREVIOUS = 0
+		val SENSITIVITY=1
+		val START_D=3;
+		val MIN_D=0;
+		val MAX_D=10;
+	#]
+	State s0 initial{
+		println("$name starts") color cyan
+		delay 1000
+		subscribeTo sonar_device for sonardata		
+		println("$name subscribed to sonardevice") color cyan
+	}
+	Transition t0 whenEvent sonardata -> filter
+	
+	State filter{
+		onMsg( sonardata : distance(D) ){
+	      	[#  
+	      		CURRENT = payloadArg(0).toInt()-START_D
+	      		
+	      		if(CURRENT<=MIN_D)	CURRENT=MIN_D
+	      		if(CURRENT>=MAX_D)	CURRENT=MAX_D
+	      	#]
+	      	
+	      	println("$name: clean data: $CURRENT") color cyan
+	      		      	
+	      	if [# CURRENT >= (PREVIOUS + SENSITIVITY) || CURRENT <= (PREVIOUS - SENSITIVITY) #] {
+	     		emitlocalstream sonardata : distance($CURRENT)
+	     		[# PREVIOUS = CURRENT #]
+	     	}
+    	}
+	}	
+	Transition t0 whenEvent sonardata -> filter
+}
+
+
+QActor sonar_device context ctx_monitoring_device {
+	
+	[# 
+		lateinit var reader : java.io.BufferedReader
+		var working = false
+	    lateinit var process : Process	
+	    var Distance = 0
+	#]	
+	
+	
+	State s0 initial {
+		println("$name starts") color blue
+	}		
+	Transition t0 whenMsg sonarstart -> startSonar
+		
+	State startSonar{
+		[#
+    	working = true		
+		process = Runtime.getRuntime().exec("python sonar.py")
+		reader  = java.io.BufferedReader(  java.io.InputStreamReader(process.getInputStream() ))	
+		#]	
+		println("SONAR starts") color blue
+		delay 1000
+	}
+	Goto readSonarData
+	
+	
+	State readSonarData{ 
+		[# 
+		var data = reader.readLine()
+		CommUtils.outyellow("$name with python: data = $data"   ) 
+		if( data != null ){
+			try { 
+				val vd = data.toFloat()
+				val v  = vd.toInt()
+				
+				Distance=v;
+			} catch(e: Exception){
+					CommUtils.outred("$name readSonarDataERROR: $e "   )
+			}
+		}
+		
+		#]	
+		emitlocalstream sonardata : distance($Distance)
+		autodispatch doread : doread(1)
+	}
+	Transition t0 whenMsg sonarstop  -> stopSonar
+				  whenMsg doread and [# working  #] -> readSonarData 
+				  whenMsg doread and [# !working #] -> endOfRead
+		
+	State endOfRead{
+		[#
+   	    process.destroy()
+    	if (process.isAlive()) {
+    	    process.destroyForcibly();
+    	}
+       	CommUtils.outred("$tt $name | endOfRead"  )
+		#]
+	}
+	Transition t0 whenMsg sonarstart -> startSonar 
+				  whenMsg sonarstop  -> stopSonar
+		
+	State stopSonar {
+		[# process.destroy(); #]		
+		println("SONAR STOPPED") color blue
+	}
+	Transition t0 whenMsg sonarstop -> stopSonar
+}
+
+QActor led context ctx_monitoring_device {
+	[#
+		
+		var MODE=main.resources.utils.LedMode.OFF
+		
+		
+	#]
+	State s0 initial {
+		println("$name starts")
+		observeResource wis msgid system_state
+		
+	}Goto idle
+	
+	State idle{
+		println("$name idle")
+	}Transition t0 whenMsg system_state -> handle_update_mode
+	
+	State handle_update_mode{
+		printCurrentMessage color red
+		onMsg(system_state:system_state(RP,A,B,L)){
+			[#
+					val RP=payloadArg(0).toInt()
+					val A=payloadArg(1).toBoolean()
+					val B=payloadArg(2).toBoolean()
+					val L=payloadArg(3).toDouble()
+					
+					if(B){
+						MODE=main.resources.utils.LedMode.BLINKING;
+					}else if(RP==0 || L==1.0){
+						MODE=main.resources.utils.LedMode.ON
+					}else{
+						MODE=main.resources.utils.LedMode.OFF
+					}
+			#]
+			forward led_device -m update_led_mode:update_led_mode($MODE)
+		}
+	}Goto idle
+}
+
+QActor led_device context ctx_monitoring_device{
+	[#
+		var P=Runtime.getRuntime().exec("python ledOff24.py");
+	#]
+	State s0 initial{
+		println("$name START") color red
+	}
+	Transition t0 whenMsg update_led_mode -> handle_update_mode
+				 
+	State handle_update_mode{
+		printCurrentMessage color red
+		onMsg( update_led_mode : update_led_mode(M) ) {
+			[#
+				val S=main.resources.utils.LedMode.valueOf(payloadArg(0));
+				P.destroy();
+				P=when (S){
+					main.resources.utils.LedMode.BLINKING 	-> Runtime.getRuntime().exec("python ledBlink24.py")
+					main.resources.utils.LedMode.ON			-> Runtime.getRuntime().exec("python ledOn24.py")
+					main.resources.utils.LedMode.OFF 		-> Runtime.getRuntime().exec("python ledOff24.py")
+				}
+			#]
+		}
+	}
+	Transition t0 whenMsg update_led_mode -> handle_update_mode
+}

@@ -1,5 +1,4 @@
-System wis_system
-
+System wis_system 
 // NOTE: message types have been chosen only to produce a first working prototype of the system so they are not 
 // fixed and have to be discussed in future sprints
 
@@ -43,20 +42,20 @@ Reply test_repl: test_repl(N) for test_req
 //Contexts===================================================================================
 Context ctx_wis 			  ip 	[	host="localhost"		port=8022]  
 Context ctx_basic_robot 	  ip 	[	host= "127.0.0.1"		port=8020]
-Context ctx_monitoring_device ip 	[ 	host= "192.168.1.63" 	port=8012]
+Context ctx_monitoring_device ip 	[ 	host= "10.0.0.3" 		port=8012]
 //===========================================================================================
 
 //ExternalActors declaration=================================================================
 ExternalQActor basicrobot 		context ctx_basic_robot
 ExternalQActor sonar24 			context ctx_monitoring_device
-ExternalQActor led 				context ctx_monitoring_device
+ExternalQActor led 				context ctx_monitoring_device 
 //===========================================================================================
 
 //WIS system=================================================================================
 //NOTE: the following model is already working but yet a prototype, some parts are still extremely simplified
 //(for instance OpRobot movements) and some are completely unimplemented (error handling)
 
-QActor incinerator context ctx_wis{     
+QActor incinerator context ctx_wis{      
  	[#
  		var ACTIVE	   = false;
  		var BURNING    = false;
@@ -159,7 +158,6 @@ QActor op_robot context ctx_wis {
 							"burn out"		to Position(5,3),
 							"ash storage"	to Position(6,4)
 		)
-		val DLIMT = 1.0
 	#]
 	State s0 initial{ 
  		println("$name starts") color green
@@ -197,7 +195,7 @@ QActor op_robot context ctx_wis {
 				val A=payloadArg(1).toBoolean()
 				val B=payloadArg(2).toBoolean()
 				val L=payloadArg(3).toDouble()
-				OK=(RP>0) && (A && !B) && (L>DLIMT)
+				OK=(RP>0) && (A && !B) && (L<1.0)
 			#]
 		}
 		println("$name: conditions verified: $OK") color green
@@ -300,7 +298,7 @@ QActor op_robot context ctx_wis {
 	 State unload_ash{
 	 	println("$name: unloading ash...") color green
 	 	emit unload_ash : unload_ash
-	 	delay 1000
+	 	delay 3000
 	 }Goto check_continue_conditions
 	 
 	 State check_continue_conditions{
@@ -316,7 +314,7 @@ QActor op_robot context ctx_wis {
 				val A=payloadArg(1).toBoolean();
 				val B=payloadArg(2).toBoolean();
 				val L=payloadArg(3).toDouble();
-				OK=(RP>0) && (A && !B) && (L>DLIMT)
+				OK=(RP>0) && (A && !B) && (L<1.0)
 			#]
 		}
 		println("$name: conditions verified: $OK") color green
@@ -380,16 +378,6 @@ QActor wis context ctx_wis{
 					"ash_storage_level"  -> L=V.toDouble()
 				}
 			#]
-			
-			if [# (L == DLIMT || L >= DMAX) #]{
-				updateResource [# "ledState(blink)" #]
-			} else {
-				if [# B #] {
-					updateResource [# "ledState(on)" #]
-				} else {
-					updateResource [# "ledState(off)" #]
-				}
-			}
 			
 			updateResource [# "system_state($RP,$A,$B,$L)" #]
 			println("$name: $P updated") color yellow

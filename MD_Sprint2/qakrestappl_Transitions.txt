@@ -1,0 +1,10 @@
+{"actor":"sonar_device", "msgType":"dispatch", "curstate":"s0", "nextstate":"startSonar", "msgId":"sonarstart"}
+{"actor":"sonar_device", "msgType":"dispatch", "curstate":"readSonarData", "nextstate":"stopSonar", "msgId":"sonarstop"}
+{"actor":"sonar_device", "msgType":"dispatch", "curstate":"readSonarData", "nextstate":"readSonarData", "msgId":"doread"}
+{"actor":"sonar_device", "msgType":"dispatch", "curstate":"readSonarData", "nextstate":"endOfRead", "msgId":"doread"}
+{"actor":"sonar_device", "msgType":"dispatch", "curstate":"endOfRead", "nextstate":"startSonar", "msgId":"sonarstart"}
+{"actor":"sonar_device", "msgType":"dispatch", "curstate":"endOfRead", "nextstate":"stopSonar", "msgId":"sonarstop"}
+{"actor":"sonar_device", "msgType":"dispatch", "curstate":"stopSonar", "nextstate":"stopSonar", "msgId":"sonarstop"}
+{"actor":"led", "msgType":"dispatch", "curstate":"idle", "nextstate":"handle_update_mode", "msgId":"system_state"}
+{"actor":"led_device", "msgType":"dispatch", "curstate":"s0", "nextstate":"handle_update_mode", "msgId":"update_led_mode"}
+{"actor":"led_device", "msgType":"dispatch", "curstate":"handle_update_mode", "nextstate":"handle_update_mode", "msgId":"update_led_mode"}
