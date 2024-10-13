@@ -22,12 +22,14 @@ class Scale ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
 		
+		 		var O="init"
 		 		var ROLL_PACKETS=4
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
 						CommUtils.outblue("$name starts")
 						delay(500) 
+						observeResource("localhost","8022","ctx_wis","wis","system_state")
 						updateResourceRep( "actor_state(waste_storage_rps,$ROLL_PACKETS)"  
 						)
 						//genTimer( actor, state )
@@ -65,17 +67,25 @@ class Scale ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t04",targetState="handle_load_rp",cond=whenEvent("load_rp"))
+					 transition(edgeName="t04",targetState="handle_load_rp",cond=whenDispatch("system_state"))
 				}	 
 				state("handle_load_rp") { //this:State
 					action { //it:State
-						
-									var R=false
-									if(ROLL_PACKETS>0){
-										ROLL_PACKETS--
-									}
-						updateResourceRep( "actor_state(waste_storage_rps,$ROLL_PACKETS)"  
-						)
+						if( checkMsgContent( Term.createTerm("system_state(RP,A,B,L,O)"), Term.createTerm("system_state(RP,A,B,L,O)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								
+											val NEW_O=payloadArg(4);
+											val TO_UPDATE=(NEW_O!=O && O=="rp_loaded");
+											O=NEW_O
+								if(  TO_UPDATE  
+								 ){
+													if(ROLL_PACKETS>0){
+														ROLL_PACKETS--
+													}
+								updateResourceRep( "actor_state(waste_storage_rps,$ROLL_PACKETS)"  
+								)
+								}
+						}
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

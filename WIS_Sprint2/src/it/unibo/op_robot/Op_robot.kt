@@ -13,7 +13,9 @@ import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
 
 //User imports JAN2024
-import main.resources.position.Position
+import main.resources.utils.Position
+import main.resources.utils.Location
+import main.resources.utils.OpRobotState
 
 class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : ActorBasicFsm( name, scope, confined=isconfined ){
 
@@ -23,13 +25,15 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
 		
-				var OK=false;
-				val LOCATIONS=mapOf("home" 			to Position(0,0),
-									"waste storage" to Position(0,4),
-									"burn in"		to Position(3,1),
-									"burn out"		to Position(5,3),
-									"ash storage"	to Position(6,4)
+				var OK=false
+				val LOCATIONS=mapOf( Location.HOME  		to Position(0,0),
+									 Location.WASTE_STORAGE to Position(0,4),
+									 Location.BURN_IN		to Position(3,1),
+									 Location.BURN_OUT		to Position(5,3),
+									 Location.ASH_STORAGE	to Position(6,4)
 				)
+				var TARGET_LOCATION=Location.HOME
+				var OP_ROBOT_STATE=OpRobotState.INIT;
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -44,6 +48,9 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 				state("engage_robot") { //this:State
 					action { //it:State
 						delay(500) 
+						 OP_ROBOT_STATE=OpRobotState.ENGAGING  
+						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
+						)
 						CommUtils.outyellow("$name: engaging robot")
 						request("engage", "engage(wis,330)" ,"basicrobot" )  
 						//genTimer( actor, state )
@@ -62,6 +69,9 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 								
 												OK=true	
 						}
+						 OP_ROBOT_STATE=OpRobotState.ENGAGED  
+						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
+						)
 						CommUtils.outyellow("$name: robot engaged: $OK")
 						//genTimer( actor, state )
 					}
@@ -76,6 +86,9 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 				state("check_start_conditions") { //this:State
 					action { //it:State
 						delay(500) 
+						 OP_ROBOT_STATE=OpRobotState.CHECKING  
+						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
+						)
 						CommUtils.outgreen("$name: checking conditions")
 						request("system_state_req", "system_state_req" ,"wis" )  
 						//genTimer( actor, state )
@@ -87,15 +100,19 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 				}	 
 				state("handle_start_conditions_verified_repl") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("system_state_repl(RP,A,B,L)"), Term.createTerm("system_state_repl(RP,A,B,L)"), 
+						if( checkMsgContent( Term.createTerm("system_state_repl(RP,A,B,L,O)"), Term.createTerm("system_state_repl(RP,A,B,L,O)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
 												val RP=payloadArg(0).toInt()
 												val A=payloadArg(1).toBoolean()
 												val B=payloadArg(2).toBoolean()
 												val L=payloadArg(3).toDouble()
+												val O=payloadArg(4)
 												OK=(RP>0) && (A && !B) && (L<1.0)
 						}
+						 OP_ROBOT_STATE=OpRobotState.CHECKED  
+						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
+						)
 						CommUtils.outgreen("$name: conditions verified: $OK")
 						//genTimer( actor, state )
 					}
@@ -110,10 +127,13 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 				state("move_to_waste_storage") { //this:State
 					action { //it:State
 						
-									val DEST="waste storage"
-									val X=LOCATIONS[DEST]?.x
-									val Y=LOCATIONS[DEST]?.y
-						CommUtils.outgreen("$name: moving to $DEST...")
+									TARGET_LOCATION=Location.WASTE_STORAGE
+									val X=LOCATIONS[TARGET_LOCATION]?.x
+									val Y=LOCATIONS[TARGET_LOCATION]?.y
+						 OP_ROBOT_STATE=OpRobotState.MOVING_WS  
+						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
+						)
+						CommUtils.outgreen("$name: moving to $TARGET_LOCATION...")
 						request("moverobot", "moverobot($X,$Y)" ,"basicrobot" )  
 						//genTimer( actor, state )
 					}
@@ -125,9 +145,17 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 				}	 
 				state("load_rp") { //this:State
 					action { //it:State
+						 OP_ROBOT_STATE=OpRobotState.MOVED_WS  
+						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
+						)
+						 OP_ROBOT_STATE=OpRobotState.RP_LOADING  
+						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
+						)
 						CommUtils.outgreen("$name: loading an rp")
-						emit("load_rp", "load_rp" ) 
 						delay(1000) 
+						 OP_ROBOT_STATE=OpRobotState.RP_LOADED  
+						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
+						)
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -138,10 +166,13 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 				state("move_to_burn_in") { //this:State
 					action { //it:State
 						
-									val DEST="burn in"
-									val X=LOCATIONS[DEST]?.x
-									val Y=LOCATIONS[DEST]?.y
-						CommUtils.outgreen("$name: moving to $DEST...")
+									TARGET_LOCATION=Location.BURN_IN
+									val X=LOCATIONS[TARGET_LOCATION]?.x
+									val Y=LOCATIONS[TARGET_LOCATION]?.y
+						 OP_ROBOT_STATE=OpRobotState.MOVING_BI  
+						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
+						)
+						CommUtils.outgreen("$name: moving to $TARGET_LOCATION...")
 						request("moverobot", "moverobot($X,$Y)" ,"basicrobot" )  
 						//genTimer( actor, state )
 					}
@@ -153,9 +184,18 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 				}	 
 				state("request_to_burn") { //this:State
 					action { //it:State
+						 OP_ROBOT_STATE=OpRobotState.MOVED_BI  
+						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
+						)
+						 OP_ROBOT_STATE=OpRobotState.RP_UNLOADING  
+						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
+						)
 						CommUtils.outgreen("$name: requesting to burn an rp")
 						request("burn_req", "burn_req" ,"incinerator" )  
 						delay(1000) 
+						 OP_ROBOT_STATE=OpRobotState.RP_UNLOADED  
+						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
+						)
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -166,10 +206,13 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 				state("return_to_home") { //this:State
 					action { //it:State
 						
-									val DEST="home"
-									val X=LOCATIONS[DEST]?.x
-									val Y=LOCATIONS[DEST]?.y
-						CommUtils.outgreen("$name: moving to $DEST...")
+									TARGET_LOCATION=Location.HOME
+									val X=LOCATIONS[TARGET_LOCATION]?.x
+									val Y=LOCATIONS[TARGET_LOCATION]?.y
+						 OP_ROBOT_STATE=OpRobotState.MOVING_H  
+						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
+						)
+						CommUtils.outgreen("$name: moving to $TARGET_LOCATION...")
 						request("moverobot", "moverobot($X,$Y)" ,"basicrobot" )  
 						//genTimer( actor, state )
 					}
@@ -181,6 +224,12 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 				}	 
 				state("wait_for_burn_repl") { //this:State
 					action { //it:State
+						 OP_ROBOT_STATE=OpRobotState.MOVED_H  
+						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
+						)
+						 OP_ROBOT_STATE=OpRobotState.WAITING  
+						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
+						)
 						CommUtils.outgreen("$name: waiting end of burning...")
 						//genTimer( actor, state )
 					}
@@ -204,10 +253,13 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 				state("move_to_burn_out") { //this:State
 					action { //it:State
 						
-									val DEST="burn out"
-									val X=LOCATIONS[DEST]?.x
-									val Y=LOCATIONS[DEST]?.y
-						CommUtils.outgreen("$name: moving to $DEST...")
+									TARGET_LOCATION=Location.BURN_OUT
+									val X=LOCATIONS[TARGET_LOCATION]?.x
+									val Y=LOCATIONS[TARGET_LOCATION]?.y
+						 OP_ROBOT_STATE=OpRobotState.MOVING_BO  
+						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
+						)
+						CommUtils.outgreen("$name: moving to $TARGET_LOCATION...")
 						request("moverobot", "moverobot($X,$Y)" ,"basicrobot" )  
 						//genTimer( actor, state )
 					}
@@ -219,8 +271,17 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 				}	 
 				state("load_ash") { //this:State
 					action { //it:State
+						 OP_ROBOT_STATE=OpRobotState.MOVED_BO  
+						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
+						)
+						 OP_ROBOT_STATE=OpRobotState.ASH_LOADING  
+						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
+						)
 						CommUtils.outgreen("$name: loading ash")
 						delay(1000) 
+						 OP_ROBOT_STATE=OpRobotState.ASH_LOADED  
+						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
+						)
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -231,10 +292,13 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 				state("move_to_ash_storage") { //this:State
 					action { //it:State
 						
-									val DEST="ash storage"
-									val X=LOCATIONS[DEST]?.x
-									val Y=LOCATIONS[DEST]?.y
-						CommUtils.outgreen("$name: moving to $DEST...")
+									TARGET_LOCATION=Location.ASH_STORAGE
+									val X=LOCATIONS[TARGET_LOCATION]?.x
+									val Y=LOCATIONS[TARGET_LOCATION]?.y
+						 OP_ROBOT_STATE=OpRobotState.MOVING_AS  
+						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
+						)
+						CommUtils.outgreen("$name: moving to $TARGET_LOCATION...")
 						request("moverobot", "moverobot($X,$Y)" ,"basicrobot" )  
 						//genTimer( actor, state )
 					}
@@ -245,9 +309,17 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 				}	 
 				state("unload_ash") { //this:State
 					action { //it:State
+						 OP_ROBOT_STATE=OpRobotState.MOVED_AS  
+						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
+						)
+						 OP_ROBOT_STATE=OpRobotState.ASH_UNLOADING  
+						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
+						)
 						CommUtils.outgreen("$name: unloading ash...")
-						emit("unload_ash", "unload_ash" ) 
 						delay(3000) 
+						 OP_ROBOT_STATE=OpRobotState.ASH_UNLOADED  
+						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
+						)
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -257,6 +329,9 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 				}	 
 				state("check_continue_conditions") { //this:State
 					action { //it:State
+						 OP_ROBOT_STATE=OpRobotState.CHECKING  
+						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
+						)
 						CommUtils.outgreen("$name: checking conditions")
 						request("system_state_req", "system_state_req" ,"wis" )  
 						//genTimer( actor, state )
@@ -268,15 +343,19 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 				}	 
 				state("handle_continue_conditions_verified_repl") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("system_state_repl(RP,A,B,L)"), Term.createTerm("system_state_repl(RP,A,B,L)"), 
+						if( checkMsgContent( Term.createTerm("system_state_repl(RP,A,B,L,O)"), Term.createTerm("system_state_repl(RP,A,B,L,O)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
 												val RP=payloadArg(0).toInt()
 												val A=payloadArg(1).toBoolean();
 												val B=payloadArg(2).toBoolean();
 												val L=payloadArg(3).toDouble();
+												val O=payloadArg(4)
 												OK=(RP>0) && (A && !B) && (L<1.0)
 						}
+						 OP_ROBOT_STATE=OpRobotState.CHECKED  
+						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
+						)
 						CommUtils.outgreen("$name: conditions verified: $OK")
 						//genTimer( actor, state )
 					}
@@ -291,10 +370,13 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 				state("move_to_home") { //this:State
 					action { //it:State
 						
-									val DEST="home"
-									val X=LOCATIONS[DEST]?.x
-									val Y=LOCATIONS[DEST]?.y
-						CommUtils.outgreen("$name: moving to $DEST...")
+									TARGET_LOCATION=Location.HOME
+									val X=LOCATIONS[TARGET_LOCATION]?.x
+									val Y=LOCATIONS[TARGET_LOCATION]?.y
+						 OP_ROBOT_STATE=OpRobotState.MOVING_H  
+						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
+						)
+						CommUtils.outgreen("$name: moving to $TARGET_LOCATION...")
 						request("moverobot", "moverobot($X,$Y)" ,"basicrobot" )  
 						//genTimer( actor, state )
 					}

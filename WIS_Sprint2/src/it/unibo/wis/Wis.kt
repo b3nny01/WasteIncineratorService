@@ -26,6 +26,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 		 		var A = false
 		 		var B = false 
 		 		var L = 0.0
+		 		var O = "init"
 		 		val DLIMT = 5.0
 		 		val DMAX = 30.0
 		return { //this:ActionBasciFsm
@@ -34,8 +35,9 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 						CommUtils.outyellow("$name starts")
 						observeResource("localhost","8022","ctx_wis","scale","actor_state")
 						observeResource("localhost","8022","ctx_wis","incinerator","actor_state")
+						observeResource("localhost","8022","ctx_wis","op_robot","actor_state")
 						delay(500) 
-						observeResource("10.0.0.3","8012","ctx_monitoring_device","sonar24","actor_state")
+						observeResource("localhost","8022","ctx_wis","sonar","actor_state")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -81,10 +83,11 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 													"incinerator_burning"-> B=V.toBoolean()
 													"waste_storage_rps"  -> RP=V.toInt()
 													"ash_storage_level"  -> L=V.toDouble()
+													"op_robot_state"	 -> O=V
 												}
-								updateResourceRep( "system_state($RP,$A,$B,$L)"  
+								updateResourceRep( "system_state($RP,$A,$B,$L,$O)"  
 								)
-								CommUtils.outyellow("$name: $P updated")
+								CommUtils.outyellow("$name: $P updated with $V")
 						}
 						//genTimer( actor, state )
 					}
@@ -95,8 +98,8 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 				}	 
 				state("handle_system_state_req") { //this:State
 					action { //it:State
-						CommUtils.outyellow("$name: current state { RP:$RP,A:$A, B:$B, L:$L }")
-						answer("system_state_req", "system_state_repl", "system_state_repl($RP,$A,$B,$L)"   )  
+						CommUtils.outyellow("$name: current state { RP:$RP,A:$A, B:$B, L:$L, $O }")
+						answer("system_state_req", "system_state_repl", "system_state_repl($RP,$A,$B,$L,$O)"   )  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

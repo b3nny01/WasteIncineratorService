@@ -26,16 +26,16 @@ with Diagram('monitoring_deviceArch', show=False, outformat='png', graph_attr=gr
      sys = Custom('','./qakicons/system.png')
 ### see https://renenyffenegger.ch/notes/tools/Graphviz/attributes/label/HTML-like/index
      with Cluster('ctx_monitoring_device', graph_attr=nodeattr):
-          sonar24=Custom('sonar24','./qakicons/symActorSmall.png')
+          sonar=Custom('sonar','./qakicons/symActorSmall.png')
           datacleaner=Custom('datacleaner','./qakicons/symActorSmall.png')
           sonar_device=Custom('sonar_device','./qakicons/symActorSmall.png')
           led=Custom('led','./qakicons/symActorSmall.png')
           led_device=Custom('led_device','./qakicons/symActorSmall.png')
      with Cluster('ctx_wis', graph_attr=nodeattr):
           wis=Custom('wis(ext)','./qakicons/externalQActor.png')
-     datacleaner >> Edge( label='sonardata', **eventedgeattr, decorate='true', fontcolor='red') >> sonar24
+     datacleaner >> Edge( label='sonardata', **eventedgeattr, decorate='true', fontcolor='red') >> sonar
      sonar_device >> Edge( label='sonardata', **eventedgeattr, decorate='true', fontcolor='red') >> datacleaner
      led >> Edge(color='blue', style='solid',  decorate='true', label='<update_led_mode &nbsp; >',  fontcolor='blue') >> led_device
+     sonar >> Edge(color='blue', style='solid',  decorate='true', label='<sonarstart &nbsp; >',  fontcolor='blue') >> sonar_device
      wis >> Edge(color='blue', style='solid',  decorate='true', label='<system_state &nbsp; >',  fontcolor='blue') >> led
-     sonar24 >> Edge(color='blue', style='solid',  decorate='true', label='<sonarstart &nbsp; >',  fontcolor='blue') >> sonar_device
 diag

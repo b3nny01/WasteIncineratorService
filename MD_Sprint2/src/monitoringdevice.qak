@@ -19,7 +19,7 @@ Context ctx_wis   		   	  ip [ host= "10.0.0.1" port=8022 ]
 ExternalQActor wis context ctx_wis
 
 
-QActor sonar24 context ctx_monitoring_device{ 
+QActor sonar context ctx_monitoring_device{ 
 	
 	[# 
 		val MAX_D=10.0

@@ -12,8 +12,8 @@ dispatch( update_led_mode, update_led_mode(M) ).
 context(ctx_monitoring_device, "localhost",  "TCP", "8012").
 context(ctx_wis, "10.0.0.1",  "TCP", "8022").
  qactor( wis, ctx_wis, "external").
-  qactor( sonar24, ctx_monitoring_device, "it.unibo.sonar24.Sonar24").
- static(sonar24).
+  qactor( sonar, ctx_monitoring_device, "it.unibo.sonar.Sonar").
+ static(sonar).
   qactor( datacleaner, ctx_monitoring_device, "it.unibo.datacleaner.Datacleaner").
  static(datacleaner).
   qactor( sonar_device, ctx_monitoring_device, "it.unibo.sonar_device.Sonar_device").
