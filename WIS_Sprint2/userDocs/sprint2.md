@@ -32,29 +32,40 @@ For this reason, it is recommended to **decompose the MonitoringDevice into its 
 ### Analysis Architecture
 Below, we present a comparison between the system architecture derived from the problem analysis in sprint 1 and the one resulting from sprint 2.
 
-**Sprint 1 Architecture**
+**Sprint 1 Architecture:**
+
 <img src="./resources/imgs/wis_system_1.png" width="550px">
 
-**Sprint 2 Architecture**
-<img src="./resources/imgs/wis_system_1.png" width="550px">
+**Sprint 2 Architecture:**
+
+<img src="./resources/imgs/wis_system_2.png" width="550px"/>
 
 ## Project
 
-### System Architecture
+### Project Architecture
 
 Based on the Problem Analysis carried out previously, we implemented an executable version of the system covering the discussed features; we attach here a visual representation of the system architecture:
 
-<img src="resources/imgs/wis_system.png" width="1100px"/>
+<img src="resources/imgs/wis_system_2.png" width="1100px"/>
 
 ## Implementation
 
-### Sonar Pipeline
-During the implementation, we encountered the high sensitivity of the Sonar, which often produces "noisy" data. For this reason, it became necessary to introduce a "Filtering Pipeline" to eliminate spurious data.  
+### Sonar And Led abstraction
+During the implementation, we encountered the **high sensitivity of the Sonar**, which often produces "noisy" data. For this reason, **it became necessary to introduce a "Filtering Pipeline"** to eliminate spurious data.  
 
 Specifically, this pipeline is composed of three actors:
 - **SonarDevice**, which handles the actual reading of all data from the physical sonar.
 - **DataCleaner**, which monitors the SonarDevice and filters the relevant results for the problem, aiming to minimize the effect of measurement errors.
 - **Sonar**, which serves as the "interface" towards the WIS.
+
+In order to decouple the py we decided to split the Led actor in:
+- **LedDevice**, which handles the communication with the physical led
+- **Led** which incorporates the Led buisness logic, deciding when to turn on and off the led
+
+ 
+**monitoring device context detail:**
+
+<img src="resources/imgs/monitoring_device_2.png" width="550px">
 
 ## Test Plan
 
@@ -79,6 +90,8 @@ Specifically, this pipeline is composed of three actors:
 </table>
 
 ### Usage
+
+#### Basic Robot Activation
 To test the system you will have to activate the Virtual Environment first.
 To do so, open a terminal in the `unibo.basicrobot24` folder and type
 ```
@@ -86,11 +99,38 @@ docker compose -f virtualRobot23.yaml up
 ```
 **N.B.** If you have an older version of docker, you may have to type `docker-compose` instead of `docker compose`
 
-After that, you will have to activate the BasicRobot, which will act as a mediator between the VirtualRobot and the WasteIncineratorService application.
-To do so open another terminal inside the `unibo.basicrobot24` folder and type 
+Next activate the BasicRobot.
+It will act as a mediator between the VirtualRobot and the WasteIncineratorService application.
+To do so, open another terminal inside the `unibo.basicrobot24` folder and type 
 
 ```
 gradlew run
+```
+
+#### Monitoring Device
+After that you will need :
+* a raspberry (we used a raspberry PI 3+)
+* a led
+* a sonar (HCSR04)
+* a 220ohm resistor
+* a breadboard
+
+You will have to assemble those elements following this wiring scheme:
+
+<img src="resources/imgs/rasp_scheme.jpeg">
+
+Then you will have to deploy the Monitoring Device control software, to do so, open a terminal inside the `MD_Sprint2` folder run:
+
+```
+gradlew build
+```
+
+After that, copy the `MD_Sprint2/build/distributions/monitoring_device-1.0.zip` folder inside the raspberry (for instance using `scp`) and unzip it
+
+#### System activation
+Firstly you have to activate the monitoring device, to do so connect to your raspberry via `ssh`, then move inside the `monitoring_device-1.0/bin` folder and run
+```
+./monitoring_device
 ```
 
 Lastly, you have to activate the WIS system by opening a third terminal inside the `WIS_Sprint1` folder and running
@@ -101,5 +141,5 @@ gradlew run
 **N.B.** Type `gradlew test` if you want to launch JUnit tests instead of activating the system demo.
 
 ## Future Sprints
-In the next sprint, we will focus on the MonitoringDevice's behavior.<br/>
-Our goal is to connect the actual prototype of the system to a real monitoring device deployed on a real raspberry. 
+In the next sprint, we will focus on the GUI.<br/>
+Our goal is to enable the possibility to connect to a web interface and check the state of the system. 

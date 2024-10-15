@@ -33,10 +33,11 @@ For this reason, it is recommended to **decompose the MonitoringDevice into its 
 Below, we present a comparison between the system architecture derived from the problem analysis in sprint 1 and the one resulting from sprint 2.
 
 **Sprint 1 Architecture**
-<img src="./resources/imgs/wis_system_1.png" width="550px">
+<img src="./resources/imgs/wis_system_1.png" width="550px"/>
 
 **Sprint 2 Architecture**
-<img src="./resources/imgs/wis_system_1.png" width="550px">
+<img src="./resources/imgs/wis_system_2.png" width="550px"/>
+<img src="./resources/imgs/monitoring_device_2.png" width="550px"/>
 
 ## Project
 

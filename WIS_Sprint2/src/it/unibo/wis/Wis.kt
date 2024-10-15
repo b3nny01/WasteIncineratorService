@@ -37,7 +37,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 						observeResource("localhost","8022","ctx_wis","incinerator","actor_state")
 						observeResource("localhost","8022","ctx_wis","op_robot","actor_state")
 						delay(500) 
-						observeResource("localhost","8022","ctx_wis","sonar","actor_state")
+						observeResource("10.0.0.3","8012","ctx_monitoring_device","sonar","actor_state")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
