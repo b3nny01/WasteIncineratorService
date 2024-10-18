@@ -96,13 +96,14 @@ class Test_observer ( name: String, scope: CoroutineScope, isconfined: Boolean=f
 				}	 
 				state("handle_update") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("system_state(RP,A,B,L,O)"), Term.createTerm("system_state(RP,A,B,L)"), 
+						if( checkMsgContent( Term.createTerm("system_state(RP,A,B,L,O)"), Term.createTerm("system_state(RP,A,B,L,O)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
 												RP=payloadArg(0).toInt()
 												A=payloadArg(1).toBoolean()
 												B=payloadArg(2).toBoolean()
 												L=payloadArg(3).toDouble()
+												O=payloadArg(4)
 						}
 						//genTimer( actor, state )
 					}
@@ -114,7 +115,7 @@ class Test_observer ( name: String, scope: CoroutineScope, isconfined: Boolean=f
 				state("end_test") { //this:State
 					action { //it:State
 						CommUtils.outblack("$name: ending test")
-						answer("test_req", "test_repl", "test_repl($RP,$A,$B,$L)"   )  
+						answer("test_req", "test_repl", "test_repl($RP,$A,$B,$L,$O)"   )  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

@@ -23,7 +23,7 @@ class Scale ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 		//val interruptedStateTransitions = mutableListOf<Transition>()
 		
 		 		var O="init"
-		 		var ROLL_PACKETS=4
+		 		var ROLL_PACKETS=5
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State

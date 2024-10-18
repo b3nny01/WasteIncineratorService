@@ -50,7 +50,7 @@ class Led ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					action { //it:State
 						CommUtils.outred("$name in ${currentState.stateName} | $currentMsg | ${Thread.currentThread().getName()} n=${Thread.activeCount()}")
 						 	   
-						if( checkMsgContent( Term.createTerm("system_state(RP,A,B,L,O)"), Term.createTerm("system_state(RP,A,B,L)"), 
+						if( checkMsgContent( Term.createTerm("system_state(RP,A,B,L,O)"), Term.createTerm("system_state(RP,A,B,L,O)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
 													val RP=payloadArg(0).toInt()

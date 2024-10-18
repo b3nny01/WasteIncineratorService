@@ -80,12 +80,22 @@ In order to decouple the py we decided to split the Led actor in:
   <th><b>Expected Behavior</b></th>
 </tr>
 <tr>
-  <td><b>testIncinineratorActivation</b></td>
+  <td><b>testIncinineratorActivationMock</b></td>
   <td>WasteStorage contains 4 RP, AshStorge is empty, nobody empties AshStorage, Incinerator is inactive</td>
   <td>Once the system is initialized, Incinerator is active</td>
 </tr>
 <tr> 
-  <td><b>testOk4Rp</b></td>
+  <td><b>testOk4RpMock</b></td>
+  <td>WasteStorage contains 4 RP, AshStorge is empty and can contain the ashes of 3 RPs, nobody empties AshStorage</td>
+  <td>After some time WasteStorage contains 1 RP and AshStorage is full</td>
+</tr>
+<tr>
+  <td><b>testIncinineratorActivationMock</b></td>
+  <td>WasteStorage contains 4 RP, AshStorge is empty, nobody empties AshStorage, Incinerator is inactive</td>
+  <td>Once the system is initialized, Incinerator is active</td>
+</tr>
+<tr> 
+  <td><b>testOk4RpMock</b></td>
   <td>WasteStorage contains 4 RP, AshStorge is empty and can contain the ashes of 3 RPs, nobody empties AshStorage</td>
   <td>After some time WasteStorage contains 1 RP and AshStorage is full</td>
 </tr>

@@ -50,8 +50,8 @@ public class WISTest{
 	}
 	
 	@Test
-	public void testOk4RP() {
-		CommUtils.outmagenta("testOk4RP ========================================================= ");
+	public void testOk5RP() {
+		CommUtils.outmagenta("testOk5RP ========================================================= ");
 		IApplMessage req = CommUtils.buildRequest("test", "test_req", "test_req", "test_observer");
 		try {
 			IApplMessage reply = connSupport.request(req);
@@ -65,7 +65,7 @@ public class WISTest{
 			assertEquals(l, 1.0,0.001);
 			
 		} catch (Exception e) {
-			fail("testOk4RP " + e.getMessage());
+			fail("testOk5RP " + e.getMessage());
 		}
 	}
 }
