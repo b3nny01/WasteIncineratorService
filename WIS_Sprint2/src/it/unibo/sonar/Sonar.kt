@@ -24,7 +24,7 @@ class Sonar ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 		 
 				var O="init"
 				var L=0.0
-				val MAX_L=10.0
+				val MAX_L=5.0
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State

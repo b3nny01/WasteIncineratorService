@@ -13,6 +13,7 @@ import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
 
 //User imports JAN2024
+import main.resources.utils.LedState
 
 class Led ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : ActorBasicFsm( name, scope, confined=isconfined ){
 
@@ -22,15 +23,13 @@ class Led ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
 		
-				
-				var MODE=main.resources.utils.LedMode.OFF
-				
-				
+				var STATE=LedState.OFF
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						CommUtils.outblack("$name starts")
-						observeResource("10.0.0.1","8022","ctx_wis","wis","system_state")
+						CommUtils.outred("$name starts")
+						delay(500) 
+						observeResource("localhost","8012","ctx_monitoring_device","wis","system_state")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -40,34 +39,35 @@ class Led ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 				}	 
 				state("idle") { //this:State
 					action { //it:State
-						CommUtils.outblack("$name idle")
+						CommUtils.outred("$name: idle")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t011",targetState="handle_update_mode",cond=whenDispatch("system_state"))
+					 transition(edgeName="t02",targetState="handle_update_mode",cond=whenDispatch("system_state"))
 				}	 
 				state("handle_update_mode") { //this:State
 					action { //it:State
-						CommUtils.outred("$name in ${currentState.stateName} | $currentMsg | ${Thread.currentThread().getName()} n=${Thread.activeCount()}")
-						 	   
-						if( checkMsgContent( Term.createTerm("system_state(RP,A,B,L)"), Term.createTerm("system_state(RP,A,B,L)"), 
+						if( checkMsgContent( Term.createTerm("system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)"), Term.createTerm("system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
 													val RP=payloadArg(0).toInt()
 													val A=payloadArg(1).toBoolean()
 													val B=payloadArg(2).toBoolean()
-													val L=payloadArg(3).toDouble()
+													val AL=payloadArg(3).toDouble() 
 													
 													if(B){
-														MODE=main.resources.utils.LedMode.BLINKING;
-													}else if(RP==0 || L==1.0){
-														MODE=main.resources.utils.LedMode.ON
+														STATE=LedState.BLINKING;
+													}else if(RP==0 || AL==1.0){
+														STATE=LedState.ON
 													}else{
-														MODE=main.resources.utils.LedMode.OFF
+														STATE=LedState.OFF
 													}
-								forward("update_led_mode", "update_led_mode($MODE)" ,"led_device" ) 
+								updateResourceRep( "actor_state(led_state,$STATE)"  
+								)
+								CommUtils.outred("$name: mode: $STATE")
+								forward("update_led_mode", "update_led_mode($STATE)" ,"led_device" ) 
 						}
 						//genTimer( actor, state )
 					}

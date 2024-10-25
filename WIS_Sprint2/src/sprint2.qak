@@ -42,7 +42,7 @@ Reply test_repl: test_repl(N) for test_req
 //Contexts===================================================================================
 Context ctx_wis 			  ip 	[	host="localhost"		port=8022]  
 Context ctx_basic_robot 	  ip 	[	host= "127.0.0.1"		port=8020]
-//Context ctx_monitoring_device ip 	[ 	host= "10.0.0.3" 		port=8012]
+//Context ctx_monitoring_device ip 	[ 	host= "192.168.1.2" 	port=8012]
 //===========================================================================================
 
 //ExternalActors declaration=================================================================
@@ -183,6 +183,7 @@ QActor op_robot context ctx_wis {
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.ENGAGING #]
 		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		delay 100
 		
 		println("$name: engaging robot") color yellow
 		request basicrobot -m engage:engage(wis,330)
@@ -200,6 +201,7 @@ QActor op_robot context ctx_wis {
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.ENGAGED #]
 		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		delay 100
 		
 		println("$name: robot engaged: $OK") color yellow
 	} Goto check_start_conditions if [# OK #] else engage_robot
@@ -209,6 +211,7 @@ QActor op_robot context ctx_wis {
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.CHECKING #]
 		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		delay 100
 		
 		println("$name: checking conditions") color green
 		request wis -m system_state_req:system_state_req
@@ -229,6 +232,7 @@ QActor op_robot context ctx_wis {
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.CHECKED #]
 		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		delay 100
 		
 		println("$name: conditions verified: $OK") color green
 	}Goto move_to_waste_storage if [# OK #] else check_start_conditions
@@ -244,6 +248,7 @@ QActor op_robot context ctx_wis {
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.MOVING_WS #]
 		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		delay 100
 		
 		println("$name: moving to $TARGET_LOCATION...") color green
 		request basicrobot -m moverobot:moverobot($X,$Y)
@@ -255,16 +260,19 @@ QActor op_robot context ctx_wis {
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.MOVED_WS #]
 		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		delay 100
 		
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.RP_LOADING #]
 		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		delay 100
 		
 		println("$name: loading an rp") color green
 		delay 1000
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.RP_LOADED #]
 		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		delay 100
 		
 	}Goto move_to_burn_in
 		
@@ -278,6 +286,7 @@ QActor op_robot context ctx_wis {
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.MOVING_BI #]
 		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		delay 100
 		
 		println("$name: moving to $TARGET_LOCATION...") color green
 		request basicrobot -m moverobot:moverobot($X,$Y)
@@ -289,10 +298,12 @@ QActor op_robot context ctx_wis {
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.MOVED_BI #]
 		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		delay 100
 		
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.RP_UNLOADING #]
 		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		delay 100
 		
 		println("$name: requesting to burn an rp") color green
 		request incinerator -m burn_req : burn_req
@@ -300,7 +311,7 @@ QActor op_robot context ctx_wis {
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.RP_UNLOADED #]
 		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
-		
+		delay 100
 
 	}Goto return_to_home
 	
@@ -313,6 +324,7 @@ QActor op_robot context ctx_wis {
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.MOVING_H #]
 		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		delay 100
 		
 		println("$name: moving to $TARGET_LOCATION...") color green
 		request basicrobot -m moverobot:moverobot($X,$Y) 
@@ -325,10 +337,12 @@ QActor op_robot context ctx_wis {
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.MOVED_H #]
 		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		delay 100
 		
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.WAITING #]
 		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		delay 100
 		
 		println("$name: waiting end of burning...") color green
 	}Transition t0
@@ -350,6 +364,7 @@ QActor op_robot context ctx_wis {
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.MOVING_BO #]
 		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		delay 100
 		
 		println("$name: moving to $TARGET_LOCATION...") color green
 		request basicrobot -m moverobot:moverobot($X,$Y) 
@@ -361,17 +376,19 @@ QActor op_robot context ctx_wis {
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.MOVED_BO #]
 		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		delay 100
 		
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.ASH_LOADING #]
 		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		delay 100
 		
 		println("$name: loading ash") color green
 		delay 1000
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.ASH_LOADED #]
 		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
-		
+		delay 100
 	}Goto move_to_ash_storage
 	
 	// unload ashes
@@ -384,6 +401,7 @@ QActor op_robot context ctx_wis {
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.MOVING_AS #]
 		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		delay 100
 		
 		println("$name: moving to $TARGET_LOCATION...") color green
 		request basicrobot -m moverobot:moverobot($X,$Y)
@@ -394,23 +412,27 @@ QActor op_robot context ctx_wis {
 	 	// updating state
 	 	[# OP_ROBOT_STATE=OpRobotState.MOVED_AS #]
 		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		delay 100
 		
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.ASH_UNLOADING #]
 		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		delay 100
 		
-	 	println("$name: unloading ash...") color green
+	 	println("name: unloading ash...") color green
 	 	delay 3000
 	 	// updating state
 	 	[# OP_ROBOT_STATE=OpRobotState.ASH_UNLOADED #]
 		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		delay 100
 		
-	 }Goto check_continue_conditions
+	 }Goto check_continue_conditions 
 	 
 	 State check_continue_conditions{
 	 	// updating state
 	 	[# OP_ROBOT_STATE=OpRobotState.CHECKING #]
 		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		delay 100
 		
 		println("$name: checking conditions") color green
 		request wis -m system_state_req:system_state_req
@@ -431,6 +453,7 @@ QActor op_robot context ctx_wis {
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.CHECKED #]
 		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		delay 100
 		
 		println("$name: conditions verified: $OK") color green
 	}Goto move_to_waste_storage if [#OK#] else move_to_home
@@ -444,6 +467,7 @@ QActor op_robot context ctx_wis {
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.MOVING_H #]
 		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		delay 100
 		
 		println("$name: moving to $TARGET_LOCATION...") color green
 		request basicrobot -m moverobot:moverobot($X,$Y)
@@ -487,7 +511,6 @@ QActor wis context ctx_wis{
 		whenRequest system_state_req -> handle_system_state_req
 				
 	State update_state{
-		printCurrentMessage color black
 		onMsg(actor_state:actor_state(P,V)){
 			[#
 				val P=payloadArg(0);
@@ -580,11 +603,11 @@ QActor test_observer context ctx_wis{
  
 //MockActors=================================================================================
 
-QActor sonar context ctx_wis{ 	
+QActor sonar context ctx_wis{  	
 	[# 
 		var O="init"
 		var L=0.0
-		val MAX_L=10.0
+		val MAX_L=5.0
 	#]
 	State s0 initial{
 		println("$name starts") color magenta
@@ -631,7 +654,6 @@ QActor led context ctx_wis {
 	}Transition t0 whenMsg system_state -> handle_update_mode
 	
 	State handle_update_mode{
-		printCurrentMessage color red
 		onMsg(system_state:system_state(RP,A,B,L,O)){
 			[#
 					val RP=payloadArg(0).toInt()

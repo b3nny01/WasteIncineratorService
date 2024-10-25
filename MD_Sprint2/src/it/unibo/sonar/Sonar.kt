@@ -21,39 +21,50 @@ class Sonar ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
-		 
-				val MAX_D=10.0
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
 						CommUtils.outmagenta("$name starts")
-						delay(1000) 
-						forward("sonarstart", "sonarstart(1)" ,"sonar_device" ) 
-						subscribeToLocalActor("datacleaner") 
+						delay(500) 
+						forward("sonar_start", "sonarstart(1)" ,"sonar_device" ) 
+						subscribeToLocalActor("data_cleaner") 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t00",targetState="handleData",cond=whenEvent("sonardata"))
+					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
 				}	 
-				state("handleData") { //this:State
+				state("idle") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("distance(D)"), Term.createTerm("distance(D)"), 
+						CommUtils.outmagenta("$name: idle")
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t00",targetState="handle_data",cond=whenEvent("sonar_clean_data"))
+				}	 
+				state("handle_data") { //this:State
+					action { //it:State
+						if( checkMsgContent( Term.createTerm("clean_data(D,MIND,MAXD)"), Term.createTerm("clean_data(D,MIND,MAXD)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								  
 										 		val D = payloadArg(0).toDouble()
-										 		val ASH_LEVEL=(MAX_D-D)/MAX_D 
-								CommUtils.outmagenta("$name: ash level: $ASH_LEVEL")
+										 		val MIN_D= payloadArg(1).toDouble()
+										 		val MAX_D= payloadArg(2).toDouble()
+										 				 		
+										 		val ASH_LEVEL=(MAX_D-D)/(MAX_D-MIN_D) 
 								updateResourceRep( "actor_state(ash_storage_level,$ASH_LEVEL)"  
 								)
+								CommUtils.outmagenta("$name: ash level: $ASH_LEVEL")
 						}
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t01",targetState="handleData",cond=whenEvent("sonardata"))
+					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
 				}	 
 			}
 		}

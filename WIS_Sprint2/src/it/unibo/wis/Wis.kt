@@ -21,91 +21,54 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
-		
-		 		var RP = 0
-		 		var A = false
-		 		var B = false 
-		 		var L = 0.0
-		 		var O = "init"
-		 		val DLIMT = 5.0
-		 		val DMAX = 30.0
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						CommUtils.outyellow("$name starts")
-						observeResource("localhost","8022","ctx_wis","scale","actor_state")
-						observeResource("localhost","8022","ctx_wis","incinerator","actor_state")
-						observeResource("localhost","8022","ctx_wis","op_robot","actor_state")
+						CommUtils.outblue("$name STARTS")
+						subscribeToLocalActor("incinerator") 
+						subscribeToLocalActor("monitoring_device") 
 						delay(500) 
-						observeResource("localhost","8022","ctx_wis","sonar","actor_state")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="activate_incinerator", cond=doswitch() )
+					 transition( edgeName="goto",targetState="activation", cond=doswitch() )
 				}	 
-				state("activate_incinerator") { //this:State
+				state("activation") { //this:State
 					action { //it:State
-						
-									val AR=true	
-						CommUtils.outyellow("$name: activating incinerator")
-						forward("incinerator_activation", "incinerator_activation($AR)" ,"incinerator" ) 
+						CommUtils.outblue("$name sends activation message to incinerator")
+						forward("activationCommand", "activationCommand(1)" ,"incinerator" ) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="waiting_for_updates", cond=doswitch() )
+					 transition(edgeName="t00",targetState="handleEndBurning",cond=whenEvent("endOfBurning"))
+					transition(edgeName="t01",targetState="handleAshLevel",cond=whenEvent("ashLevel"))
 				}	 
-				state("waiting_for_updates") { //this:State
+				state("handleEndBurning") { //this:State
 					action { //it:State
-						CommUtils.outyellow("$name: waiting for updates...")
+						CommUtils.outblue("$name | incinerator completed burning cycle")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t020",targetState="update_state",cond=whenDispatch("actor_state"))
-					transition(edgeName="t021",targetState="handle_system_state_req",cond=whenRequest("system_state_req"))
 				}	 
-				state("update_state") { //this:State
+				state("handleAshLevel") { //this:State
 					action { //it:State
-						CommUtils.outblack("$name in ${currentState.stateName} | $currentMsg | ${Thread.currentThread().getName()} n=${Thread.activeCount()}")
-						 	   
-						if( checkMsgContent( Term.createTerm("actor_state(P,V)"), Term.createTerm("actor_state(P,V)"), 
+						if( checkMsgContent( Term.createTerm("ashLevel(L)"), Term.createTerm("ashLevel(A)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								
-												val P=payloadArg(0);
-												val V=payloadArg(1);
-												when (P){
-													"incinerator_active" -> A=V.toBoolean()
-													"incinerator_burning"-> B=V.toBoolean()
-													"waste_storage_rps"  -> RP=V.toInt()
-													"ash_storage_level"  -> L=V.toDouble()
-													"op_robot_state"	 -> O=V
-												}
-								updateResourceRep( "system_state($RP,$A,$B,$L,$O)"  
-								)
-								CommUtils.outyellow("$name: $P updated with $V")
+								 
+												var LEVEL = payloadArg(0)
+								CommUtils.outblue("$name | current ash level in AshStorage = $LEVEL")
 						}
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="waiting_for_updates", cond=doswitch() )
-				}	 
-				state("handle_system_state_req") { //this:State
-					action { //it:State
-						CommUtils.outyellow("$name: current state { RP:$RP,A:$A, B:$B, L:$L, $O }")
-						answer("system_state_req", "system_state_repl", "system_state_repl($RP,$A,$B,$L,$O)"   )  
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition( edgeName="goto",targetState="waiting_for_updates", cond=doswitch() )
 				}	 
 			}
 		}
