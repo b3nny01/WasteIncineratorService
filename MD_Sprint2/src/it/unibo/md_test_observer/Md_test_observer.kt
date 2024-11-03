@@ -43,9 +43,69 @@ class Md_test_observer ( name: String, scope: CoroutineScope, isconfined: Boolea
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t03",targetState="test_lb",cond=whenRequest("test_led_burning"))
-					transition(edgeName="t04",targetState="test_lews",cond=whenRequest("test_led_empty_ws"))
-					transition(edgeName="t05",targetState="test_lfas",cond=whenRequest("test_led_full_as"))
+					 transition(edgeName="t03",targetState="test_sua",cond=whenRequest("test_sonar_unload_ash"))
+					transition(edgeName="t04",targetState="test_lb",cond=whenRequest("test_led_burning"))
+					transition(edgeName="t05",targetState="test_lews",cond=whenRequest("test_led_empty_ws"))
+					transition(edgeName="t06",targetState="test_lfas",cond=whenRequest("test_led_full_as"))
+				}	 
+				state("test_sua") { //this:State
+					action { //it:State
+						CommUtils.outcyan("$name: test sonar unload ash")
+						
+						 			OK=true	
+						observeResource("localhost","8012","ctx_monitoring_device","sonar","actor_state")
+						delay(500) 
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="sua_set_empty_ash_storage", cond=doswitch() )
+				}	 
+				state("sua_set_empty_ash_storage") { //this:State
+					action { //it:State
+						forward("set_system_state", "system_state(3,true,false,0,ash_unloading,off)" ,"wis" ) 
+						delay(500) 
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="sua_unload_ash", cond=doswitch() )
+				}	 
+				state("sua_unload_ash") { //this:State
+					action { //it:State
+						forward("set_system_state", "system_state(3,true,false,0,ash_unloaded,off)" ,"wis" ) 
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t07",targetState="sua_check_not_empty_ash_storage",cond=whenDispatch("actor_state"))
+				}	 
+				state("sua_check_not_empty_ash_storage") { //this:State
+					action { //it:State
+						if( checkMsgContent( Term.createTerm("actor_state(P,V)"), Term.createTerm("actor_state(P,V)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								
+								 				OK=(payloadArg(1).toDouble()==(1/3.0))
+						}
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="end_sua_test", cond=doswitch() )
+				}	 
+				state("end_sua_test") { //this:State
+					action { //it:State
+						answer("test_sonar_unload_ash", "test_repl", "test_repl($OK)"   )  
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
 				}	 
 				state("test_lb") { //this:State
 					action { //it:State
@@ -60,7 +120,7 @@ class Md_test_observer ( name: String, scope: CoroutineScope, isconfined: Boolea
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t06",targetState="lb_check_led_device_off_1",cond=whenReply("led_device_state_repl"))
+					 transition(edgeName="t08",targetState="lb_check_led_device_off_1",cond=whenReply("led_device_state_repl"))
 				}	 
 				state("lb_check_led_device_off_1") { //this:State
 					action { //it:State
@@ -74,12 +134,12 @@ class Md_test_observer ( name: String, scope: CoroutineScope, isconfined: Boolea
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="set_burning_true", cond=doswitchGuarded({ OK  
+					 transition( edgeName="goto",targetState="lb_set_burning_true", cond=doswitchGuarded({ OK  
 					}) )
 					transition( edgeName="goto",targetState="end_lb_test", cond=doswitchGuarded({! ( OK  
 					) }) )
 				}	 
-				state("set_burning_true") { //this:State
+				state("lb_set_burning_true") { //this:State
 					action { //it:State
 						forward("set_system_state", "system_state(3,true,true,0,rp_unloaded,off)" ,"wis" ) 
 						delay(500) 
@@ -89,7 +149,7 @@ class Md_test_observer ( name: String, scope: CoroutineScope, isconfined: Boolea
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t07",targetState="lb_check_led_device_blink",cond=whenReply("led_device_state_repl"))
+					 transition(edgeName="t09",targetState="lb_check_led_device_blink",cond=whenReply("led_device_state_repl"))
 				}	 
 				state("lb_check_led_device_blink") { //this:State
 					action { //it:State
@@ -103,12 +163,12 @@ class Md_test_observer ( name: String, scope: CoroutineScope, isconfined: Boolea
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="set_burning_false", cond=doswitchGuarded({ OK  
+					 transition( edgeName="goto",targetState="lb_set_burning_false", cond=doswitchGuarded({ OK  
 					}) )
 					transition( edgeName="goto",targetState="end_lb_test", cond=doswitchGuarded({! ( OK  
 					) }) )
 				}	 
-				state("set_burning_false") { //this:State
+				state("lb_set_burning_false") { //this:State
 					action { //it:State
 						forward("set_system_state", "system_state(3,true,false,0,waiting,blinking)" ,"wis" ) 
 						delay(500) 
@@ -118,7 +178,7 @@ class Md_test_observer ( name: String, scope: CoroutineScope, isconfined: Boolea
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t08",targetState="lb_check_led_device_off_2",cond=whenReply("led_device_state_repl"))
+					 transition(edgeName="t010",targetState="lb_check_led_device_off_2",cond=whenReply("led_device_state_repl"))
 				}	 
 				state("lb_check_led_device_off_2") { //this:State
 					action { //it:State
@@ -157,7 +217,7 @@ class Md_test_observer ( name: String, scope: CoroutineScope, isconfined: Boolea
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t09",targetState="lews_check_led_device_off_1",cond=whenReply("led_device_state_repl"))
+					 transition(edgeName="t011",targetState="lews_check_led_device_off_1",cond=whenReply("led_device_state_repl"))
 				}	 
 				state("lews_check_led_device_off_1") { //this:State
 					action { //it:State
@@ -171,12 +231,12 @@ class Md_test_observer ( name: String, scope: CoroutineScope, isconfined: Boolea
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="set_empty_waste_storage", cond=doswitchGuarded({ OK  
+					 transition( edgeName="goto",targetState="lews_set_empty_waste_storage", cond=doswitchGuarded({ OK  
 					}) )
 					transition( edgeName="goto",targetState="end_lews_test", cond=doswitchGuarded({! ( OK  
 					) }) )
 				}	 
-				state("set_empty_waste_storage") { //this:State
+				state("lews_set_empty_waste_storage") { //this:State
 					action { //it:State
 						forward("set_system_state", "system_state(0,true,false,0,rp_loaded,off)" ,"wis" ) 
 						delay(500) 
@@ -186,7 +246,7 @@ class Md_test_observer ( name: String, scope: CoroutineScope, isconfined: Boolea
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t010",targetState="lews_check_led_device_on",cond=whenReply("led_device_state_repl"))
+					 transition(edgeName="t012",targetState="lews_check_led_device_on",cond=whenReply("led_device_state_repl"))
 				}	 
 				state("lews_check_led_device_on") { //this:State
 					action { //it:State
@@ -200,12 +260,12 @@ class Md_test_observer ( name: String, scope: CoroutineScope, isconfined: Boolea
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="set_full_waste_storage", cond=doswitchGuarded({OK 
+					 transition( edgeName="goto",targetState="lews_set_full_waste_storage", cond=doswitchGuarded({OK 
 					}) )
 					transition( edgeName="goto",targetState="end_lews_test", cond=doswitchGuarded({! (OK 
 					) }) )
 				}	 
-				state("set_full_waste_storage") { //this:State
+				state("lews_set_full_waste_storage") { //this:State
 					action { //it:State
 						forward("set_system_state", "system_state(3,true,false,0,rp_loaded,off)" ,"wis" ) 
 						delay(500) 
@@ -215,7 +275,7 @@ class Md_test_observer ( name: String, scope: CoroutineScope, isconfined: Boolea
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t011",targetState="lews_check_led_device_off_2",cond=whenReply("led_device_state_repl"))
+					 transition(edgeName="t013",targetState="lews_check_led_device_off_2",cond=whenReply("led_device_state_repl"))
 				}	 
 				state("lews_check_led_device_off_2") { //this:State
 					action { //it:State
@@ -254,7 +314,7 @@ class Md_test_observer ( name: String, scope: CoroutineScope, isconfined: Boolea
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t012",targetState="lfas_check_led_device_off_1",cond=whenReply("led_device_state_repl"))
+					 transition(edgeName="t014",targetState="lfas_check_led_device_off_1",cond=whenReply("led_device_state_repl"))
 				}	 
 				state("lfas_check_led_device_off_1") { //this:State
 					action { //it:State
@@ -268,12 +328,12 @@ class Md_test_observer ( name: String, scope: CoroutineScope, isconfined: Boolea
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="set_full_ash_storage", cond=doswitchGuarded({ OK  
+					 transition( edgeName="goto",targetState="lfas_set_full_ash_storage", cond=doswitchGuarded({ OK  
 					}) )
 					transition( edgeName="goto",targetState="end_lfas_test", cond=doswitchGuarded({! ( OK  
 					) }) )
 				}	 
-				state("set_full_ash_storage") { //this:State
+				state("lfas_set_full_ash_storage") { //this:State
 					action { //it:State
 						forward("set_system_state", "system_state(3,true,false,1,ash_unloaded,off)" ,"wis" ) 
 						delay(500) 
@@ -283,7 +343,7 @@ class Md_test_observer ( name: String, scope: CoroutineScope, isconfined: Boolea
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t013",targetState="lfas_check_led_device_on",cond=whenReply("led_device_state_repl"))
+					 transition(edgeName="t015",targetState="lfas_check_led_device_on",cond=whenReply("led_device_state_repl"))
 				}	 
 				state("lfas_check_led_device_on") { //this:State
 					action { //it:State
@@ -297,12 +357,12 @@ class Md_test_observer ( name: String, scope: CoroutineScope, isconfined: Boolea
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="set_empty_ash_storage", cond=doswitchGuarded({OK 
+					 transition( edgeName="goto",targetState="lfas_set_empty_ash_storage", cond=doswitchGuarded({OK 
 					}) )
 					transition( edgeName="goto",targetState="end_lfas_test", cond=doswitchGuarded({! (OK 
 					) }) )
 				}	 
-				state("set_empty_ash_storage") { //this:State
+				state("lfas_set_empty_ash_storage") { //this:State
 					action { //it:State
 						forward("set_system_state", "system_state(3,true,false,0,ash_loaded,on)" ,"wis" ) 
 						delay(500) 
@@ -312,7 +372,7 @@ class Md_test_observer ( name: String, scope: CoroutineScope, isconfined: Boolea
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t014",targetState="lfas_check_led_device_off_2",cond=whenReply("led_device_state_repl"))
+					 transition(edgeName="t016",targetState="lfas_check_led_device_off_2",cond=whenReply("led_device_state_repl"))
 				}	 
 				state("lfas_check_led_device_off_2") { //this:State
 					action { //it:State

@@ -42,7 +42,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t018",targetState="handle_set_system_state",cond=whenDispatch("set_system_state"))
+					 transition(edgeName="t021",targetState="handle_set_system_state",cond=whenDispatch("set_system_state"))
 				}	 
 				state("handle_set_system_state") { //this:State
 					action { //it:State

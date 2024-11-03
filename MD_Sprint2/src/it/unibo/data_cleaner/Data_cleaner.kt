@@ -27,7 +27,7 @@ class Data_cleaner ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 				val SENSITIVITY=1
 				val START_D=3;
 				val MIN_D=0;
-				val MAX_D=10;
+				val MAX_D=9;
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State

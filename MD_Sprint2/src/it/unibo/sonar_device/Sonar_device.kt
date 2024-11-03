@@ -23,7 +23,7 @@ class Sonar_device ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 		//val interruptedStateTransitions = mutableListOf<Transition>()
 		 
 				var O="init"
-				var D=13
+				var D=12
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -41,22 +41,37 @@ class Sonar_device ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 					action { //it:State
 						CommUtils.outyellow("$name: mock python data: $D")
 						emitLocalStreamEvent("sonar_data", "distance($D)" ) 
-						delay(1000) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t015",targetState="handle_unload_ash",cond=whenDispatch("system_state"))
+					 transition(edgeName="t017",targetState="handle_set_sonar_state",cond=whenDispatch("set_sonar_state"))
+					transition(edgeName="t018",targetState="handle_unload_ash",cond=whenDispatch("system_state"))
+				}	 
+				state("handle_set_sonar_state") { //this:State
+					action { //it:State
+						if( checkMsgContent( Term.createTerm("set_sonar_state(D)"), Term.createTerm("set_sonar_state(D)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								
+												D=payloadArg(0).toInt()
+						}
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="read_mock_data", cond=doswitch() )
 				}	 
 				state("handle_unload_ash") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)"), Term.createTerm("system_state(RP,A,B,L,O)"), 
+						if( checkMsgContent( Term.createTerm("system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)"), Term.createTerm("system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
 												val NEW_O=payloadArg(4);
-												val TO_UPDATE=(NEW_O!=O && O=="ash_unloaded");
+												val TO_UPDATE=(NEW_O!=O && NEW_O=="ash_unloaded");
 												O=NEW_O
+								CommUtils.outgreen("$TO_UPDATE")
 								if(  TO_UPDATE  
 								 ){  
 											 		D-=3; 

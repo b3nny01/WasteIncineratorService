@@ -12,7 +12,9 @@ dispatch( update_led_mode, update_led_mode(M) ).
 request( test_led_burning, test_req(N) ).
 request( test_led_empty_ws, test_req(N) ).
 request( test_led_full_as, test_req(N) ).
+request( test_sonar_unload_ash, test_req(N) ).
 dispatch( set_system_state, system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE) ).
+dispatch( set_sonar_state, set_sonar_state(D) ).
 request( led_device_state_req, led_device_state_req(N) ).
 reply( led_device_state_repl, led_device_state_repl(S) ).  %%for led_device_state_req
 %====================================================================================

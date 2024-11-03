@@ -43,8 +43,8 @@ class Led_device ( name: String, scope: CoroutineScope, isconfined: Boolean=fals
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t016",targetState="handle_update_mode",cond=whenDispatch("update_led_mode"))
-					transition(edgeName="t017",targetState="handle_led_device_state_req",cond=whenRequest("led_device_state_req"))
+					 transition(edgeName="t019",targetState="handle_update_mode",cond=whenDispatch("update_led_mode"))
+					transition(edgeName="t020",targetState="handle_led_device_state_req",cond=whenRequest("led_device_state_req"))
 				}	 
 				state("handle_update_mode") { //this:State
 					action { //it:State
