@@ -82,12 +82,41 @@ In order to decouple the py we decided to split the Led actor into:
 <tr>
   <td><b>testIncinineratorActivation</b></td>
   <td>WasteStorage contains 4 RP, AshStorge is empty, nobody empties AshStorage, Incinerator is inactive</td>
-  <td>Once the system is initialized, Incinerator is active</td>
+  <td>Once the system is initialized, the Incinerator is active</td>
 </tr>
 <tr> 
   <td><b>testOk5RP</b></td>
   <td>WasteStorage contains 5 RP, AshStorge is empty and can contain the ashes of 4 RPs, nobody empties AshStorage</td>
   <td>After some time WasteStorage contains 1 RP and AshStorage is full</td>
+</tr>
+</table>
+
+**Test Class**: [MDTest](/MD_Sprint2/src/main/java/test/MDTest.java)
+<table>
+<tr>
+  <th><b>Test Name</b></th>
+  <th><b>Initial Condition</b></th>
+  <th><b>Expected Behavior</b></th>
+</tr>
+<tr>
+  <td><b>test00_SonarUnloadAsh</b></td>
+  <td>AshStorge is empty, nobody empties AshStorage, Sonar is monitoring AshStorage, OpRobot is unloading ash in the AshStorage</td>
+  <td>Once OpRobot is done unloading the ash, Sonar detects the ash level change</td>
+</tr>
+<tr> 
+  <td><b>test01_LedBurning</b></td>
+  <td>Incinerator is inactive, Led is off</td>
+  <td>When the Incinerator is activated, Led starts blinking. When the Incinerator is stopped, Led turns back off</td>
+</tr>
+ <tr>
+  <td><b>test02_LedEmptyWasteStorage</b></td>
+  <td>WasteStorage contains 1 RP, AshStorage is empty, Incinerator is inactive, Led is off</td>
+  <td>When WasteStorage gets emptied, Led turns on. When WasteStorage gets filled with a new RP, Led turns back off</td>
+</tr>
+<tr> 
+  <td><b>test03_LedFullAshStorage</b></td>
+  <td>AshStorge is empty, WasteStorage is not empty, Incinerator is inactive, Led is off</td>
+  <td>When AshStorage fills up, Led turns on. When AshStorage gets emptied, Led turns back off</td>
 </tr>
 </table>
 
