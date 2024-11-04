@@ -60,12 +60,12 @@ Specifically, this pipeline is composed of three actors:
 - **DataCleaner**, which monitors the SonarDevice and filters the relevant results for the problem, aiming to minimize the effect of measurement errors.
 - **Sonar**, which serves as the "interface" towards the WIS.
 
-In order to decouple the py we decided to split the Led actor in:
+In order to decouple the py we decided to split the Led actor into:
 - **LedDevice**, which handles the communication with the physical led
-- **Led** which incorporates the Led buisness logic, deciding when to turn on and off the led
+- **Led**, which incorporates the Led business logic, deciding when to turn on and off the led
 
  
-**monitoring device context detail:**
+**MonitoringDevice context details:**
 
 <img src="resources/imgs/monitoring_device_2.png" width="550px">
 
