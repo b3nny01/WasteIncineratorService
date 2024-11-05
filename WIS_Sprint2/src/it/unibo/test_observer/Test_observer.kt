@@ -27,6 +27,7 @@ class Test_observer ( name: String, scope: CoroutineScope, isconfined: Boolean=f
 		 		var B = false 
 		 		var L = 0.0
 		 		var O = ""
+		 		var LS="off"
 		 		var END=false
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
@@ -37,7 +38,7 @@ class Test_observer ( name: String, scope: CoroutineScope, isconfined: Boolean=f
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t022",targetState="start_test",cond=whenRequest("test_req"))
+					 transition(edgeName="t021",targetState="start_test",cond=whenRequest("test_req"))
 				}	 
 				state("start_test") { //this:State
 					action { //it:State
@@ -49,11 +50,11 @@ class Test_observer ( name: String, scope: CoroutineScope, isconfined: Boolean=f
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t023",targetState="handle_system_state_repl",cond=whenReply("system_state_repl"))
+					 transition(edgeName="t022",targetState="handle_system_state_repl",cond=whenReply("system_state_repl"))
 				}	 
 				state("handle_system_state_repl") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("system_state_repl(RP,A,B,L,O)"), Term.createTerm("system_state_repl(RP,A,B,L,O)"), 
+						if( checkMsgContent( Term.createTerm("system_state_repl(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)"), Term.createTerm("system_state_repl(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
 												RP=payloadArg(0).toInt()
@@ -61,6 +62,7 @@ class Test_observer ( name: String, scope: CoroutineScope, isconfined: Boolean=f
 												B=payloadArg(2).toBoolean();
 												L=payloadArg(3).toDouble();
 												O=payloadArg(4)
+												LS=payloadArg(5)
 						}
 						//genTimer( actor, state )
 					}
@@ -92,11 +94,11 @@ class Test_observer ( name: String, scope: CoroutineScope, isconfined: Boolean=f
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t024",targetState="handle_update",cond=whenDispatch("system_state"))
+					 transition(edgeName="t023",targetState="handle_update",cond=whenDispatch("system_state"))
 				}	 
 				state("handle_update") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("system_state(RP,A,B,L,O)"), Term.createTerm("system_state(RP,A,B,L,O)"), 
+						if( checkMsgContent( Term.createTerm("system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)"), Term.createTerm("system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
 												RP=payloadArg(0).toInt()
@@ -104,6 +106,8 @@ class Test_observer ( name: String, scope: CoroutineScope, isconfined: Boolean=f
 												B=payloadArg(2).toBoolean()
 												L=payloadArg(3).toDouble()
 												O=payloadArg(4)
+												LS=payloadArg(5)
+												
 						}
 						//genTimer( actor, state )
 					}
@@ -115,7 +119,7 @@ class Test_observer ( name: String, scope: CoroutineScope, isconfined: Boolean=f
 				state("end_test") { //this:State
 					action { //it:State
 						CommUtils.outblack("$name: ending test")
-						answer("test_req", "test_repl", "test_repl($RP,$A,$B,$L,$O)"   )  
+						answer("test_req", "test_repl", "test_repl($RP,$A,$B,$L,$O,$LS)"   )  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

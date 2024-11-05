@@ -13,6 +13,7 @@ import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
 
 //User imports JAN2024
+import main.resources.configuration.SystemConfiguration
 
 class Data_cleaner ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : ActorBasicFsm( name, scope, confined=isconfined ){
 
@@ -24,10 +25,10 @@ class Data_cleaner ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 		 
 				var CURRENT=0
 				var PREVIOUS = 0
-				val SENSITIVITY=1
-				val START_D=3;
-				val MIN_D=0;
-				val MAX_D=9;
+				val SENSITIVITY=SystemConfiguration.getProperty("data_cleaner.sensitivity").toInt()
+				val START_D=SystemConfiguration.getProperty("data_cleaner.start_distance").toInt()
+				val MIN_D=SystemConfiguration.getProperty("data_cleaner.min_distance").toInt()
+				val MAX_D=SystemConfiguration.getProperty("data_cleaner.max_distance").toInt()
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State

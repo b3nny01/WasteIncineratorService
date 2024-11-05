@@ -44,11 +44,11 @@ class Led ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t026",targetState="handle_update_mode",cond=whenDispatch("system_state"))
+					 transition(edgeName="t025",targetState="handle_update_mode",cond=whenDispatch("system_state"))
 				}	 
 				state("handle_update_mode") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("system_state(RP,A,B,L,O)"), Term.createTerm("system_state(RP,A,B,L,O)"), 
+						if( checkMsgContent( Term.createTerm("system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)"), Term.createTerm("system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
 													val RP=payloadArg(0).toInt()

@@ -2,16 +2,14 @@ System wis_system
 // NOTE: message types have been chosen only to produce a first working prototype of the system so they are not 
 // fixed and have to be discussed in future sprints
 
-Dispatch	actor_state					: actor_state(P,V)
+Dispatch	actor_state					: actor_state(PROPERTY,VALUE)
 
-Dispatch 	incinerator_activation		: incinerator_activation(A)
-
-Dispatch	set_rp_number				: set_rp_number(V)
+Dispatch 	incinerator_activation		: incinerator_activation(ACTIVE)
 
 Request 	system_state_req			: system_state_req(N)
-Reply 		system_state_repl			: system_state_repl(RP,A,B,L,O) for system_state_req
+Reply 		system_state_repl			: system_state_repl(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)for system_state_req
 
-Dispatch	system_state				: system_state(RP,A,B,L,O)
+Dispatch	system_state: system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)
 
 Request burn_req					: burn_req(N)
 Reply 	burn_repl					: burn_repl(N) for burn_req
@@ -21,7 +19,7 @@ Request engage        : engage(OWNER, STEPTIME)
 Reply   engagedone    : engagedone(ARG)    for engage
 Reply   engagerefused : engagerefused(ARG) for engage
 
-Dispatch disengage    : disengage(ARG)
+Dispatch disengage    : disengage(ARG) 
 
 Request moverobot     :  moverobot(TARGETX, TARGETY)  
 Reply moverobotdone   :  moverobotok(ARG)                    for moverobot
@@ -75,7 +73,7 @@ QActor incinerator context ctx_wis{
 		whenRequest burn_req -> handle_burn_req
 	
 	State handle_activation{
-		onMsg (incinerator_activation:incinerator_activation(A)){
+		onMsg (incinerator_activation:incinerator_activation(ACTIVE)){
 			[#
 				ACTIVE=payloadArg(0).toBoolean()
 			#]
@@ -120,18 +118,7 @@ QActor scale context ctx_wis{
 		updateResource [# "actor_state(waste_storage_rps,$ROLL_PACKETS)" #]
 	}
 	Transition t0 whenTime 1000 -> idle
-				  whenMsg set_rp_number -> handle_set_rp_number 
-	
-	State handle_set_rp_number{
-		onMsg(set_rp_number : set_rp_number(V)){
-			[#
-				ROLL_PACKETS= payloadArg(0).toInt()	
-			#]
-			updateResource [# "actor_state(waste_storage_rps,$ROLL_PACKETS)" #]
-			println("$name: setting RP number: $ROLL_PACKETS") color blue
-		}
-	}
-	Goto idle
+				 
 	
 	State idle{
 		println("$name: idle") color blue
@@ -139,7 +126,7 @@ QActor scale context ctx_wis{
 		whenMsg system_state -> handle_load_rp 
 	
 	State handle_load_rp{
-		onMsg(system_state:system_state(RP,A,B,L,O)){
+		onMsg(system_state:system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)){
 		[#
 			val NEW_O=payloadArg(4);
 			val TO_UPDATE=(NEW_O!=O && O=="rp_loaded");
@@ -219,13 +206,12 @@ QActor op_robot context ctx_wis {
 	whenReply system_state_repl->handle_start_conditions_verified_repl
 	
 	State handle_start_conditions_verified_repl{
-		onMsg(system_state_repl:system_state_repl(RP,A,B,L,O)){
+		onMsg(system_state_repl:system_state_repl(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)){
 			[#
 				val RP=payloadArg(0).toInt()
 				val A=payloadArg(1).toBoolean()
 				val B=payloadArg(2).toBoolean()
 				val L=payloadArg(3).toDouble()
-				val O=payloadArg(4)
 				OK=(RP>0) && (A && !B) && (L<1.0)
 			#]
 		}
@@ -440,7 +426,7 @@ QActor op_robot context ctx_wis {
 	whenReply system_state_repl->handle_continue_conditions_verified_repl
 	
 	State handle_continue_conditions_verified_repl{
-		onMsg(system_state_repl:system_state_repl(RP,A,B,L,O)){
+		onMsg(system_state_repl:system_state_repl(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)){
 			[#
 				val RP=payloadArg(0).toInt()
 				val A=payloadArg(1).toBoolean();
@@ -483,8 +469,7 @@ QActor wis context ctx_wis{
  		var B = false 
  		var L = 0.0
  		var O = "init"
- 		val DLIMT = 5.0
- 		val DMAX = 30.0
+ 		var LS="off"
  	#]
  	
  	State s0 initial{ 
@@ -511,7 +496,7 @@ QActor wis context ctx_wis{
 		whenRequest system_state_req -> handle_system_state_req
 				
 	State update_state{
-		onMsg(actor_state:actor_state(P,V)){
+		onMsg(actor_state:actor_state(PROPERTY,VALUE)){
 			[#
 				val P=payloadArg(0);
 				val V=payloadArg(1);
@@ -521,17 +506,18 @@ QActor wis context ctx_wis{
 					"waste_storage_rps"  -> RP=V.toInt()
 					"ash_storage_level"  -> L=V.toDouble()
 					"op_robot_state"	 -> O=V
+					"led_state"			 -> LS=V
 				}
 			#]
 			
-			updateResource [# "system_state($RP,$A,$B,$L,$O)" #]
+			updateResource [# "system_state($RP,$A,$B,$L,$O,$LS)" #]
 			println("$name: $P updated with $V") color yellow
 		}
 	} Goto waiting_for_updates
 
 	State handle_system_state_req{
-		println("$name: current state { RP:$RP,A:$A, B:$B, L:$L, $O }") color yellow
-		replyTo system_state_req with system_state_repl : system_state_repl($RP,$A,$B,$L,$O)
+		println("$name: current state { RP:$RP,A:$A, B:$B, L:$L, $O, $LS }") color yellow
+		replyTo system_state_req with system_state_repl : system_state_repl($RP,$A,$B,$L,$O,$LS)
 	}Goto waiting_for_updates
  }  
 //===========================================================================================
@@ -544,6 +530,7 @@ QActor test_observer context ctx_wis{
  		var B = false 
  		var L = 0.0
  		var O = ""
+ 		var LS="off"
  		var END=false
  	#]
  	
@@ -559,13 +546,14 @@ QActor test_observer context ctx_wis{
 	}Transition t0 whenReply system_state_repl -> handle_system_state_repl
 	
 	State handle_system_state_repl{
-		onMsg(system_state_repl:system_state_repl(RP,A,B,L,O)){
+		onMsg(system_state_repl:system_state_repl(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)){
 			[#
 				RP=payloadArg(0).toInt()
 				A=payloadArg(1).toBoolean();
 				B=payloadArg(2).toBoolean();
 				L=payloadArg(3).toDouble();
 				O=payloadArg(4)
+				LS=payloadArg(5)
 			#]
 		}
 	}Goto check_end
@@ -583,20 +571,22 @@ QActor test_observer context ctx_wis{
 	}Transition t0 whenMsg system_state -> handle_update
 	
 	State handle_update{
-		onMsg(system_state:system_state(RP,A,B,L,O)){
+		onMsg(system_state:system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)){
 			[#
 				RP=payloadArg(0).toInt()
 				A=payloadArg(1).toBoolean()
 				B=payloadArg(2).toBoolean()
 				L=payloadArg(3).toDouble()
 				O=payloadArg(4)
+				LS=payloadArg(5)
+				
 			#]
 		}
 	}Goto check_end
 	
 	State end_test{
 		println("$name: ending test")
-		replyTo test_req with test_repl : test_repl($RP,$A,$B,$L,$O)
+		replyTo test_req with test_repl : test_repl($RP,$A,$B,$L,$O,$LS)
 	}
 	
  }  
@@ -607,7 +597,7 @@ QActor sonar context ctx_wis{
 	[# 
 		var O="init"
 		var L=0.0
-		val MAX_L=5.0
+		val MAX_L=10.00
 	#]
 	State s0 initial{
 		println("$name starts") color magenta
@@ -620,7 +610,7 @@ QActor sonar context ctx_wis{
 	}Transition t0 whenMsg  system_state-> handle_unload_ash
 	
 	State handle_unload_ash{
-		onMsg(system_state:system_state(RP,A,B,L,O)){
+		onMsg(system_state:system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)){
 			[#
 				val NEW_O=payloadArg(4);
 				val TO_UPDATE=(NEW_O!=O && O=="ash_unloaded");
@@ -654,7 +644,7 @@ QActor led context ctx_wis {
 	}Transition t0 whenMsg system_state -> handle_update_mode
 	
 	State handle_update_mode{
-		onMsg(system_state:system_state(RP,A,B,L,O)){
+		onMsg(system_state:system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)){
 			[#
 					val RP=payloadArg(0).toInt()
 					val A=payloadArg(1).toBoolean()

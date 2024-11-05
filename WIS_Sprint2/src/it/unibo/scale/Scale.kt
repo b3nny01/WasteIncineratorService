@@ -40,24 +40,6 @@ class Scale ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 				 	 					  scope, context!!, "local_tout_"+name+"_s0", 1000.toLong() )  //OCT2023
 					}	 	 
 					 transition(edgeName="t02",targetState="idle",cond=whenTimeout("local_tout_"+name+"_s0"))   
-					transition(edgeName="t03",targetState="handle_set_rp_number",cond=whenDispatch("set_rp_number"))
-				}	 
-				state("handle_set_rp_number") { //this:State
-					action { //it:State
-						if( checkMsgContent( Term.createTerm("set_rp_number(V)"), Term.createTerm("set_rp_number(V)"), 
-						                        currentMsg.msgContent()) ) { //set msgArgList
-								
-												ROLL_PACKETS= payloadArg(0).toInt()	
-								updateResourceRep( "actor_state(waste_storage_rps,$ROLL_PACKETS)"  
-								)
-								CommUtils.outblue("$name: setting RP number: $ROLL_PACKETS")
-						}
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
 				}	 
 				state("idle") { //this:State
 					action { //it:State
@@ -67,11 +49,11 @@ class Scale ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t04",targetState="handle_load_rp",cond=whenDispatch("system_state"))
+					 transition(edgeName="t03",targetState="handle_load_rp",cond=whenDispatch("system_state"))
 				}	 
 				state("handle_load_rp") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("system_state(RP,A,B,L,O)"), Term.createTerm("system_state(RP,A,B,L,O)"), 
+						if( checkMsgContent( Term.createTerm("system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)"), Term.createTerm("system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
 											val NEW_O=payloadArg(4);

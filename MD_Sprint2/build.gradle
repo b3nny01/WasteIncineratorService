@@ -175,6 +175,9 @@ distributions {
         	 into('bin'){
         	 	from 'raspberry_scripts'
         	 } 
+        	 into('bin'){
+        	 	from 'monitoring_device.properties'
+        	 }
              from './monitoring_device.pl'
              from './sysRules.pl'
              from './facadeConfig.json'

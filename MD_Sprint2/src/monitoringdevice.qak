@@ -29,7 +29,7 @@ Reply    led_device_state_repl: led_device_state_repl(S) for led_device_state_re
 
 Context ctx_monitoring_device ip [ host= "localhost" 	port=8012 ] 
 //Context ctx_wis   		   	  ip [ host= "192.168.1.2" port=8022 ]  
-
+//
 //ExternalQActor wis context ctx_wis
 
 
@@ -63,13 +63,15 @@ QActor sonar context ctx_monitoring_device{
 
 
 QActor data_cleaner context ctx_monitoring_device{
+	import "main.resources.configuration.SystemConfiguration" 
+	
 	[# 
 		var CURRENT=0
 		var PREVIOUS = 0
-		val SENSITIVITY=1
-		val START_D=3;
-		val MIN_D=0;
-		val MAX_D=9;
+		val SENSITIVITY=SystemConfiguration.getProperty("data_cleaner.sensitivity").toInt()
+		val START_D=SystemConfiguration.getProperty("data_cleaner.start_distance").toInt()
+		val MIN_D=SystemConfiguration.getProperty("data_cleaner.min_distance").toInt()
+		val MAX_D=SystemConfiguration.getProperty("data_cleaner.max_distance").toInt()
 	#]
 	State s0 initial{
 		println("$name starts") color cyan
@@ -378,9 +380,9 @@ QActor md_test_observer context ctx_monitoring_device{
 //	State s0 initial {
 //		println("$name starts") color blue
 //	}		
-//	Transition t0 whenMsg sonarstart -> startSonar
+//	Transition t0 whenMsg sonar_start -> handle_sonar_start
 //		
-//	State startSonar{
+//	State handle_sonar_start{
 //		[#
 //    	working = true		
 //		process = Runtime.getRuntime().exec("python sonar.py")
@@ -389,10 +391,10 @@ QActor md_test_observer context ctx_monitoring_device{
 //		println("SONAR starts") color blue
 //		delay 1000
 //	}
-//	Goto readSonarData
+//	Goto read_sonar_data
 //	
 //	
-//	State readSonarData{ 
+//	State read_sonar_data{ 
 //		[# 
 //		var data = reader.readLine()
 //		CommUtils.outyellow("$name with python: data = $data"   ) 
@@ -408,14 +410,14 @@ QActor md_test_observer context ctx_monitoring_device{
 //		}
 //		
 //		#]	
-//		emitlocalstream sonardata : distance($Distance)
-//		autodispatch doread : doread(1)
+//		emitlocalstream sonar_data : distance($Distance)
+//		autodispatch do_read : do_read(1)
 //	}
-//	Transition t0 whenMsg sonarstop  -> stopSonar
-//				  whenMsg doread and [# working  #] -> readSonarData 
-//				  whenMsg doread and [# !working #] -> endOfRead
+//	Transition t0 whenMsg sonar_stop  -> handle_sonar_stop
+//				  whenMsg do_read and [# working  #] -> read_sonar_data 
+//				  whenMsg do_read and [# !working #] -> end_of_read
 //		
-//	State endOfRead{
+//	State end_of_read{
 //		[#
 //   	    process.destroy()
 //    	if (process.isAlive()) {
@@ -424,14 +426,14 @@ QActor md_test_observer context ctx_monitoring_device{
 //       	CommUtils.outred("$tt $name | endOfRead"  )
 //		#]
 //	}
-//	Transition t0 whenMsg sonarstart -> startSonar 
-//				  whenMsg sonarstop  -> stopSonar
+//	Transition t0 whenMsg sonar_start -> handle_sonar_start
+//				  whenMsg sonar_stop  -> handle_sonar_stop
 //		
-//	State stopSonar {
+//	State handle_sonar_stop {
 //		[# process.destroy(); #]		
 //		println("SONAR STOPPED") color blue
 //	}
-//	Transition t0 whenMsg sonarstop -> stopSonar
+//	Transition t0 whenMsg sonar_stop -> handle_sonar_stop
 //}
 //
 //QActor led_device context ctx_monitoring_device{
@@ -463,9 +465,10 @@ QActor md_test_observer context ctx_monitoring_device{
 
 //MockActors=================================================================================
 QActor sonar_device context ctx_monitoring_device{ 	
+	import "main.resources.configuration.SystemConfiguration"
 	[# 
 		var O="init"
-		var D=12
+		var D=SystemConfiguration.getProperty("mock_sonar_device.base_distance").toInt()
 	#]
 	State s0 initial{
 		println("$name starts") color yellow

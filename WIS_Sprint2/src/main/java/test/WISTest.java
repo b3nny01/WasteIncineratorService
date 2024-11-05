@@ -33,7 +33,7 @@ public class WISTest{
 	}
 
 	@Test
-	public void testIncinineratorActivation() {
+	public void test00_IncinineratorActivation() {
 		CommUtils.outmagenta("testIncinineratorActivation =======================================");
 		IApplMessage req = CommUtils.buildRequest("tester", "system_state_req", "system_state_req", "wis");
 		try {
@@ -50,7 +50,7 @@ public class WISTest{
 	}
 	
 	@Test
-	public void testOk5RP() {
+	public void test01_Ok5RP() {
 		CommUtils.outmagenta("testOk5RP ========================================================= ");
 		IApplMessage req = CommUtils.buildRequest("test", "test_req", "test_req", "test_observer");
 		try {

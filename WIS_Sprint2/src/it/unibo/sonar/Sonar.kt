@@ -24,7 +24,7 @@ class Sonar ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 		 
 				var O="init"
 				var L=0.0
-				val MAX_L=5.0
+				val MAX_L=10.00
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -46,11 +46,11 @@ class Sonar ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t025",targetState="handle_unload_ash",cond=whenDispatch("system_state"))
+					 transition(edgeName="t024",targetState="handle_unload_ash",cond=whenDispatch("system_state"))
 				}	 
 				state("handle_unload_ash") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("system_state(RP,A,B,L,O)"), Term.createTerm("system_state(RP,A,B,L,O)"), 
+						if( checkMsgContent( Term.createTerm("system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)"), Term.createTerm("system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
 												val NEW_O=payloadArg(4);

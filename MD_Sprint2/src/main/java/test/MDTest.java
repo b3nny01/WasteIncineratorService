@@ -36,7 +36,7 @@ public class MDTest{
 	}
 
 	@Test
-	public void test00_SonarUnloadAsh() {
+	public void test00_SonarUnloadAsh() { 
 		CommUtils.outmagenta("testSonarUnloadAsh ================================================");
 		IApplMessage req = CommUtils.buildRequest("md_test", "test_sonar_unload_ash", "test_req", "md_test_observer");
 		try {
