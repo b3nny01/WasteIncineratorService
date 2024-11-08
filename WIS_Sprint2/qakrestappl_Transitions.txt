@@ -2,5 +2,3 @@
 {"actor":"scale", "msgType":"dispatch", "curstate":"idle", "nextstate":"handle_load_rp", "msgId":"system_state"}
 {"actor":"wis", "msgType":"dispatch", "curstate":"waiting_for_updates", "nextstate":"update_state", "msgId":"actor_state"}
 {"actor":"test_observer", "msgType":"dispatch", "curstate":"wait_for_updates", "nextstate":"handle_update", "msgId":"system_state"}
-{"actor":"sonar", "msgType":"dispatch", "curstate":"idle", "nextstate":"handle_unload_ash", "msgId":"system_state"}
-{"actor":"led", "msgType":"dispatch", "curstate":"idle", "nextstate":"handle_update_mode", "msgId":"system_state"}

@@ -61,7 +61,7 @@ public class WISTest{
 			int rp = Integer.parseInt(payloadArgs[0]);
 			double l=Double.parseDouble(payloadArgs[3]);
 			
-			assertEquals(rp, 1);
+			assertEquals(rp, 2);
 			assertEquals(l, 1.0,0.001);
 			
 		} catch (Exception e) {

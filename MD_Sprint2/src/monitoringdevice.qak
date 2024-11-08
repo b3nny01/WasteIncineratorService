@@ -26,11 +26,10 @@ Request  led_device_state_req:led_device_state_req(N)
 Reply    led_device_state_repl: led_device_state_repl(S) for led_device_state_req
 //===========================================================================================
  
-
 Context ctx_monitoring_device ip [ host= "localhost" 	port=8012 ] 
-//Context ctx_wis   		   	  ip [ host= "192.168.1.2" port=8022 ]  
-//
-//ExternalQActor wis context ctx_wis
+Context ctx_wis   		   	  ip [ host= "192.168.1.2" port=8022 ]  
+
+ExternalQActor wis context ctx_wis
 
 
 QActor sonar context ctx_monitoring_device{ 
@@ -538,33 +537,33 @@ QActor led_device context ctx_monitoring_device{
 	} Goto idle
 }
 
-QActor wis context ctx_monitoring_device{
-
- 	State s0 initial{ 
- 		println("$name starts") color yellow
-		delay 500
-		observeResource sonar msgid actor_state
-	} Goto idle
-	
-	State idle{
-		println("$name: idle") color yellow
-		
-	}Transition t0 whenMsg set_system_state -> handle_set_system_state
-	
-	State handle_set_system_state{
-		onMsg(system_state:system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)){
-			[#
-					val RP=payloadArg(0)
-					val A=payloadArg(1)
-					val B=payloadArg(2)
-					val AL=payloadArg(3)
-					val ORS=payloadArg(4)
-					val LS=payloadArg(5) 
-			#]
-			updateResource[# "system_state($RP,$A,$B,$AL,$ORS,$LS)" #]
-			println("$name: system state: $RP,$A,$B,$AL,$ORS,$LS") color red
-		}
-	}Goto idle
-	
-	
- }  
+//QActor wis context ctx_monitoring_device{
+//
+// 	State s0 initial{ 
+// 		println("$name starts") color yellow
+//		delay 500
+//		observeResource sonar msgid actor_state
+//	} Goto idle
+//	
+//	State idle{
+//		println("$name: idle") color yellow
+//		
+//	}Transition t0 whenMsg set_system_state -> handle_set_system_state
+//	
+//	State handle_set_system_state{
+//		onMsg(system_state:system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)){
+//			[#
+//					val RP=payloadArg(0)
+//					val A=payloadArg(1)
+//					val B=payloadArg(2)
+//					val AL=payloadArg(3)
+//					val ORS=payloadArg(4)
+//					val LS=payloadArg(5) 
+//			#]
+//			updateResource[# "system_state($RP,$A,$B,$AL,$ORS,$LS)" #]
+//			println("$name: system state: $RP,$A,$B,$AL,$ORS,$LS") color red
+//		}
+//	}Goto idle
+//	
+//	
+// }  

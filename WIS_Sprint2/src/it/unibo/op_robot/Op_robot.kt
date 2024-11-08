@@ -16,6 +16,7 @@ import it.unibo.kactor.sysUtil.createActor   //Sept2023
 import main.resources.utils.Position
 import main.resources.utils.Location
 import main.resources.utils.OpRobotState
+import main.resources.configuration.SystemConfigurator
 
 class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : ActorBasicFsm( name, scope, confined=isconfined ){
 
@@ -32,6 +33,7 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 									 Location.BURN_OUT		to Position(5,3),
 									 Location.ASH_STORAGE	to Position(6,4)
 				)
+				val STEP_TIME=SystemConfigurator.getProperty("op_robot.step_time").toInt()
 				var TARGET_LOCATION=Location.HOME
 				var OP_ROBOT_STATE=OpRobotState.INIT;
 		return { //this:ActionBasciFsm

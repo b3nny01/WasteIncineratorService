@@ -52,7 +52,7 @@ Based on the Problem Analysis carried out previously, we implemented an executab
 
 ## Implementation
 
-### Sonar And Led abstraction
+### Sonar and Led abstraction
 During the implementation, we encountered the **high sensitivity of the Sonar**, which often produces "noisy" data. For this reason, **it became necessary to introduce a "Filtering Pipeline"** to eliminate spurious data.  
 
 Specifically, this pipeline is composed of three actors:
@@ -64,6 +64,8 @@ In order to decouple the py we decided to split the Led actor into:
 - **LedDevice**, which handles the communication with the physical led
 - **Led**, which incorporates the Led business logic, deciding when to turn on and off the led
 
+### System Configurability
+During the implementation we faced the problem of the **lack of System Configurability**, so we decided to create a support singleton object **the SystemConfigurator** who is in charge of **loading the main properties of the system from a file during actors'initialization**.
  
 **MonitoringDevice context details:**
 
@@ -80,14 +82,14 @@ In order to decouple the py we decided to split the Led actor into:
   <th><b>Expected Behavior</b></th>
 </tr>
 <tr>
-  <td><b>testIncinineratorActivation</b></td>
+  <td><b>test00_IncinineratorActivation</b></td>
   <td>WasteStorage contains 4 RP, AshStorge is empty, nobody empties AshStorage, Incinerator is inactive</td>
   <td>Once the system is initialized, the Incinerator is active</td>
 </tr>
 <tr> 
-  <td><b>testOk5RP</b></td>
-  <td>WasteStorage contains 5 RP, AshStorge is empty and can contain the ashes of 4 RPs, nobody empties AshStorage</td>
-  <td>After some time WasteStorage contains 1 RP and AshStorage is full</td>
+  <td><b>test01_Ok5RP</b></td>
+  <td>WasteStorage contains 5 RP, AshStorge is empty and can contain the ashes of 3 RPs, nobody empties AshStorage</td>
+  <td>After some time WasteStorage contains 2 RP and AshStorage is full</td>
 </tr>
 </table>
 

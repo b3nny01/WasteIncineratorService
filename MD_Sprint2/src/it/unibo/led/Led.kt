@@ -29,7 +29,7 @@ class Led ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					action { //it:State
 						CommUtils.outred("$name starts")
 						delay(500) 
-						observeResource("localhost","8012","ctx_monitoring_device","wis","system_state")
+						observeResource("192.168.1.2","8022","ctx_wis","wis","system_state")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

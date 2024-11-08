@@ -30,7 +30,7 @@ class Sonar_device ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 					action { //it:State
 						CommUtils.outyellow("$name starts")
 						delay(500) 
-						observeResource("localhost","8012","ctx_monitoring_device","wis","system_state")
+						observeResource("192.168.1.2","8022","ctx_wis","wis","system_state")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

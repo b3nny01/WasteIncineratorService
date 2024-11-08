@@ -32,7 +32,8 @@ with Diagram('monitoring_deviceArch', show=False, outformat='png', graph_attr=gr
           md_test_observer=Custom('md_test_observer','./qakicons/symActorSmall.png')
           sonar_device=Custom('sonar_device','./qakicons/symActorSmall.png')
           led_device=Custom('led_device','./qakicons/symActorSmall.png')
-          wis=Custom('wis','./qakicons/symActorSmall.png')
+     with Cluster('ctx_wis', graph_attr=nodeattr):
+          wis=Custom('wis(ext)','./qakicons/externalQActor.png')
      data_cleaner >> Edge( label='sonar_clean_data', **eventedgeattr, decorate='true', fontcolor='red') >> sonar
      sonar_device >> Edge( label='sonar_data', **eventedgeattr, decorate='true', fontcolor='red') >> data_cleaner
      md_test_observer >> Edge(color='magenta', style='solid', decorate='true', label='<led_device_state_req<font color="darkgreen"> led_device_state_repl</font> &nbsp; >',  fontcolor='magenta') >> led_device
@@ -41,6 +42,5 @@ with Diagram('monitoring_deviceArch', show=False, outformat='png', graph_attr=gr
      sonar >> Edge(color='blue', style='solid',  decorate='true', label='<sonar_start &nbsp; >',  fontcolor='blue') >> sonar_device
      md_test_observer >> Edge(color='blue', style='solid',  decorate='true', label='<set_system_state &nbsp; >',  fontcolor='blue') >> wis
      wis >> Edge(color='blue', style='solid',  decorate='true', label='<system_state &nbsp; >',  fontcolor='blue') >> led
-     sonar >> Edge(color='blue', style='solid',  decorate='true', label='<actor_state &nbsp; >',  fontcolor='blue') >> wis
      wis >> Edge(color='blue', style='solid',  decorate='true', label='<system_state &nbsp; >',  fontcolor='blue') >> sonar_device
 diag

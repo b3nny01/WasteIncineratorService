@@ -3,4 +3,3 @@
 {"actor":"sonar_device", "msgType":"dispatch", "curstate":"read_mock_data", "nextstate":"handle_set_sonar_state", "msgId":"set_sonar_state"}
 {"actor":"sonar_device", "msgType":"dispatch", "curstate":"read_mock_data", "nextstate":"handle_unload_ash", "msgId":"system_state"}
 {"actor":"led_device", "msgType":"dispatch", "curstate":"idle", "nextstate":"handle_update_mode", "msgId":"update_led_mode"}
-{"actor":"wis", "msgType":"dispatch", "curstate":"idle", "nextstate":"handle_set_system_state", "msgId":"set_system_state"}
