@@ -1,0 +1,65 @@
+.App {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.App > .left-div{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height:80vh;
+  margin: 0.2rem;
+  padding: 3rem;
+  border-radius: 1rem;
+  background-color: gray;
+  margin: 0.2rem;
+}
+
+.App > .right-div > .title-div{
+  width: auto;
+  height: auto;
+  text-align: center;
+  background-color: lightgray;
+  font-size: 1rem;
+  font-weight: bold ;
+  padding: 1rem;
+  border-radius: 1rem;
+  margin: 0.2rem
+}
+
+.App > .left-div > .service-area-div{
+  height: 80%;
+}
+
+.App > .right-div{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: auto;
+  height: 80vh;
+  aspect-ratio: 3/4;
+  padding: 3rem;
+  border-radius: 1rem;
+  background-color: gray;
+  margin: 0.2rem;
+}
+
+.App > .right-div > .info-div{
+  height:80%;
+}
+
+.App > .right-div > .service-area-iframe{
+  background-color: black;
+  width: auto;
+  height: 30%;
+  aspect-ratio: 2;
+  padding: 1rem;
+  border-radius: 1rem;
+  border: 0px;
+}
+

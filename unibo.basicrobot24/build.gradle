@@ -20,6 +20,9 @@ plugins {
     
     //Per poter usare javafx
     id 'org.openjfx.javafxplugin' version '0.1.0'
+
+    //Per poter usare docker compose
+    id "com.avast.gradle.docker-compose" version "0.17.6"
 }
 
 version '1.0'
@@ -197,6 +200,13 @@ task run0(type: JavaExec) {
     description = "Run the main class with JavaExecTask"
     classpath = sourceSets.main.runtimeClasspath
     //main = 'it.unibo.ctxbasicrobot.MainCtxbasicrobotKt'
+}
+
+
+dockerCompose {
+    useDockerComposeV2 = true
+    useComposeFiles = ["virtualRobot23.yaml"]
+    projectName = "uniboBasicRobot"
 }
 
 /*

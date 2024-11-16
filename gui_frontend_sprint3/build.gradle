@@ -1,0 +1,3 @@
+task npmRunBuild(type:Exec){
+    commandLine "npm","run","build"
+}

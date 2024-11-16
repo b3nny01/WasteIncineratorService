@@ -1,0 +1,33 @@
+.ash-storage-cell-div{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    height: auto;
+    border-radius: 0.5rem;
+}
+
+.ash-storage-cell-div > img {
+    width: 50%;
+    height: auto;
+    aspect-ratio: 1;
+}
+
+.ash-storage-cell-div > .ash-level-div{
+    width: 50%;
+    height: auto;
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.ash-storage-cell-div > .ash-level-div > .label{
+    font-size: 0.8rem;
+}
+.ash-storage-cell-div > .ash-level-div > .value{
+    font-size: 1.2rem;
+    font-weight: bold;
+    padding: 0.5rem;
+}
