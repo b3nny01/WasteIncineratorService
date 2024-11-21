@@ -36,7 +36,7 @@ At first glance, one might think that having the WIS control the DDRRobot could 
 
 However, a more in-depth analysis reveals that OpRobot actually needs to verify the initial conditions only at two specific moments (at the beginning and the end of an execution cycle) and would not gain significant advantages from continuously observing the state of the entire system (which would significantly increase the complexity of the WIS actor, which would have to both control the DDRRobot and update its internal representation of the system's state).
 
-For these reasons, it is more convenient to **apply the Single Responsibility Principle by incorporating the logic for controlling the DDRRobot into a dedicated actor, the BasicRobot**, which communicates with the WIS to ensure that the initial conditions are verified.
+For these reasons, it is more convenient to **apply the Single Responsibility Principle by incorporating the logic for controlling the DDRRobot into a dedicated actor, the OpRobot**, which communicates with the WIS to ensure that the initial conditions are verified.
 
 ### LoadRP and UnloadAsh
 In a real system, **the OpRobot should be able to load and unload the RPs and their ashes**, and such changes to the system would be detected by the respective sensors (Scale and MonitoringDevice) without the need to exchange messages at the software level.<br/>
