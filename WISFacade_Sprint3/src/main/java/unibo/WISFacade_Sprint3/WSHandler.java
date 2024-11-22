@@ -102,7 +102,7 @@ public class WSHandler extends AbstractWebSocketHandler {
         try {
             if( sessions.size() > 0 ){
                 for (WebSocketSession session : sessions) {
-                    session.sendMessage(new TextMessage("WSH> "+message));
+                    session.sendMessage(new TextMessage(message));
                     //CommUtils.outcyan("WSH | sent on current session " + session.getRemoteAddress());
                 }
             }

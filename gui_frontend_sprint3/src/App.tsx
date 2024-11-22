@@ -23,6 +23,10 @@ function App() {
     },
   });
 
+  useEffect(() => {
+    if (lastMessage !== null) setSystemState(JSON.parse(lastMessage.data));
+  }, [lastMessage]);
+
   return (
     <div className="App">
       <div className="left-div">
@@ -36,7 +40,10 @@ function App() {
         />
       </div>
       <div className="right-div">
-        <InfoDiv opRobotState={systemState.opRobotState} ledState={systemState.ledState} />
+        <InfoDiv
+          opRobotState={systemState.opRobotState}
+          ledState={systemState.ledState}
+        />
       </div>
     </div>
   );

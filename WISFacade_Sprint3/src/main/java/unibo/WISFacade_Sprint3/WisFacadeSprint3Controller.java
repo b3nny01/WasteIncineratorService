@@ -44,7 +44,7 @@ public class WisFacadeSprint3Controller {
     @Value("${robot24.robotpos}")    
     String robotpos;
 
-    protected String mainPage     = "WisSystemGui";
+    protected String mainPage     = "index";
     protected ApplguiCore guiCore ;
 
     public WisFacadeSprint3Controller(){

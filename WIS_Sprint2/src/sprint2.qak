@@ -53,7 +53,7 @@ ExternalQActor basicrobot 		context ctx_basic_robot
 //NOTE: the following model is already working but yet a prototype, some parts are still extremely simplified
 //(for instance OpRobot movements) and some are completely unimplemented (error handling)
 
-QActor incinerator context ctx_wis{      
+QActor incinerator context ctx_wis{       
  	[#
  		var ACTIVE	   = false;
  		var BURNING    = false;
