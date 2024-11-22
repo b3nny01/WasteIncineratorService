@@ -27,11 +27,11 @@ with Diagram('wis_systemArch', show=False, outformat='png', graph_attr=graphattr
 ### see https://renenyffenegger.ch/notes/tools/Graphviz/attributes/label/HTML-like/index
      with Cluster('ctx_wis', graph_attr=nodeattr):
           incinerator=Custom('incinerator','./qakicons/symActorSmall.png')
-          scale=Custom('scale','./qakicons/symActorSmall.png')
-          op_robot=Custom('op_robot','./qakicons/symActorSmall.png')
+          scale=Custom('scale','./qakicons/symActorWithobjSmall.png')
+          op_robot=Custom('op_robot','./qakicons/symActorWithobjSmall.png')
           wis=Custom('wis','./qakicons/symActorSmall.png')
           test_observer=Custom('test_observer','./qakicons/symActorSmall.png')
-          sonar=Custom('sonar','./qakicons/symActorSmall.png')
+          sonar=Custom('sonar','./qakicons/symActorWithobjSmall.png')
           led=Custom('led','./qakicons/symActorSmall.png')
      with Cluster('ctx_basic_robot', graph_attr=nodeattr):
           basicrobot=Custom('basicrobot(ext)','./qakicons/externalQActor.png')

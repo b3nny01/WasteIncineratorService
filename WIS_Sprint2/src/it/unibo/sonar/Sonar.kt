@@ -13,7 +13,6 @@ import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
 
 //User imports JAN2024
-import main.resources.configuration.SystemConfigurator
 
 class Sonar ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : ActorBasicFsm( name, scope, confined=isconfined ){
 
@@ -22,11 +21,12 @@ class Sonar ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
+		 val configurator = main.resources.configuration.SystemConfigurator
 		 
 				var O="init"
-				var L=SystemConfigurator.getProperty("mock_sonar.start_level").toDouble()
-				var L_STEP=SystemConfigurator.getProperty("mock_sonar.level_step").toDouble()
-				val MAX_L=SystemConfigurator.getProperty("mock_sonar.max_level").toDouble()
+				var L=configurator.getProperty("mock_sonar.start_level").toDouble()
+				var L_STEP=configurator.getProperty("mock_sonar.level_step").toDouble()
+				val MAX_L=configurator.getProperty("mock_sonar.max_level").toDouble()
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State

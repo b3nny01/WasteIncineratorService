@@ -105,11 +105,10 @@ QActor incinerator context ctx_wis{
 	}Goto idle
 }
  
-QActor scale context ctx_wis{
-	import "main.resources.configuration.SystemConfigurator"
+QActor scale context ctx_wis withobj configurator using "main.resources.configuration.SystemConfigurator"{
  	[#
  		var O="init"
- 		var ROLL_PACKETS=SystemConfigurator.getProperty("mock_scale.roll_packets").toInt()
+ 		var ROLL_PACKETS=configurator.getProperty("mock_scale.roll_packets").toInt()
  	 #]
  	 
  	State s0 initial{ 
@@ -147,11 +146,10 @@ QActor scale context ctx_wis{
 	
  }
 
-QActor op_robot context ctx_wis {
+QActor op_robot context ctx_wis withobj configurator using "main.resources.configuration.SystemConfigurator"{
 	import "main.resources.utils.Position"
 	import "main.resources.utils.Location"
 	import "main.resources.utils.OpRobotState"
-	import "main.resources.configuration.SystemConfigurator"
 
 	[#
 		var OK=false
@@ -161,7 +159,7 @@ QActor op_robot context ctx_wis {
 							 Location.BURN_OUT		to Position(5,3),
 							 Location.ASH_STORAGE	to Position(6,4)
 		)
-		val STEP_TIME=SystemConfigurator.getProperty("op_robot.step_time").toInt()
+		val STEP_TIME=configurator.getProperty("op_robot.step_time").toInt()
 		var TARGET_LOCATION=Location.HOME
 		var OP_ROBOT_STATE=OpRobotState.INIT;
 	#]
@@ -596,13 +594,12 @@ QActor test_observer context ctx_wis{
  }  
  
 //MockActors=================================================================================
-QActor sonar context ctx_wis{    
-	import "main.resources.configuration.SystemConfigurator"
+QActor sonar context ctx_wis withobj configurator using "main.resources.configuration.SystemConfigurator"{    
 	[# 
 		var O="init"
-		var L=SystemConfigurator.getProperty("mock_sonar.start_level").toDouble()
-		var L_STEP=SystemConfigurator.getProperty("mock_sonar.level_step").toDouble()
-		val MAX_L=SystemConfigurator.getProperty("mock_sonar.max_level").toDouble()
+		var L=configurator.getProperty("mock_sonar.start_level").toDouble()
+		var L_STEP=configurator.getProperty("mock_sonar.level_step").toDouble()
+		val MAX_L=configurator.getProperty("mock_sonar.max_level").toDouble()
 	#]
 	State s0 initial{
 		println("$name starts") color magenta

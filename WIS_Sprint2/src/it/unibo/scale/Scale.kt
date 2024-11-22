@@ -13,7 +13,6 @@ import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
 
 //User imports JAN2024
-import main.resources.configuration.SystemConfigurator
 
 class Scale ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : ActorBasicFsm( name, scope, confined=isconfined ){
 
@@ -22,9 +21,10 @@ class Scale ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
+		 val configurator = main.resources.configuration.SystemConfigurator
 		
 		 		var O="init"
-		 		var ROLL_PACKETS=SystemConfigurator.getProperty("mock_scale.roll_packets").toInt()
+		 		var ROLL_PACKETS=configurator.getProperty("mock_scale.roll_packets").toInt()
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
