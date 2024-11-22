@@ -10,14 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/*
-readConfig invocato da CustomContainer
 
-setup() e getActorNamesInApplCtx() invocati da
-  ApplguiCore create da FacadeBuilder
-  
-  MA PERCHE' dovrebbe conoscere basicrobot24.pl??
- */
 public class ApplSystemInfo {
     public static String qakSysHost;
     public static String qakSysPort;
@@ -50,6 +43,17 @@ public class ApplSystemInfo {
             facadeport    = Integer.parseInt(facadeportStr);
         }
     }
+    
+//    public static void readConfig(){
+//        qakSysHost    = "localhost";
+//        ctxportStr    = "8022";
+//        qakSysCtx     = "ctx_wis";
+//        applActorName = "wis";
+//        facadeportStr = "8085";
+//        appName       = "wis_system";
+//        ctxport       = Integer.parseInt(ctxportStr);
+//        facadeport    = Integer.parseInt(facadeportStr);
+//    }
 
     public  static List<String> getActorNamesInApplCtx( ) {
         //CommUtils.outcyan( "ApplSystemInfo | getActorNames ctx=" + ctx  );

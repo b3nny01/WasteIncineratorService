@@ -5,6 +5,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import unibo.basicomm23.utils.CommUtils;
 
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -14,9 +18,10 @@ import java.util.List;
 public class QaksysConfigSupport {
 
     public static List<String> readConfig( String fName )  {
+    	Resource resource = new ClassPathResource(fName);
         try{
-            Path p = Paths.get(fName);
-            String data = new String( Files.readAllBytes(p));
+        	InputStream inputStream = resource.getInputStream();
+        	String data = new String(inputStream.readAllBytes());
             return readTheContent(data);
         }catch( Exception e){
             try {
