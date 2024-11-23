@@ -1,4 +1,4 @@
-System monitoring_device  
+System monitoring_device
 
 Dispatch 	sonar_start  	 : sonarstart(X)
 Dispatch 	sonar_stop   	 : sonarstop(X)
