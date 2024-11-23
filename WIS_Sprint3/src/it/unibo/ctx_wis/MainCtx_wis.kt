@@ -10,6 +10,7 @@ fun main() = runBlocking {
 	        "localhost", this, "wis_system.pl", "sysRules.pl", "ctx_wis"
 	)
 	//JAN Facade
+	main.java.unibo.WISFacade_Sprint3.WisFacadeSprint3Application.main( arrayOf<String>() );
 	//JAN24 Display
 }
 
