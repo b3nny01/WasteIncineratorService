@@ -192,14 +192,34 @@ task run0(type: JavaExec) {
     main = 'it.unibo.ctx_wis.MainCtx_wisKt'
 }
 
-task runExternalJar(type: JavaExec) {
+/*
+task runFacadeJar(type: JavaExec) {
     group = "Execution"
     description = "Run the facade JAR file"
     main = "-jar"
-    args = ["WISFacade_Sprint3-1.0.jar"]
+    args = [configurations.runtimeClasspath.find { it.name == "WISFacade_Sprint3-1.0.jar" }]
 }
 
-run0.finalizedBy(runExternalJar)
+task runAll(type: JavaExec)  {
+    group = "Execution"
+    description = "Run application and facade jar in parallel"
+
+    doLast {
+        def tasks = [
+            { exec { commandLine "gradle", "runApp" } },
+            { exec { commandLine "gradle", "runFacadeJar" } }
+        ]
+
+        def threads = tasks.collect { task ->
+            Thread.start { task() }
+        }
+
+        threads.each { it.join() }
+    }
+}
+*/
+
+
 
 /*
 //TODO
