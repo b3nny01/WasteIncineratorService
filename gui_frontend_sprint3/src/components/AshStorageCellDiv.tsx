@@ -7,8 +7,8 @@ function AshStorageCellDiv(props: { ashLevel: number }) {
     return (
         <div className="ash-storage-cell-div">
             <div className="ash-level-div">
-                <span className="label">Ash Level:</span>
-                <span className="value">{String(100 * props.ashLevel) + "%"}</span>
+                <span className="label">Ash Lvl:</span>
+                <span className="value">{String((100 * props.ashLevel).toFixed(0)) + "%"}</span>
             </div>
             <img src={ashStorageImg} />
         </div>

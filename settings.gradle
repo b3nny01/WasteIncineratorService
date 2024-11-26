@@ -9,5 +9,7 @@ rootProject.name = 'WasteIncineratorService'
 include "unibo.basicrobot24"
 include "WIS_Sprint1"
 include "WIS_Sprint2"
+include "WIS_Sprint3"
 include "MD_Sprint2"
 include "gui_frontend_sprint3"
+include "GUI_Backend_Sprint3"

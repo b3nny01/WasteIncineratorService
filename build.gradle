@@ -1,0 +1,56 @@
+task buildFrontend{
+    dependsOn "gui_frontend_sprint3:npmRunBuild"
+}
+
+task exportFrontendToBackend{
+    dependsOn "buildFrontend"
+    doLast{
+        copy{
+            from "gui_frontend_sprint3/build"
+            into "GUI_Backend_Sprint3/src/main/resources/static"
+        }
+        copy{
+            from "GUI_Backend_Sprint3/src/main/resources/static/index.html"
+            into "GUI_Backend_Sprint3/src/main/resources/templates/"
+        }
+        delete "GUI_Backend_Sprint3/src/main/resources/static/index.html"
+    }
+}
+
+task buildBackend{
+    dependsOn "exportFrontendToBackend",":GUI_Backend_Sprint3:build"
+
+    project("GUI_Backend_Sprint3").tasks.withType(Test) {
+        enabled = false
+    }
+    project("GUI_Backend_Sprint3").afterEvaluate{
+        project("GUI_Backend_Sprint3").tasks.named("build"){
+            mustRunAfter(rootProject.tasks.named("exportFrontendToBackend"))
+        }
+}
+
+}
+
+task exportBackendToWIS3{
+    dependsOn "buildBackend"
+    doLast{
+        copy{
+            from "GUI_Backend_Sprint3/build/libs"
+            into "unibolibs"
+        }
+    }
+}
+
+
+task buildWIS3{
+    dependsOn "exportBackendToWIS3","WIS_Sprint3:build"
+
+    project("WIS_Sprint3").tasks.withType(Test) {
+        enabled = false
+    }
+    project("WIS_Sprint3").afterEvaluate{
+        project("WIS_Sprint3").tasks.named("build"){
+            mustRunAfter(rootProject.tasks.named("exportBackendToWIS3"))
+        }
+    }
+}

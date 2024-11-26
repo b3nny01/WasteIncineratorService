@@ -668,9 +668,9 @@ QActor led context ctx_wis {
 
 
 
-Facade wisfacade port 8085 usingactor wis inctx ctx_wis  
-                   appl "main.java.unibo.WISFacade_Sprint3.WisFacadeSprint3Application"
-                   UserLibs -f "WISFacade_Sprint3-1.0" -f "WISFacade_Sprint3-1.0-plain"
+Facade wisfacade port 8085 usingactor wis inctx ctx_wis   
+                   appl "unibo.wisfacade.WisFacadeApplication"
+                   UserLibs -f "GUI_Backend_Sprint3-1.0-plain" -f "GUI_Backend_Sprint3-1.0"
                    
                    
                    
