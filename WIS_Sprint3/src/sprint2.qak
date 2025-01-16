@@ -481,6 +481,7 @@ QActor wis context ctx_wis{
 		observeResource op_robot msgid actor_state
 		delay 500
 		observeResource sonar msgid actor_state
+		observeResource led msgid actor_state
 	} Goto activate_incinerator	
 	
 	State activate_incinerator{
@@ -620,7 +621,7 @@ QActor sonar context ctx_wis withobj configurator using "main.resources.configur
 			#]
 			if[# TO_UPDATE #]{
 				[#  
-			 		L+=2.5;
+			 		L+=L_STEP;
 			 		val ASH_LEVEL=L/MAX_L 
 			 	#]
 			 	println("$name: ash level: $ASH_LEVEL") color magenta
@@ -653,15 +654,25 @@ QActor led context ctx_wis {
 					val B=payloadArg(2).toBoolean()
 					val L=payloadArg(3).toDouble()
 					
-					if(B){
-						MODE=LedMode.BLINKING;
-					}else if(RP==0 || L==1.0){
-						MODE=LedMode.ON
+					var NEW_MODE=LedMode.OFF
+					
+					if(B){ 
+						NEW_MODE=LedMode.ON;
+					}else if(RP==0 || L>=1.0){
+						NEW_MODE=LedMode.BLINKING
 					}else{
-						MODE=LedMode.OFF
+						NEW_MODE=LedMode.OFF
 					}
 			#]
-			println("$name: mode: $MODE") color magenta
+			println("$name: mode: $MODE") color magenta 
+			
+			if [# NEW_MODE!=MODE #]{
+				[#
+					MODE=NEW_MODE	
+				#]
+				updateResource [# "actor_state(led_state,$MODE)" #]
+			}
+			
 		}
 	}Goto idle
 }

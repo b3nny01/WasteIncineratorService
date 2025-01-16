@@ -56,14 +56,22 @@ class Led ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 													val B=payloadArg(2).toBoolean()
 													val L=payloadArg(3).toDouble()
 													
-													if(B){
-														MODE=LedMode.BLINKING;
-													}else if(RP==0 || L==1.0){
-														MODE=LedMode.ON
+													var NEW_MODE=LedMode.OFF
+													
+													if(B){ 
+														NEW_MODE=LedMode.ON;
+													}else if(RP==0 || L>=1.0){
+														NEW_MODE=LedMode.BLINKING
 													}else{
-														MODE=LedMode.OFF
+														NEW_MODE=LedMode.OFF
 													}
 								CommUtils.outmagenta("$name: mode: $MODE")
+								if(  NEW_MODE!=MODE  
+								 ){
+													MODE=NEW_MODE	
+								updateResourceRep( "actor_state(led_state,$MODE)"  
+								)
+								}
 						}
 						//genTimer( actor, state )
 					}

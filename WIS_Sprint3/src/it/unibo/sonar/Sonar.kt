@@ -60,7 +60,7 @@ class Sonar ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 												O=NEW_O
 								if(  TO_UPDATE  
 								 ){  
-											 		L+=2.5;
+											 		L+=L_STEP;
 											 		val ASH_LEVEL=L/MAX_L 
 								CommUtils.outmagenta("$name: ash level: $ASH_LEVEL")
 								updateResourceRep( "actor_state(ash_storage_level,$ASH_LEVEL)"  
