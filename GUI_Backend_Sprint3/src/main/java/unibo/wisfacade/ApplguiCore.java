@@ -48,13 +48,16 @@ public class ApplguiCore {
         // system_state(4,true,false,0.2777777777777778,checked,off)
 
         String[] tks = msg.split("\\(")[1].split("\\)")[0].split("\\,");
+        String[] posTks=tks[5].substring(1).split("y");
+        Position pos=new Position(Integer.parseInt(posTks[0]),Integer.parseInt(posTks[1]));
 
         JSONObject systemState = new JSONObject(new SystemState(Integer.parseInt(tks[0]),
                 Boolean.parseBoolean(tks[1]),
                 Boolean.parseBoolean(tks[2]),
                 Double.parseDouble(tks[3]),
                 tks[4],
-                tks[5]));
+                pos,
+                tks[6]));
 
         outinadapter.sendToAll(systemState.toString());
         // potrei mandare a M2M ... che poi manda la risposta a REST POST

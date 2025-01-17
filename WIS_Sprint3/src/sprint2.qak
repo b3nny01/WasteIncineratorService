@@ -7,9 +7,9 @@ Dispatch	actor_state					: actor_state(PROPERTY,VALUE)
 Dispatch 	incinerator_activation		: incinerator_activation(ACTIVE)
 
 Request 	system_state_req			: system_state_req(N)
-Reply 		system_state_repl			: system_state_repl(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)for system_state_req
+Reply 		system_state_repl			: system_state_repl(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,OP_ROBOT_POS,LED_STATE)for system_state_req
 
-Dispatch	system_state: system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)
+Dispatch	system_state: system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,OP_ROBOT_POS,LED_STATE)
 
 Request burn_req					: burn_req(N)
 Reply 	burn_repl					: burn_repl(N) for burn_req 
@@ -126,7 +126,7 @@ QActor scale context ctx_wis withobj configurator using "main.resources.configur
 		whenMsg system_state -> handle_load_rp 
 	
 	State handle_load_rp{
-		onMsg(system_state:system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)){
+		onMsg(system_state:system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,OP_ROBOT_POS,LED_STATE)){
 		[#
 			val NEW_O=payloadArg(4);
 			val TO_UPDATE=(NEW_O!=O && O=="rp_loaded");
@@ -162,6 +162,7 @@ QActor op_robot context ctx_wis withobj configurator using "main.resources.confi
 		val STEP_TIME=configurator.getProperty("op_robot.step_time").toInt()
 		var TARGET_LOCATION=Location.HOME
 		var OP_ROBOT_STATE=OpRobotState.INIT;
+		var OP_ROBOT_POS:Position?=Position(0,0)
 	#]
 	State s0 initial{ 
  		println("$name starts") color green
@@ -208,7 +209,7 @@ QActor op_robot context ctx_wis withobj configurator using "main.resources.confi
 	whenReply system_state_repl->handle_start_conditions_verified_repl
 	
 	State handle_start_conditions_verified_repl{
-		onMsg(system_state_repl:system_state_repl(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)){
+		onMsg(system_state_repl:system_state_repl(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,OP_ROBOT_POS,LED_STATE)){
 			[#
 				val RP=payloadArg(0).toInt()
 				val A=payloadArg(1).toBoolean()
@@ -248,6 +249,8 @@ QActor op_robot context ctx_wis withobj configurator using "main.resources.confi
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.MOVED_WS #]
 		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		[# OP_ROBOT_POS=LOCATIONS[Location.WASTE_STORAGE] #]
+		updateResource[# "actor_state(op_robot_pos,$OP_ROBOT_POS)" #]
 		delay 100
 		
 		// updating state
@@ -286,6 +289,8 @@ QActor op_robot context ctx_wis withobj configurator using "main.resources.confi
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.MOVED_BI #]
 		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		[# OP_ROBOT_POS=LOCATIONS[Location.BURN_IN] #]
+		updateResource[# "actor_state(op_robot_pos,$OP_ROBOT_POS)" #]
 		delay 100
 		
 		// updating state
@@ -325,6 +330,8 @@ QActor op_robot context ctx_wis withobj configurator using "main.resources.confi
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.MOVED_H #]
 		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		[# OP_ROBOT_POS=LOCATIONS[Location.HOME] #]
+		updateResource[# "actor_state(op_robot_pos,$OP_ROBOT_POS)" #]
 		delay 100
 		
 		// updating state
@@ -364,6 +371,8 @@ QActor op_robot context ctx_wis withobj configurator using "main.resources.confi
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.MOVED_BO #]
 		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		[# OP_ROBOT_POS=LOCATIONS[Location.BURN_OUT] #]
+		updateResource[# "actor_state(op_robot_pos,$OP_ROBOT_POS)" #]
 		delay 100
 		
 		// updating state
@@ -400,6 +409,8 @@ QActor op_robot context ctx_wis withobj configurator using "main.resources.confi
 	 	// updating state
 	 	[# OP_ROBOT_STATE=OpRobotState.MOVED_AS #]
 		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		[# OP_ROBOT_POS=LOCATIONS[Location.ASH_STORAGE] #]
+		updateResource[# "actor_state(op_robot_pos,$OP_ROBOT_POS)" #]
 		delay 100
 		
 		// updating state
@@ -428,7 +439,7 @@ QActor op_robot context ctx_wis withobj configurator using "main.resources.confi
 	whenReply system_state_repl->handle_continue_conditions_verified_repl
 	
 	State handle_continue_conditions_verified_repl{
-		onMsg(system_state_repl:system_state_repl(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)){
+		onMsg(system_state_repl:system_state_repl(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,OP_ROBOT_POS,LED_STATE)){
 			[#
 				val RP=payloadArg(0).toInt()
 				val A=payloadArg(1).toBoolean();
@@ -470,7 +481,8 @@ QActor wis context ctx_wis{
  		var A = false
  		var B = false 
  		var L = 0.0
- 		var O = "init"
+ 		var OS = "init"
+ 		var OP = "x0y0"
  		var LS="off"
  	#]
  	
@@ -508,19 +520,21 @@ QActor wis context ctx_wis{
 					"incinerator_burning"-> B=V.toBoolean()
 					"waste_storage_rps"  -> RP=V.toInt()
 					"ash_storage_level"  -> L=V.toDouble()
-					"op_robot_state"	 -> O=V
+					"op_robot_state"	 -> OS=V
+					"op_robot_pos"		 -> OP=V
 					"led_state"			 -> LS=V
+ 
 				}
 			#]
 			
-			updateResource [# "system_state($RP,$A,$B,$L,$O,$LS)" #]
+			updateResource [# "system_state($RP,$A,$B,$L,$OS,$OP,$LS)" #]
 			println("$name: $P updated with $V") color yellow
 		}
 	} Goto waiting_for_updates
 
 	State handle_system_state_req{
-		println("$name: current state { RP:$RP,A:$A, B:$B, L:$L, $O, $LS }") color yellow
-		replyTo system_state_req with system_state_repl : system_state_repl($RP,$A,$B,$L,$O,$LS)
+		println("$name: current state { RP:$RP,A:$A, B:$B, L:$L, $OS, $OP, $LS }") color yellow
+		replyTo system_state_req with system_state_repl : system_state_repl($RP,$A,$B,$L,$OS,$OP,$LS)
 	}Goto waiting_for_updates
  }  
 //===========================================================================================
@@ -549,14 +563,14 @@ QActor test_observer context ctx_wis{
 	}Transition t0 whenReply system_state_repl -> handle_system_state_repl
 	
 	State handle_system_state_repl{
-		onMsg(system_state_repl:system_state_repl(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)){
+		onMsg(system_state_repl:system_state_repl(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,OP_ROBOT_POS,LED_STATE)){
 			[#
 				RP=payloadArg(0).toInt()
 				A=payloadArg(1).toBoolean();
 				B=payloadArg(2).toBoolean();
 				L=payloadArg(3).toDouble();
 				O=payloadArg(4)
-				LS=payloadArg(5)
+				LS=payloadArg(6)
 			#]
 		}
 	}Goto check_end
@@ -574,14 +588,14 @@ QActor test_observer context ctx_wis{
 	}Transition t0 whenMsg system_state -> handle_update
 	
 	State handle_update{
-		onMsg(system_state:system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)){
+		onMsg(system_state:system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,OP_ROBOT_POS,LED_STATE)){
 			[#
 				RP=payloadArg(0).toInt()
 				A=payloadArg(1).toBoolean()
 				B=payloadArg(2).toBoolean()
 				L=payloadArg(3).toDouble()
 				O=payloadArg(4)
-				LS=payloadArg(5)
+				LS=payloadArg(6)
 				
 			#]
 		}
@@ -613,7 +627,7 @@ QActor sonar context ctx_wis withobj configurator using "main.resources.configur
 	}Transition t0 whenMsg  system_state-> handle_unload_ash
 	
 	State handle_unload_ash{
-		onMsg(system_state:system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)){
+		onMsg(system_state:system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,OP_ROBOT_POS,LED_STATE)){
 			[#
 				val NEW_O=payloadArg(4);
 				val TO_UPDATE=(NEW_O!=O && O=="ash_unloaded");
@@ -647,7 +661,7 @@ QActor led context ctx_wis {
 	}Transition t0 whenMsg system_state -> handle_update_mode
 	
 	State handle_update_mode{
-		onMsg(system_state:system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)){
+		onMsg(system_state:system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,OP_ROBOT_POS,LED_STATE)){
 			[#
 					val RP=payloadArg(0).toInt()
 					val A=payloadArg(1).toBoolean()

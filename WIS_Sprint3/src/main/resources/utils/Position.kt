@@ -9,6 +9,6 @@ data class Position(val x:Int,val y:Int){
 		}
 	}
 	override fun toString():String{
-		return "pos("+x.toString()+","+y.toString()+")"
+		return "x"+x.toString()+"y"+y.toString()
 	}
 }

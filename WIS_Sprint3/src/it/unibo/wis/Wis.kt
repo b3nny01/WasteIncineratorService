@@ -26,7 +26,8 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 		 		var A = false
 		 		var B = false 
 		 		var L = 0.0
-		 		var O = "init"
+		 		var OS = "init"
+		 		var OP = "x0y0"
 		 		var LS="off"
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
@@ -81,10 +82,12 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 													"incinerator_burning"-> B=V.toBoolean()
 													"waste_storage_rps"  -> RP=V.toInt()
 													"ash_storage_level"  -> L=V.toDouble()
-													"op_robot_state"	 -> O=V
+													"op_robot_state"	 -> OS=V
+													"op_robot_pos"		 -> OP=V
 													"led_state"			 -> LS=V
+								 
 												}
-								updateResourceRep( "system_state($RP,$A,$B,$L,$O,$LS)"  
+								updateResourceRep( "system_state($RP,$A,$B,$L,$OS,$OP,$LS)"  
 								)
 								CommUtils.outyellow("$name: $P updated with $V")
 						}
@@ -97,8 +100,8 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 				}	 
 				state("handle_system_state_req") { //this:State
 					action { //it:State
-						CommUtils.outyellow("$name: current state { RP:$RP,A:$A, B:$B, L:$L, $O, $LS }")
-						answer("system_state_req", "system_state_repl", "system_state_repl($RP,$A,$B,$L,$O,$LS)"   )  
+						CommUtils.outyellow("$name: current state { RP:$RP,A:$A, B:$B, L:$L, $OS, $OP, $LS }")
+						answer("system_state_req", "system_state_repl", "system_state_repl($RP,$A,$B,$L,$OS,$OP,$LS)"   )  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

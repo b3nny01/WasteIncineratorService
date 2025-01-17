@@ -48,7 +48,7 @@ class Led ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 				}	 
 				state("handle_update_mode") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)"), Term.createTerm("system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)"), 
+						if( checkMsgContent( Term.createTerm("system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,OP_ROBOT_POS,LED_STATE)"), Term.createTerm("system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,OP_ROBOT_POS,LED_STATE)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
 													val RP=payloadArg(0).toInt()

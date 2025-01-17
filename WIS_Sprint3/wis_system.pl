@@ -4,8 +4,8 @@
 dispatch( actor_state, actor_state(PROPERTY,VALUE) ).
 dispatch( incinerator_activation, incinerator_activation(ACTIVE) ).
 request( system_state_req, system_state_req(N) ).
-reply( system_state_repl, system_state_repl(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE) ).  %%for system_state_req
-dispatch( system_state, system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE) ).
+reply( system_state_repl, system_state_repl(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,OP_ROBOT_POS,LED_STATE) ).  %%for system_state_req
+dispatch( system_state, system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,OP_ROBOT_POS,LED_STATE) ).
 request( burn_req, burn_req(N) ).
 reply( burn_repl, burn_repl(N) ).  %%for burn_req
 request( engage, engage(OWNER,STEPTIME) ).

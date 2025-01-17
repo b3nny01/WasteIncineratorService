@@ -1,4 +1,5 @@
 package unibo.wisfacade;
+import unibo.wisfacade.Position;
 
 public class SystemState {
     private int rps;
@@ -6,15 +7,17 @@ public class SystemState {
     private boolean burning;
     private double ashLevel;
     private String opRobotState;
+    private Position opRobotPosition;
     private String ledState;
 
-    public SystemState(int rps, boolean active, boolean burning, double ashLevel, String opRobotState,
+    public SystemState(int rps, boolean active, boolean burning, double ashLevel, String opRobotState,Position opRobotPosition,
             String ledState) {
         this.rps = rps;
         this.active = active;
         this.burning = burning;
         this.ashLevel = ashLevel;
         this.opRobotState = opRobotState;
+        this.opRobotPosition=opRobotPosition;
         this.ledState = ledState;
     }
 
@@ -24,6 +27,7 @@ public class SystemState {
         this.burning = false;
         this.ashLevel = -1;
         this.opRobotState = "";
+        this.opRobotPosition=new Position(0,0);
         this.ledState = "";
     }
 
@@ -73,6 +77,14 @@ public class SystemState {
 
     public void setLedState(String ledState) {
         this.ledState = ledState;
+    }
+
+    public Position getOpRobotPosition() {
+        return opRobotPosition;
+    }
+
+    public void setOpRobotPosition(Position opRobotPosition) {
+        this.opRobotPosition = opRobotPosition;
     }
 
 }

@@ -54,7 +54,7 @@ class Test_observer ( name: String, scope: CoroutineScope, isconfined: Boolean=f
 				}	 
 				state("handle_system_state_repl") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("system_state_repl(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)"), Term.createTerm("system_state_repl(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)"), 
+						if( checkMsgContent( Term.createTerm("system_state_repl(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,OP_ROBOT_POS,LED_STATE)"), Term.createTerm("system_state_repl(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,OP_ROBOT_POS,LED_STATE)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
 												RP=payloadArg(0).toInt()
@@ -62,7 +62,7 @@ class Test_observer ( name: String, scope: CoroutineScope, isconfined: Boolean=f
 												B=payloadArg(2).toBoolean();
 												L=payloadArg(3).toDouble();
 												O=payloadArg(4)
-												LS=payloadArg(5)
+												LS=payloadArg(6)
 						}
 						//genTimer( actor, state )
 					}
@@ -98,7 +98,7 @@ class Test_observer ( name: String, scope: CoroutineScope, isconfined: Boolean=f
 				}	 
 				state("handle_update") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)"), Term.createTerm("system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)"), 
+						if( checkMsgContent( Term.createTerm("system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,OP_ROBOT_POS,LED_STATE)"), Term.createTerm("system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,OP_ROBOT_POS,LED_STATE)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
 												RP=payloadArg(0).toInt()
@@ -106,7 +106,7 @@ class Test_observer ( name: String, scope: CoroutineScope, isconfined: Boolean=f
 												B=payloadArg(2).toBoolean()
 												L=payloadArg(3).toDouble()
 												O=payloadArg(4)
-												LS=payloadArg(5)
+												LS=payloadArg(6)
 												
 						}
 						//genTimer( actor, state )

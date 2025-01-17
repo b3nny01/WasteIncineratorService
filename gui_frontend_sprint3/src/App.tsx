@@ -14,6 +14,7 @@ function App() {
     burning: false,
     ashLevel: -1,
     opRobotState: "offline",
+    opRobotPosition:{x:0,y:0},
     ledState: "offline",
   });
 
@@ -36,7 +37,7 @@ function App() {
           burning={systemState.burning}
           ashLevel={systemState.ashLevel}
           opRobotState={systemState.opRobotState}
-          opRobotPosition={{ x: 0, y: 0 }}
+          opRobotPosition={systemState.opRobotPosition}
         />
       </div>
       <div className="right-div">

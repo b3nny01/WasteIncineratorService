@@ -36,6 +36,7 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 				val STEP_TIME=configurator.getProperty("op_robot.step_time").toInt()
 				var TARGET_LOCATION=Location.HOME
 				var OP_ROBOT_STATE=OpRobotState.INIT;
+				var OP_ROBOT_POS:Position?=Position(0,0)
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -105,7 +106,7 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 				}	 
 				state("handle_start_conditions_verified_repl") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("system_state_repl(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)"), Term.createTerm("system_state_repl(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)"), 
+						if( checkMsgContent( Term.createTerm("system_state_repl(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,OP_ROBOT_POS,LED_STATE)"), Term.createTerm("system_state_repl(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,OP_ROBOT_POS,LED_STATE)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
 												val RP=payloadArg(0).toInt()
@@ -154,6 +155,9 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 						 OP_ROBOT_STATE=OpRobotState.MOVED_WS  
 						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
 						)
+						 OP_ROBOT_POS=LOCATIONS[Location.WASTE_STORAGE]  
+						updateResourceRep( "actor_state(op_robot_pos,$OP_ROBOT_POS)"  
+						)
 						delay(100) 
 						 OP_ROBOT_STATE=OpRobotState.RP_LOADING  
 						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
@@ -196,6 +200,9 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					action { //it:State
 						 OP_ROBOT_STATE=OpRobotState.MOVED_BI  
 						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
+						)
+						 OP_ROBOT_POS=LOCATIONS[Location.BURN_IN]  
+						updateResourceRep( "actor_state(op_robot_pos,$OP_ROBOT_POS)"  
 						)
 						delay(100) 
 						 OP_ROBOT_STATE=OpRobotState.RP_UNLOADING  
@@ -240,6 +247,9 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					action { //it:State
 						 OP_ROBOT_STATE=OpRobotState.MOVED_H  
 						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
+						)
+						 OP_ROBOT_POS=LOCATIONS[Location.HOME]  
+						updateResourceRep( "actor_state(op_robot_pos,$OP_ROBOT_POS)"  
 						)
 						delay(100) 
 						 OP_ROBOT_STATE=OpRobotState.WAITING  
@@ -291,6 +301,9 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 						 OP_ROBOT_STATE=OpRobotState.MOVED_BO  
 						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
 						)
+						 OP_ROBOT_POS=LOCATIONS[Location.BURN_OUT]  
+						updateResourceRep( "actor_state(op_robot_pos,$OP_ROBOT_POS)"  
+						)
 						delay(100) 
 						 OP_ROBOT_STATE=OpRobotState.ASH_LOADING  
 						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
@@ -333,6 +346,9 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 						 OP_ROBOT_STATE=OpRobotState.MOVED_AS  
 						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
 						)
+						 OP_ROBOT_POS=LOCATIONS[Location.ASH_STORAGE]  
+						updateResourceRep( "actor_state(op_robot_pos,$OP_ROBOT_POS)"  
+						)
 						delay(100) 
 						 OP_ROBOT_STATE=OpRobotState.ASH_UNLOADING  
 						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
@@ -368,7 +384,7 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 				}	 
 				state("handle_continue_conditions_verified_repl") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("system_state_repl(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)"), Term.createTerm("system_state_repl(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)"), 
+						if( checkMsgContent( Term.createTerm("system_state_repl(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,OP_ROBOT_POS,LED_STATE)"), Term.createTerm("system_state_repl(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,OP_ROBOT_POS,LED_STATE)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
 												val RP=payloadArg(0).toInt()

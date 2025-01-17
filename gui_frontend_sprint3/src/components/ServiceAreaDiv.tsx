@@ -19,7 +19,7 @@ function buildGridTemplateAreas(robotPosX: number, robotPosY: number) {
     [".", ".", ".", ".", ".", ".", "."],
   ];
 
-  serviceArea[robotPosX][robotPosY] = "r";
+  serviceArea[robotPosY][robotPosX] = "r";
 
   let result = "'w0 h w1 w1 w1 w1 w1 w1 w2'\n";
   for (let i = 0; i < serviceArea.length; i++) {
