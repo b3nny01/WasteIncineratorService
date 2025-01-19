@@ -28,11 +28,21 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 				state("s0") { //this:State
 					action { //it:State
 						CommUtils.outred("$name starts")
-						delay(500) 
-						updateResourceRep( "actor_state(incinerator_active,$ACTIVE)"  
-						)
-						updateResourceRep( "actor_state(incinerator_burning,$BURNING)"  
-						)
+						delay(2000) 
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="init_mqtt", cond=doswitch() )
+				}	 
+				state("init_mqtt") { //this:State
+					action { //it:State
+						connectToMqttBroker( "ws://localhost:9001" )
+						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(incinerator_active,$ACTIVE)" ) 
+						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(incinerator_active,$ACTIVE)").toString(), "actor_state" )   
+						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(incinerator_burning,$BURNING)" ) 
+						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(incinerator_burning,$BURNING)").toString(), "actor_state" )   
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -57,8 +67,8 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
 												ACTIVE=payloadArg(0).toBoolean()
-								updateResourceRep( "actor_state(incinerator_active,$ACTIVE)"  
-								)
+								//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(incinerator_active,$ACTIVE)" ) 
+								publish(MsgUtil.buildEvent(name,"actor_state","actor_state(incinerator_active,$ACTIVE)").toString(), "actor_state" )   
 						}
 						CommUtils.outred("$name: handling activation request, active: $ACTIVE")
 						//genTimer( actor, state )
@@ -79,13 +89,13 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 									
 						CommUtils.outred("$name: handling burn request, result:$BURNING")
 						if(  BURNING  
-						 ){updateResourceRep( "actor_state(incinerator_burning,$BURNING)"  
-						)
+						 ){//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(incinerator_burning,$BURNING)" ) 
+						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(incinerator_burning,$BURNING)").toString(), "actor_state" )   
 						delay(5000) 
 						 
 										BURNING=false
-						updateResourceRep( "actor_state(incinerator_burning,$BURNING)"  
-						)
+						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(incinerator_burning,$BURNING)" ) 
+						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(incinerator_burning,$BURNING)").toString(), "actor_state" )   
 						}
 						answer("burn_req", "burn_repl", "burn_repl($R)"   )  
 						//genTimer( actor, state )

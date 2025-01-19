@@ -1,15 +1,16 @@
 System wis_system
-// NOTE: message types have been chosen only to produce a first working prototype of the system so they are not 
-// fixed and have to be discussed in future sprints
 
-Dispatch	actor_state					: actor_state(PROPERTY,VALUE) 
+//mqttBroker  "localhost":9001 eventTopic "wis_topic"
+
+Event    	actor_state					: actor_state(PROPERTY,VALUE) 
 
 Dispatch 	incinerator_activation		: incinerator_activation(ACTIVE)
 
 Request 	system_state_req			: system_state_req(N)
 Reply 		system_state_repl			: system_state_repl(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,OP_ROBOT_POS,LED_STATE)for system_state_req
 
-Dispatch	system_state: system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,OP_ROBOT_POS,LED_STATE)
+//Dispatch	system_state: system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,OP_ROBOT_POS,LED_STATE)
+Event 		system_state: system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,OP_ROBOT_POS,LED_STATE)
 
 Request burn_req					: burn_req(N)
 Reply 	burn_repl					: burn_repl(N) for burn_req 
@@ -53,7 +54,7 @@ ExternalQActor basicrobot 		context ctx_basic_robot
 //NOTE: the following model is already working but yet a prototype, some parts are still extremely simplified
 //(for instance OpRobot movements) and some are completely unimplemented (error handling)
 
-QActor incinerator context ctx_wis{       
+QActor incinerator context ctx_wis{        
  	[#
  		var ACTIVE	   = false;
  		var BURNING    = false;
@@ -61,9 +62,15 @@ QActor incinerator context ctx_wis{
  	 
  	State s0 initial{ 
  		println("$name starts") color red
-		delay 500
-		updateResource  [# "actor_state(incinerator_active,$ACTIVE)" #]
-		updateResource  [# "actor_state(incinerator_burning,$BURNING)" #]
+		delay 2000
+	}Goto init_mqtt
+	
+	State init_mqtt{
+		connectToMqttBroker "ws://localhost:9001"
+//		updateResource  [# "actor_state(incinerator_active,$ACTIVE)" #]
+//		updateResource  [# "actor_state(incinerator_burning,$BURNING)" #]
+		publish "actor_state" -m actor_state:actor_state(incinerator_active,$ACTIVE)
+		publish "actor_state" -m actor_state:actor_state(incinerator_burning,$BURNING)
 	}Goto idle
 	
 	State idle{
@@ -77,7 +84,8 @@ QActor incinerator context ctx_wis{
 			[#
 				ACTIVE=payloadArg(0).toBoolean()
 			#]
-			updateResource  [# "actor_state(incinerator_active,$ACTIVE)" #]
+//			updateResource  [# "actor_state(incinerator_active,$ACTIVE)" #]
+			publish "actor_state" -m actor_state:actor_state(incinerator_active,$ACTIVE)
 		}
 		println("$name: handling activation request, active: $ACTIVE") color red
 	} Goto idle
@@ -94,14 +102,112 @@ QActor incinerator context ctx_wis{
 		println("$name: handling burn request, result:$BURNING") color red
 
 		if[# BURNING #]{
-			updateResource  [# "actor_state(incinerator_burning,$BURNING)" #]
+//			updateResource  [# "actor_state(incinerator_burning,$BURNING)" #]
+			publish "actor_state" -m actor_state:actor_state(incinerator_burning,$BURNING)
 			delay 5000 // burning simulation
 			[# 
 				BURNING=false
 			#]
-			updateResource  [# "actor_state(incinerator_burning,$BURNING)" #]
+//			updateResource  [# "actor_state(incinerator_burning,$BURNING)" #]
+			publish "actor_state" -m actor_state:actor_state(incinerator_burning,$BURNING)
 		}
 		replyTo burn_req with burn_repl : burn_repl($R)
+	}Goto idle
+}
+ 
+ 
+//MockActors=================================================================================
+QActor sonar context ctx_wis withobj configurator using "main.resources.configuration.SystemConfigurator"{    
+	[# 
+		var O="init"
+		var L=configurator.getProperty("mock_sonar.start_level").toDouble()
+		var L_STEP=configurator.getProperty("mock_sonar.level_step").toDouble()
+		val MAX_L=configurator.getProperty("mock_sonar.max_level").toDouble()
+	#]
+	State s0 initial{
+		println("$name starts") color magenta
+		delay 2000
+	}Goto init_mqtt
+	
+	State init_mqtt{
+//		observeResource wis msgid system_state
+		connectToMqttBroker "ws://localhost:9001"
+		subscribe "system_state"
+	}Goto idle
+	
+	State idle{
+		println("$name: idle") color magenta
+	}Transition t0 whenEvent  system_state-> handle_unload_ash
+	
+	State handle_unload_ash{
+		onMsg(system_state:system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,OP_ROBOT_POS,LED_STATE)){
+			[#
+				val NEW_O=payloadArg(4);
+				val TO_UPDATE=(NEW_O!=O && O=="ash_unloaded");
+				O=NEW_O
+			#]
+			if[# TO_UPDATE #]{
+				[#  
+			 		L+=L_STEP;
+			 		val ASH_LEVEL=L/MAX_L 
+			 	#]
+			 	println("$name: ash level: $ASH_LEVEL") color magenta
+//	 			updateResource [# "actor_state(ash_storage_level,$ASH_LEVEL)" #]
+				publish "actor_state" -m actor_state:actor_state(ash_storage_level,$ASH_LEVEL)
+	 		}
+		}
+	}Goto idle
+}
+
+QActor led context ctx_wis {
+	import "main.resources.utils.LedMode"
+	[#
+		var MODE=LedMode.OFF
+	#]
+	State s0 initial {
+		println("$name starts") color magenta
+		delay 2000
+	}Goto init_mqtt
+	
+	State init_mqtt{
+//		observeResource wis msgid system_state
+		connectToMqttBroker "ws://localhost:9001"
+		subscribe "system_state"
+	}Goto idle
+	
+	State idle{
+		println("$name: idle") color magenta
+	}Transition t0 whenEvent system_state -> handle_update_mode
+	
+	State handle_update_mode{
+		onMsg(system_state:system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,OP_ROBOT_POS,LED_STATE)){
+			[#
+					val RP=payloadArg(0).toInt()
+					val A=payloadArg(1).toBoolean()
+					val B=payloadArg(2).toBoolean()
+					val L=payloadArg(3).toDouble()
+					
+					var NEW_MODE=LedMode.OFF
+					
+					if(B){ 
+						NEW_MODE=LedMode.ON;
+					}else if(RP==0 || L>=1.0){
+						NEW_MODE=LedMode.BLINKING
+					}else{
+						NEW_MODE=LedMode.OFF
+					}
+			#]
+			println("$name: mode: $MODE") color magenta 
+			
+			if [# NEW_MODE!=MODE #]{
+				[#
+					MODE=NEW_MODE	
+				#]
+//				updateResource [# "actor_state(led_state,$MODE)" #]
+				publish "actor_state" -m actor_state:actor_state(led_state,$MODE)
+			}
+			
+		}
 	}Goto idle
 }
  
@@ -113,17 +219,21 @@ QActor scale context ctx_wis withobj configurator using "main.resources.configur
  	 
  	State s0 initial{ 
  		println("$name starts") color blue
-		delay 500
-		observeResource wis msgid system_state
-		updateResource [# "actor_state(waste_storage_rps,$ROLL_PACKETS)" #]
-	}
-	Transition t0 whenTime 1000 -> idle
-				 
+		delay 2000
+	}Goto init_mqtt
+	
+	State init_mqtt{
+//		observeResource wis msgid system_state
+		connectToMqttBroker "ws://localhost:9001"
+		subscribe "system_state"
+//		updateResource [# "actor_state(waste_storage_rps,$ROLL_PACKETS)" #]
+		publish "actor_state" -m actor_state:actor_state(waste_storage_rps,$ROLL_PACKETS)
+	}Goto idle		 
 	
 	State idle{
 		println("$name: idle") color blue
 	}Transition t0 
-		whenMsg system_state -> handle_load_rp 
+		whenEvent system_state -> handle_load_rp 
 	
 	State handle_load_rp{
 		onMsg(system_state:system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,OP_ROBOT_POS,LED_STATE)){
@@ -138,7 +248,8 @@ QActor scale context ctx_wis withobj configurator using "main.resources.configur
 						ROLL_PACKETS--
 					}
 				#]
-				updateResource [# "actor_state(waste_storage_rps,$ROLL_PACKETS)" #]
+//				updateResource [# "actor_state(waste_storage_rps,$ROLL_PACKETS)" #]
+				publish "actor_state" -m actor_state:actor_state(waste_storage_rps,$ROLL_PACKETS)
 			}
 		}
 
@@ -166,13 +277,18 @@ QActor op_robot context ctx_wis withobj configurator using "main.resources.confi
 	#]
 	State s0 initial{ 
  		println("$name starts") color green
-	}Goto engage_robot 
+ 		delay 500
+	}Goto init_mqtt
+	
+	State init_mqtt{
+		connectToMqttBroker "ws://localhost:9001"
+	} Goto engage_robot
 
 	State engage_robot{
-		delay 500
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.ENGAGING #]
-		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+//		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		publish "actor_state" -m actor_state:actor_state(op_robot_state,$OP_ROBOT_STATE)
 		delay 100
 		
 		println("$name: engaging robot") color yellow
@@ -190,7 +306,8 @@ QActor op_robot context ctx_wis withobj configurator using "main.resources.confi
 		}	
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.ENGAGED #]
-		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+//		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		publish "actor_state" -m actor_state:actor_state(op_robot_state,$OP_ROBOT_STATE)
 		delay 100
 		
 		println("$name: robot engaged: $OK") color yellow
@@ -200,7 +317,8 @@ QActor op_robot context ctx_wis withobj configurator using "main.resources.confi
 		delay 500
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.CHECKING #]
-		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+//		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		publish "actor_state" -m actor_state:actor_state(op_robot_state,$OP_ROBOT_STATE)
 		delay 100
 		
 		println("$name: checking conditions") color green
@@ -220,7 +338,8 @@ QActor op_robot context ctx_wis withobj configurator using "main.resources.confi
 		}
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.CHECKED #]
-		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+//		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		publish "actor_state" -m actor_state:actor_state(op_robot_state,$OP_ROBOT_STATE)
 		delay 100
 		
 		println("$name: conditions verified: $OK") color green
@@ -236,7 +355,8 @@ QActor op_robot context ctx_wis withobj configurator using "main.resources.confi
 		#]
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.MOVING_WS #]
-		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+//		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		publish "actor_state" -m actor_state:actor_state(op_robot_state,$OP_ROBOT_STATE)
 		delay 100
 		
 		println("$name: moving to $TARGET_LOCATION...") color green
@@ -248,21 +368,28 @@ QActor op_robot context ctx_wis withobj configurator using "main.resources.confi
 	State load_rp{
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.MOVED_WS #]
-		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
 		[# OP_ROBOT_POS=LOCATIONS[Location.WASTE_STORAGE] #]
-		updateResource[# "actor_state(op_robot_pos,$OP_ROBOT_POS)" #]
+		
+//		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+//		updateResource[# "actor_state(op_robot_pos,$OP_ROBOT_POS)" #]		
+		publish "actor_state" -m actor_state:actor_state(op_robot_state,$OP_ROBOT_STATE)
+		publish "actor_state" -m actor_state:actor_state(op_robot_pos,$OP_ROBOT_POS)
+
+		
 		delay 100
 		
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.RP_LOADING #]
-		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+//		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		publish "actor_state" -m actor_state:actor_state(op_robot_state,$OP_ROBOT_STATE)
 		delay 100
 		
 		println("$name: loading an rp") color green
 		delay 1000
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.RP_LOADED #]
-		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+//		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		publish "actor_state" -m actor_state:actor_state(op_robot_state,$OP_ROBOT_STATE)
 		delay 100
 		
 	}Goto move_to_burn_in
@@ -276,7 +403,8 @@ QActor op_robot context ctx_wis withobj configurator using "main.resources.confi
 		#]
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.MOVING_BI #]
-		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+//		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		publish "actor_state" -m actor_state:actor_state(op_robot_state,$OP_ROBOT_STATE)
 		delay 100
 		
 		println("$name: moving to $TARGET_LOCATION...") color green
@@ -288,14 +416,19 @@ QActor op_robot context ctx_wis withobj configurator using "main.resources.confi
 	State request_to_burn{
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.MOVED_BI #]
-		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
 		[# OP_ROBOT_POS=LOCATIONS[Location.BURN_IN] #]
-		updateResource[# "actor_state(op_robot_pos,$OP_ROBOT_POS)" #]
+		
+//		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+//		updateResource[# "actor_state(op_robot_pos,$OP_ROBOT_POS)" #]		
+		publish "actor_state" -m actor_state:actor_state(op_robot_state,$OP_ROBOT_STATE)
+		publish "actor_state" -m actor_state:actor_state(op_robot_pos,$OP_ROBOT_POS)
+
 		delay 100
 		
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.RP_UNLOADING #]
-		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+//		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		publish "actor_state" -m actor_state:actor_state(op_robot_state,$OP_ROBOT_STATE)
 		delay 100
 		
 		println("$name: requesting to burn an rp") color green
@@ -303,7 +436,8 @@ QActor op_robot context ctx_wis withobj configurator using "main.resources.confi
 		delay 1000
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.RP_UNLOADED #]
-		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+//		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		publish "actor_state" -m actor_state:actor_state(op_robot_state,$OP_ROBOT_STATE)
 		delay 100
 
 	}Goto return_to_home
@@ -316,7 +450,9 @@ QActor op_robot context ctx_wis withobj configurator using "main.resources.confi
 		#]
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.MOVING_H #]
-		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+//		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]		
+		publish "actor_state" -m actor_state:actor_state(op_robot_state,$OP_ROBOT_STATE)
+
 		delay 100
 		
 		println("$name: moving to $TARGET_LOCATION...") color green
@@ -329,14 +465,18 @@ QActor op_robot context ctx_wis withobj configurator using "main.resources.confi
 	State wait_for_burn_repl{
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.MOVED_H #]
-		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
 		[# OP_ROBOT_POS=LOCATIONS[Location.HOME] #]
-		updateResource[# "actor_state(op_robot_pos,$OP_ROBOT_POS)" #]
+		
+//		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+//		updateResource[# "actor_state(op_robot_pos,$OP_ROBOT_POS)" #]		
+		publish "actor_state" -m actor_state:actor_state(op_robot_state,$OP_ROBOT_STATE)
+		publish "actor_state" -m actor_state:actor_state(op_robot_pos,$OP_ROBOT_POS)
 		delay 100
 		
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.WAITING #]
-		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+//		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]	
+		publish "actor_state" -m actor_state:actor_state(op_robot_state,$OP_ROBOT_STATE)
 		delay 100
 		
 		println("$name: waiting end of burning...") color green
@@ -358,7 +498,8 @@ QActor op_robot context ctx_wis withobj configurator using "main.resources.confi
 		#]
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.MOVING_BO #]
-		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+//		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]	
+		publish "actor_state" -m actor_state:actor_state(op_robot_state,$OP_ROBOT_STATE)
 		delay 100
 		
 		println("$name: moving to $TARGET_LOCATION...") color green
@@ -370,21 +511,26 @@ QActor op_robot context ctx_wis withobj configurator using "main.resources.confi
 	State load_ash{
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.MOVED_BO #]
-		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
 		[# OP_ROBOT_POS=LOCATIONS[Location.BURN_OUT] #]
-		updateResource[# "actor_state(op_robot_pos,$OP_ROBOT_POS)" #]
+		
+//		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+//		updateResource[# "actor_state(op_robot_pos,$OP_ROBOT_POS)" #]		
+		publish "actor_state" -m actor_state:actor_state(op_robot_state,$OP_ROBOT_STATE)
+		publish "actor_state" -m actor_state:actor_state(op_robot_pos,$OP_ROBOT_POS)
 		delay 100
 		
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.ASH_LOADING #]
-		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+//		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		publish "actor_state" -m actor_state:actor_state(op_robot_state,$OP_ROBOT_STATE)
 		delay 100
 		
 		println("$name: loading ash") color green
 		delay 1000
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.ASH_LOADED #]
-		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+//		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		publish "actor_state" -m actor_state:actor_state(op_robot_state,$OP_ROBOT_STATE)
 		delay 100
 	}Goto move_to_ash_storage
 	
@@ -397,7 +543,8 @@ QActor op_robot context ctx_wis withobj configurator using "main.resources.confi
 		#]
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.MOVING_AS #]
-		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+//		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		publish "actor_state" -m actor_state:actor_state(op_robot_state,$OP_ROBOT_STATE)
 		delay 100
 		
 		println("$name: moving to $TARGET_LOCATION...") color green
@@ -408,21 +555,26 @@ QActor op_robot context ctx_wis withobj configurator using "main.resources.confi
 	 State unload_ash{
 	 	// updating state
 	 	[# OP_ROBOT_STATE=OpRobotState.MOVED_AS #]
-		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
 		[# OP_ROBOT_POS=LOCATIONS[Location.ASH_STORAGE] #]
-		updateResource[# "actor_state(op_robot_pos,$OP_ROBOT_POS)" #]
+		
+//		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+//		updateResource[# "actor_state(op_robot_pos,$OP_ROBOT_POS)" #]		
+		publish "actor_state" -m actor_state:actor_state(op_robot_state,$OP_ROBOT_STATE)
+		publish "actor_state" -m actor_state:actor_state(op_robot_pos,$OP_ROBOT_POS)
 		delay 100
 		
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.ASH_UNLOADING #]
-		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+//		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		publish "actor_state" -m actor_state:actor_state(op_robot_state,$OP_ROBOT_STATE)
 		delay 100
 		
 	 	println("name: unloading ash...") color green
 	 	delay 3000
 	 	// updating state
 	 	[# OP_ROBOT_STATE=OpRobotState.ASH_UNLOADED #]
-		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+//		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		publish "actor_state" -m actor_state:actor_state(op_robot_state,$OP_ROBOT_STATE)
 		delay 100
 		
 	 }Goto check_continue_conditions 
@@ -430,7 +582,8 @@ QActor op_robot context ctx_wis withobj configurator using "main.resources.confi
 	 State check_continue_conditions{
 	 	// updating state
 	 	[# OP_ROBOT_STATE=OpRobotState.CHECKING #]
-		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+//		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		publish "actor_state" -m actor_state:actor_state(op_robot_state,$OP_ROBOT_STATE)
 		delay 100
 		
 		println("$name: checking conditions") color green
@@ -451,7 +604,8 @@ QActor op_robot context ctx_wis withobj configurator using "main.resources.confi
 		}
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.CHECKED #]
-		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+//		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		publish "actor_state" -m actor_state:actor_state(op_robot_state,$OP_ROBOT_STATE)
 		delay 100
 		
 		println("$name: conditions verified: $OK") color green
@@ -465,7 +619,8 @@ QActor op_robot context ctx_wis withobj configurator using "main.resources.confi
 		#]
 		// updating state
 		[# OP_ROBOT_STATE=OpRobotState.MOVING_H #]
-		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+//		updateResource[# "actor_state(op_robot_state,$OP_ROBOT_STATE)" #]
+		publish "actor_state" -m actor_state:actor_state(op_robot_state,$OP_ROBOT_STATE)
 		delay 100
 		
 		println("$name: moving to $TARGET_LOCATION...") color green
@@ -475,6 +630,7 @@ QActor op_robot context ctx_wis withobj configurator using "main.resources.confi
 	whenReply moverobotfailed -> move_to_home 
 }
 
+//WIS========================================================================================
 QActor wis context ctx_wis{
  	[#
  		var RP = 0
@@ -486,14 +642,18 @@ QActor wis context ctx_wis{
  		var LS="off"
  	#]
  	
- 	State s0 initial{ 
+ 	State s0 initial{ 	 	 
  		println("$name starts") color yellow
-		observeResource scale msgid actor_state
-		observeResource incinerator msgid actor_state
-		observeResource op_robot msgid actor_state
-		delay 500
-		observeResource sonar msgid actor_state
-		observeResource led msgid actor_state
+	} Goto init_mqtt
+	
+	State init_mqtt{
+//		observeResource scale msgid actor_state
+//		observeResource incinerator msgid actor_state
+//		observeResource op_robot msgid actor_state
+//		observeResource sonar msgid actor_state
+//		observeResource led msgid actor_state
+		connectToMqttBroker "ws://localhost:9001"
+		subscribe "actor_state"
 	} Goto activate_incinerator	
 	
 	State activate_incinerator{
@@ -507,7 +667,7 @@ QActor wis context ctx_wis{
 	State waiting_for_updates{
 		println("$name: waiting for updates...") color yellow
 	}Transition t0 
-		whenMsg actor_state -> update_state	
+		whenEvent actor_state -> update_state	
 		whenRequest system_state_req -> handle_system_state_req
 				
 	State update_state{
@@ -528,6 +688,8 @@ QActor wis context ctx_wis{
 			#]
 			
 			updateResource [# "system_state($RP,$A,$B,$L,$OS,$OP,$LS)" #]
+			publish "system_state" -m system_state:system_state($RP,$A,$B,$L,$OS,$OP,$LS)
+			
 			println("$name: $P updated with $V") color yellow
 		}
 	} Goto waiting_for_updates
@@ -540,6 +702,20 @@ QActor wis context ctx_wis{
 //===========================================================================================
  
 //Tester=====================================================================================
+QActor mqtt_test context ctx_wis{
+	State s0 initial{ 
+ 		println("$name starts") color green
+ 		connectToMqttBroker "ws://localhost:9001"
+ 		subscribe "system_state"
+ 		
+	} Transition t0 whenEvent system_state->print_hello
+	
+	State print_hello{		
+		println("$name $currentMsg") color green
+	} Transition t0 whenEvent system_state->print_hello
+}
+
+
 QActor test_observer context ctx_wis{
  	[#
  		var RP = 0
@@ -558,7 +734,9 @@ QActor test_observer context ctx_wis{
 	
 	State start_test{
 		println("$name: starting test") color cyan
-		observeResource wis msgid system_state
+//		observeResource wis msgid system_state
+		connectToMqttBroker "ws://localhost:9001"
+		subscribe "system_state"
 		request wis -m system_state_req:system_state_req
 	}Transition t0 whenReply system_state_repl -> handle_system_state_repl
 	
@@ -585,7 +763,7 @@ QActor test_observer context ctx_wis{
 	
 	State wait_for_updates{
 		println("$name: waiting for updates...") color cyan
-	}Transition t0 whenMsg system_state -> handle_update
+	}Transition t0 whenEvent system_state -> handle_update
 	
 	State handle_update{
 		onMsg(system_state:system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,OP_ROBOT_POS,LED_STATE)){
@@ -608,94 +786,14 @@ QActor test_observer context ctx_wis{
 	
  }  
  
-//MockActors=================================================================================
-QActor sonar context ctx_wis withobj configurator using "main.resources.configuration.SystemConfigurator"{    
-	[# 
-		var O="init"
-		var L=configurator.getProperty("mock_sonar.start_level").toDouble()
-		var L_STEP=configurator.getProperty("mock_sonar.level_step").toDouble()
-		val MAX_L=configurator.getProperty("mock_sonar.max_level").toDouble()
-	#]
-	State s0 initial{
-		println("$name starts") color magenta
-		delay 500
-		observeResource wis msgid system_state
-	}Goto idle
-	
-	State idle{
-		println("$name: idle") color magenta
-	}Transition t0 whenMsg  system_state-> handle_unload_ash
-	
-	State handle_unload_ash{
-		onMsg(system_state:system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,OP_ROBOT_POS,LED_STATE)){
-			[#
-				val NEW_O=payloadArg(4);
-				val TO_UPDATE=(NEW_O!=O && O=="ash_unloaded");
-				O=NEW_O
-			#]
-			if[# TO_UPDATE #]{
-				[#  
-			 		L+=L_STEP;
-			 		val ASH_LEVEL=L/MAX_L 
-			 	#]
-			 	println("$name: ash level: $ASH_LEVEL") color magenta
-	 			updateResource [# "actor_state(ash_storage_level,$ASH_LEVEL)" #]
-	 		}
-		}
-	}Goto idle
-}
 
-QActor led context ctx_wis {
-	import "main.resources.utils.LedMode"
-	[#
-		var MODE=LedMode.OFF
-	#]
-	State s0 initial {
-		println("$name starts") color magenta
-		observeResource wis msgid system_state
-		
-	}Goto idle
-	
-	State idle{
-		println("$name: idle") color magenta
-	}Transition t0 whenMsg system_state -> handle_update_mode
-	
-	State handle_update_mode{
-		onMsg(system_state:system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,OP_ROBOT_POS,LED_STATE)){
-			[#
-					val RP=payloadArg(0).toInt()
-					val A=payloadArg(1).toBoolean()
-					val B=payloadArg(2).toBoolean()
-					val L=payloadArg(3).toDouble()
-					
-					var NEW_MODE=LedMode.OFF
-					
-					if(B){ 
-						NEW_MODE=LedMode.ON;
-					}else if(RP==0 || L>=1.0){
-						NEW_MODE=LedMode.BLINKING
-					}else{
-						NEW_MODE=LedMode.OFF
-					}
-			#]
-			println("$name: mode: $MODE") color magenta 
-			
-			if [# NEW_MODE!=MODE #]{
-				[#
-					MODE=NEW_MODE	
-				#]
-				updateResource [# "actor_state(led_state,$MODE)" #]
-			}
-			
-		}
-	}Goto idle
-}
 
 
 
 Facade wisfacade port 8085 usingactor wis inctx ctx_wis   
                    appl "unibo.wisfacade.WisFacadeApplication"
                    UserLibs -f "GUI_Backend_Sprint3-1.0-plain" -f "GUI_Backend_Sprint3-1.0"
+                   
                    
                    
                    

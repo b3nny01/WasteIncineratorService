@@ -28,7 +28,18 @@ class Led ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 				state("s0") { //this:State
 					action { //it:State
 						CommUtils.outmagenta("$name starts")
-						observeResource("localhost","8022","ctx_wis","wis","system_state")
+						delay(2000) 
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="init_mqtt", cond=doswitch() )
+				}	 
+				state("init_mqtt") { //this:State
+					action { //it:State
+						connectToMqttBroker( "ws://localhost:9001" )
+						subscribe(  "system_state" ) //mqtt.subscribe(this,topic)
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -44,7 +55,7 @@ class Led ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t025",targetState="handle_update_mode",cond=whenDispatch("system_state"))
+					 transition(edgeName="t03",targetState="handle_update_mode",cond=whenEvent("system_state"))
 				}	 
 				state("handle_update_mode") { //this:State
 					action { //it:State
@@ -69,8 +80,8 @@ class Led ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 								if(  NEW_MODE!=MODE  
 								 ){
 													MODE=NEW_MODE	
-								updateResourceRep( "actor_state(led_state,$MODE)"  
-								)
+								//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(led_state,$MODE)" ) 
+								publish(MsgUtil.buildEvent(name,"actor_state","actor_state(led_state,$MODE)").toString(), "actor_state" )   
 								}
 						}
 						//genTimer( actor, state )

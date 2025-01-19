@@ -31,8 +31,18 @@ class Sonar ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 				state("s0") { //this:State
 					action { //it:State
 						CommUtils.outmagenta("$name starts")
-						delay(500) 
-						observeResource("localhost","8022","ctx_wis","wis","system_state")
+						delay(2000) 
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="init_mqtt", cond=doswitch() )
+				}	 
+				state("init_mqtt") { //this:State
+					action { //it:State
+						connectToMqttBroker( "ws://localhost:9001" )
+						subscribe(  "system_state" ) //mqtt.subscribe(this,topic)
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -48,7 +58,7 @@ class Sonar ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t024",targetState="handle_unload_ash",cond=whenDispatch("system_state"))
+					 transition(edgeName="t02",targetState="handle_unload_ash",cond=whenEvent("system_state"))
 				}	 
 				state("handle_unload_ash") { //this:State
 					action { //it:State
@@ -63,8 +73,8 @@ class Sonar ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 											 		L+=L_STEP;
 											 		val ASH_LEVEL=L/MAX_L 
 								CommUtils.outmagenta("$name: ash level: $ASH_LEVEL")
-								updateResourceRep( "actor_state(ash_storage_level,$ASH_LEVEL)"  
-								)
+								//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(ash_storage_level,$ASH_LEVEL)" ) 
+								publish(MsgUtil.buildEvent(name,"actor_state","actor_state(ash_storage_level,$ASH_LEVEL)").toString(), "actor_state" )   
 								}
 						}
 						//genTimer( actor, state )

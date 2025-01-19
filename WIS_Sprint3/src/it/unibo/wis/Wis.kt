@@ -33,12 +33,17 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 				state("s0") { //this:State
 					action { //it:State
 						CommUtils.outyellow("$name starts")
-						observeResource("localhost","8022","ctx_wis","scale","actor_state")
-						observeResource("localhost","8022","ctx_wis","incinerator","actor_state")
-						observeResource("localhost","8022","ctx_wis","op_robot","actor_state")
-						delay(500) 
-						observeResource("localhost","8022","ctx_wis","sonar","actor_state")
-						observeResource("localhost","8022","ctx_wis","led","actor_state")
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="init_mqtt", cond=doswitch() )
+				}	 
+				state("init_mqtt") { //this:State
+					action { //it:State
+						connectToMqttBroker( "ws://localhost:9001" )
+						subscribe(  "actor_state" ) //mqtt.subscribe(this,topic)
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -67,8 +72,8 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t019",targetState="update_state",cond=whenDispatch("actor_state"))
-					transition(edgeName="t020",targetState="handle_system_state_req",cond=whenRequest("system_state_req"))
+					 transition(edgeName="t020",targetState="update_state",cond=whenEvent("actor_state"))
+					transition(edgeName="t021",targetState="handle_system_state_req",cond=whenRequest("system_state_req"))
 				}	 
 				state("update_state") { //this:State
 					action { //it:State
@@ -89,6 +94,8 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 												}
 								updateResourceRep( "system_state($RP,$A,$B,$L,$OS,$OP,$LS)"  
 								)
+								//val m = MsgUtil.buildEvent(name, "system_state", "system_state($RP,$A,$B,$L,$OS,$OP,$LS)" ) 
+								publish(MsgUtil.buildEvent(name,"system_state","system_state($RP,$A,$B,$L,$OS,$OP,$LS)").toString(), "system_state" )   
 								CommUtils.outyellow("$name: $P updated with $V")
 						}
 						//genTimer( actor, state )

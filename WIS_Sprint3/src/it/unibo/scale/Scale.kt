@@ -29,18 +29,26 @@ class Scale ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 				state("s0") { //this:State
 					action { //it:State
 						CommUtils.outblue("$name starts")
-						delay(500) 
-						observeResource("localhost","8022","ctx_wis","wis","system_state")
-						updateResourceRep( "actor_state(waste_storage_rps,$ROLL_PACKETS)"  
-						)
+						delay(2000) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
-				 	 		stateTimer = TimerActor("timer_s0", 
-				 	 					  scope, context!!, "local_tout_"+name+"_s0", 1000.toLong() )  //OCT2023
 					}	 	 
-					 transition(edgeName="t02",targetState="idle",cond=whenTimeout("local_tout_"+name+"_s0"))   
+					 transition( edgeName="goto",targetState="init_mqtt", cond=doswitch() )
+				}	 
+				state("init_mqtt") { //this:State
+					action { //it:State
+						connectToMqttBroker( "ws://localhost:9001" )
+						subscribe(  "system_state" ) //mqtt.subscribe(this,topic)
+						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(waste_storage_rps,$ROLL_PACKETS)" ) 
+						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(waste_storage_rps,$ROLL_PACKETS)").toString(), "actor_state" )   
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
 				}	 
 				state("idle") { //this:State
 					action { //it:State
@@ -50,7 +58,7 @@ class Scale ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t03",targetState="handle_load_rp",cond=whenDispatch("system_state"))
+					 transition(edgeName="t04",targetState="handle_load_rp",cond=whenEvent("system_state"))
 				}	 
 				state("handle_load_rp") { //this:State
 					action { //it:State
@@ -65,8 +73,8 @@ class Scale ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 													if(ROLL_PACKETS>0){
 														ROLL_PACKETS--
 													}
-								updateResourceRep( "actor_state(waste_storage_rps,$ROLL_PACKETS)"  
-								)
+								//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(waste_storage_rps,$ROLL_PACKETS)" ) 
+								publish(MsgUtil.buildEvent(name,"actor_state","actor_state(waste_storage_rps,$ROLL_PACKETS)").toString(), "actor_state" )   
 								}
 						}
 						//genTimer( actor, state )

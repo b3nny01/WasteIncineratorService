@@ -41,6 +41,17 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 				state("s0") { //this:State
 					action { //it:State
 						CommUtils.outgreen("$name starts")
+						delay(500) 
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="init_mqtt", cond=doswitch() )
+				}	 
+				state("init_mqtt") { //this:State
+					action { //it:State
+						connectToMqttBroker( "ws://localhost:9001" )
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -50,10 +61,9 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 				}	 
 				state("engage_robot") { //this:State
 					action { //it:State
-						delay(500) 
 						 OP_ROBOT_STATE=OpRobotState.ENGAGING  
-						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
-						)
+						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_state,$OP_ROBOT_STATE)" ) 
+						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(op_robot_state,$OP_ROBOT_STATE)").toString(), "actor_state" )   
 						delay(100) 
 						CommUtils.outyellow("$name: engaging robot")
 						request("engage", "engage(wis,330)" ,"basicrobot" )  
@@ -62,7 +72,7 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t04",targetState="handle_engage_robot_repl",cond=whenReply("engagedone"))
+					 transition(edgeName="t05",targetState="handle_engage_robot_repl",cond=whenReply("engagedone"))
 				}	 
 				state("handle_engage_robot_repl") { //this:State
 					action { //it:State
@@ -74,8 +84,8 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 												OK=true	
 						}
 						 OP_ROBOT_STATE=OpRobotState.ENGAGED  
-						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
-						)
+						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_state,$OP_ROBOT_STATE)" ) 
+						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(op_robot_state,$OP_ROBOT_STATE)").toString(), "actor_state" )   
 						delay(100) 
 						CommUtils.outyellow("$name: robot engaged: $OK")
 						//genTimer( actor, state )
@@ -92,8 +102,8 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					action { //it:State
 						delay(500) 
 						 OP_ROBOT_STATE=OpRobotState.CHECKING  
-						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
-						)
+						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_state,$OP_ROBOT_STATE)" ) 
+						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(op_robot_state,$OP_ROBOT_STATE)").toString(), "actor_state" )   
 						delay(100) 
 						CommUtils.outgreen("$name: checking conditions")
 						request("system_state_req", "system_state_req" ,"wis" )  
@@ -102,7 +112,7 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t05",targetState="handle_start_conditions_verified_repl",cond=whenReply("system_state_repl"))
+					 transition(edgeName="t06",targetState="handle_start_conditions_verified_repl",cond=whenReply("system_state_repl"))
 				}	 
 				state("handle_start_conditions_verified_repl") { //this:State
 					action { //it:State
@@ -116,8 +126,8 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 												OK=(RP>0) && (A && !B) && (L<1.0)
 						}
 						 OP_ROBOT_STATE=OpRobotState.CHECKED  
-						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
-						)
+						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_state,$OP_ROBOT_STATE)" ) 
+						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(op_robot_state,$OP_ROBOT_STATE)").toString(), "actor_state" )   
 						delay(100) 
 						CommUtils.outgreen("$name: conditions verified: $OK")
 						//genTimer( actor, state )
@@ -137,8 +147,8 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 									val X=LOCATIONS[TARGET_LOCATION]?.x
 									val Y=LOCATIONS[TARGET_LOCATION]?.y
 						 OP_ROBOT_STATE=OpRobotState.MOVING_WS  
-						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
-						)
+						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_state,$OP_ROBOT_STATE)" ) 
+						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(op_robot_state,$OP_ROBOT_STATE)").toString(), "actor_state" )   
 						delay(100) 
 						CommUtils.outgreen("$name: moving to $TARGET_LOCATION...")
 						request("moverobot", "moverobot($X,$Y)" ,"basicrobot" )  
@@ -147,27 +157,27 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t06",targetState="load_rp",cond=whenReply("moverobotdone"))
-					transition(edgeName="t07",targetState="move_to_waste_storage",cond=whenReply("moverobotfailed"))
+					 transition(edgeName="t07",targetState="load_rp",cond=whenReply("moverobotdone"))
+					transition(edgeName="t08",targetState="move_to_waste_storage",cond=whenReply("moverobotfailed"))
 				}	 
 				state("load_rp") { //this:State
 					action { //it:State
 						 OP_ROBOT_STATE=OpRobotState.MOVED_WS  
-						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
-						)
 						 OP_ROBOT_POS=LOCATIONS[Location.WASTE_STORAGE]  
-						updateResourceRep( "actor_state(op_robot_pos,$OP_ROBOT_POS)"  
-						)
+						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_state,$OP_ROBOT_STATE)" ) 
+						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(op_robot_state,$OP_ROBOT_STATE)").toString(), "actor_state" )   
+						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_pos,$OP_ROBOT_POS)" ) 
+						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(op_robot_pos,$OP_ROBOT_POS)").toString(), "actor_state" )   
 						delay(100) 
 						 OP_ROBOT_STATE=OpRobotState.RP_LOADING  
-						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
-						)
+						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_state,$OP_ROBOT_STATE)" ) 
+						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(op_robot_state,$OP_ROBOT_STATE)").toString(), "actor_state" )   
 						delay(100) 
 						CommUtils.outgreen("$name: loading an rp")
 						delay(1000) 
 						 OP_ROBOT_STATE=OpRobotState.RP_LOADED  
-						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
-						)
+						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_state,$OP_ROBOT_STATE)" ) 
+						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(op_robot_state,$OP_ROBOT_STATE)").toString(), "actor_state" )   
 						delay(100) 
 						//genTimer( actor, state )
 					}
@@ -183,8 +193,8 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 									val X=LOCATIONS[TARGET_LOCATION]?.x
 									val Y=LOCATIONS[TARGET_LOCATION]?.y
 						 OP_ROBOT_STATE=OpRobotState.MOVING_BI  
-						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
-						)
+						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_state,$OP_ROBOT_STATE)" ) 
+						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(op_robot_state,$OP_ROBOT_STATE)").toString(), "actor_state" )   
 						delay(100) 
 						CommUtils.outgreen("$name: moving to $TARGET_LOCATION...")
 						request("moverobot", "moverobot($X,$Y)" ,"basicrobot" )  
@@ -193,28 +203,28 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t08",targetState="request_to_burn",cond=whenReply("moverobotdone"))
-					transition(edgeName="t09",targetState="move_to_burn_in",cond=whenReply("moverobotfailed"))
+					 transition(edgeName="t09",targetState="request_to_burn",cond=whenReply("moverobotdone"))
+					transition(edgeName="t010",targetState="move_to_burn_in",cond=whenReply("moverobotfailed"))
 				}	 
 				state("request_to_burn") { //this:State
 					action { //it:State
 						 OP_ROBOT_STATE=OpRobotState.MOVED_BI  
-						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
-						)
 						 OP_ROBOT_POS=LOCATIONS[Location.BURN_IN]  
-						updateResourceRep( "actor_state(op_robot_pos,$OP_ROBOT_POS)"  
-						)
+						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_state,$OP_ROBOT_STATE)" ) 
+						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(op_robot_state,$OP_ROBOT_STATE)").toString(), "actor_state" )   
+						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_pos,$OP_ROBOT_POS)" ) 
+						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(op_robot_pos,$OP_ROBOT_POS)").toString(), "actor_state" )   
 						delay(100) 
 						 OP_ROBOT_STATE=OpRobotState.RP_UNLOADING  
-						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
-						)
+						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_state,$OP_ROBOT_STATE)" ) 
+						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(op_robot_state,$OP_ROBOT_STATE)").toString(), "actor_state" )   
 						delay(100) 
 						CommUtils.outgreen("$name: requesting to burn an rp")
 						request("burn_req", "burn_req" ,"incinerator" )  
 						delay(1000) 
 						 OP_ROBOT_STATE=OpRobotState.RP_UNLOADED  
-						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
-						)
+						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_state,$OP_ROBOT_STATE)" ) 
+						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(op_robot_state,$OP_ROBOT_STATE)").toString(), "actor_state" )   
 						delay(100) 
 						//genTimer( actor, state )
 					}
@@ -230,8 +240,8 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 									val X=LOCATIONS[TARGET_LOCATION]?.x
 									val Y=LOCATIONS[TARGET_LOCATION]?.y
 						 OP_ROBOT_STATE=OpRobotState.MOVING_H  
-						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
-						)
+						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_state,$OP_ROBOT_STATE)" ) 
+						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(op_robot_state,$OP_ROBOT_STATE)").toString(), "actor_state" )   
 						delay(100) 
 						CommUtils.outgreen("$name: moving to $TARGET_LOCATION...")
 						request("moverobot", "moverobot($X,$Y)" ,"basicrobot" )  
@@ -240,21 +250,21 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t010",targetState="wait_for_burn_repl",cond=whenReply("moverobotdone"))
-					transition(edgeName="t011",targetState="return_to_home",cond=whenReply("moverobotfailed"))
+					 transition(edgeName="t011",targetState="wait_for_burn_repl",cond=whenReply("moverobotdone"))
+					transition(edgeName="t012",targetState="return_to_home",cond=whenReply("moverobotfailed"))
 				}	 
 				state("wait_for_burn_repl") { //this:State
 					action { //it:State
 						 OP_ROBOT_STATE=OpRobotState.MOVED_H  
-						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
-						)
 						 OP_ROBOT_POS=LOCATIONS[Location.HOME]  
-						updateResourceRep( "actor_state(op_robot_pos,$OP_ROBOT_POS)"  
-						)
+						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_state,$OP_ROBOT_STATE)" ) 
+						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(op_robot_state,$OP_ROBOT_STATE)").toString(), "actor_state" )   
+						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_pos,$OP_ROBOT_POS)" ) 
+						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(op_robot_pos,$OP_ROBOT_POS)").toString(), "actor_state" )   
 						delay(100) 
 						 OP_ROBOT_STATE=OpRobotState.WAITING  
-						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
-						)
+						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_state,$OP_ROBOT_STATE)" ) 
+						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(op_robot_state,$OP_ROBOT_STATE)").toString(), "actor_state" )   
 						delay(100) 
 						CommUtils.outgreen("$name: waiting end of burning...")
 						//genTimer( actor, state )
@@ -262,7 +272,7 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t012",targetState="handle_burn_repl",cond=whenReply("burn_repl"))
+					 transition(edgeName="t013",targetState="handle_burn_repl",cond=whenReply("burn_repl"))
 				}	 
 				state("handle_burn_repl") { //this:State
 					action { //it:State
@@ -283,8 +293,8 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 									val X=LOCATIONS[TARGET_LOCATION]?.x
 									val Y=LOCATIONS[TARGET_LOCATION]?.y
 						 OP_ROBOT_STATE=OpRobotState.MOVING_BO  
-						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
-						)
+						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_state,$OP_ROBOT_STATE)" ) 
+						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(op_robot_state,$OP_ROBOT_STATE)").toString(), "actor_state" )   
 						delay(100) 
 						CommUtils.outgreen("$name: moving to $TARGET_LOCATION...")
 						request("moverobot", "moverobot($X,$Y)" ,"basicrobot" )  
@@ -293,27 +303,27 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t013",targetState="load_ash",cond=whenReply("moverobotdone"))
-					transition(edgeName="t014",targetState="move_to_burn_out",cond=whenReply("moverobotfailed"))
+					 transition(edgeName="t014",targetState="load_ash",cond=whenReply("moverobotdone"))
+					transition(edgeName="t015",targetState="move_to_burn_out",cond=whenReply("moverobotfailed"))
 				}	 
 				state("load_ash") { //this:State
 					action { //it:State
 						 OP_ROBOT_STATE=OpRobotState.MOVED_BO  
-						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
-						)
 						 OP_ROBOT_POS=LOCATIONS[Location.BURN_OUT]  
-						updateResourceRep( "actor_state(op_robot_pos,$OP_ROBOT_POS)"  
-						)
+						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_state,$OP_ROBOT_STATE)" ) 
+						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(op_robot_state,$OP_ROBOT_STATE)").toString(), "actor_state" )   
+						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_pos,$OP_ROBOT_POS)" ) 
+						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(op_robot_pos,$OP_ROBOT_POS)").toString(), "actor_state" )   
 						delay(100) 
 						 OP_ROBOT_STATE=OpRobotState.ASH_LOADING  
-						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
-						)
+						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_state,$OP_ROBOT_STATE)" ) 
+						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(op_robot_state,$OP_ROBOT_STATE)").toString(), "actor_state" )   
 						delay(100) 
 						CommUtils.outgreen("$name: loading ash")
 						delay(1000) 
 						 OP_ROBOT_STATE=OpRobotState.ASH_LOADED  
-						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
-						)
+						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_state,$OP_ROBOT_STATE)" ) 
+						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(op_robot_state,$OP_ROBOT_STATE)").toString(), "actor_state" )   
 						delay(100) 
 						//genTimer( actor, state )
 					}
@@ -329,8 +339,8 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 									val X=LOCATIONS[TARGET_LOCATION]?.x
 									val Y=LOCATIONS[TARGET_LOCATION]?.y
 						 OP_ROBOT_STATE=OpRobotState.MOVING_AS  
-						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
-						)
+						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_state,$OP_ROBOT_STATE)" ) 
+						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(op_robot_state,$OP_ROBOT_STATE)").toString(), "actor_state" )   
 						delay(100) 
 						CommUtils.outgreen("$name: moving to $TARGET_LOCATION...")
 						request("moverobot", "moverobot($X,$Y)" ,"basicrobot" )  
@@ -339,26 +349,26 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t015",targetState="unload_ash",cond=whenReply("moverobotdone"))
+					 transition(edgeName="t016",targetState="unload_ash",cond=whenReply("moverobotdone"))
 				}	 
 				state("unload_ash") { //this:State
 					action { //it:State
 						 OP_ROBOT_STATE=OpRobotState.MOVED_AS  
-						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
-						)
 						 OP_ROBOT_POS=LOCATIONS[Location.ASH_STORAGE]  
-						updateResourceRep( "actor_state(op_robot_pos,$OP_ROBOT_POS)"  
-						)
+						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_state,$OP_ROBOT_STATE)" ) 
+						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(op_robot_state,$OP_ROBOT_STATE)").toString(), "actor_state" )   
+						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_pos,$OP_ROBOT_POS)" ) 
+						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(op_robot_pos,$OP_ROBOT_POS)").toString(), "actor_state" )   
 						delay(100) 
 						 OP_ROBOT_STATE=OpRobotState.ASH_UNLOADING  
-						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
-						)
+						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_state,$OP_ROBOT_STATE)" ) 
+						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(op_robot_state,$OP_ROBOT_STATE)").toString(), "actor_state" )   
 						delay(100) 
 						CommUtils.outgreen("name: unloading ash...")
 						delay(3000) 
 						 OP_ROBOT_STATE=OpRobotState.ASH_UNLOADED  
-						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
-						)
+						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_state,$OP_ROBOT_STATE)" ) 
+						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(op_robot_state,$OP_ROBOT_STATE)").toString(), "actor_state" )   
 						delay(100) 
 						//genTimer( actor, state )
 					}
@@ -370,8 +380,8 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 				state("check_continue_conditions") { //this:State
 					action { //it:State
 						 OP_ROBOT_STATE=OpRobotState.CHECKING  
-						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
-						)
+						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_state,$OP_ROBOT_STATE)" ) 
+						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(op_robot_state,$OP_ROBOT_STATE)").toString(), "actor_state" )   
 						delay(100) 
 						CommUtils.outgreen("$name: checking conditions")
 						request("system_state_req", "system_state_req" ,"wis" )  
@@ -380,7 +390,7 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t016",targetState="handle_continue_conditions_verified_repl",cond=whenReply("system_state_repl"))
+					 transition(edgeName="t017",targetState="handle_continue_conditions_verified_repl",cond=whenReply("system_state_repl"))
 				}	 
 				state("handle_continue_conditions_verified_repl") { //this:State
 					action { //it:State
@@ -395,8 +405,8 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 												OK=(RP>0) && (A && !B) && (L<1.0)
 						}
 						 OP_ROBOT_STATE=OpRobotState.CHECKED  
-						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
-						)
+						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_state,$OP_ROBOT_STATE)" ) 
+						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(op_robot_state,$OP_ROBOT_STATE)").toString(), "actor_state" )   
 						delay(100) 
 						CommUtils.outgreen("$name: conditions verified: $OK")
 						//genTimer( actor, state )
@@ -416,8 +426,8 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 									val X=LOCATIONS[TARGET_LOCATION]?.x
 									val Y=LOCATIONS[TARGET_LOCATION]?.y
 						 OP_ROBOT_STATE=OpRobotState.MOVING_H  
-						updateResourceRep( "actor_state(op_robot_state,$OP_ROBOT_STATE)"  
-						)
+						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_state,$OP_ROBOT_STATE)" ) 
+						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(op_robot_state,$OP_ROBOT_STATE)").toString(), "actor_state" )   
 						delay(100) 
 						CommUtils.outgreen("$name: moving to $TARGET_LOCATION...")
 						request("moverobot", "moverobot($X,$Y)" ,"basicrobot" )  
@@ -426,8 +436,8 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t017",targetState="check_start_conditions",cond=whenReply("moverobotdone"))
-					transition(edgeName="t018",targetState="move_to_home",cond=whenReply("moverobotfailed"))
+					 transition(edgeName="t018",targetState="check_start_conditions",cond=whenReply("moverobotdone"))
+					transition(edgeName="t019",targetState="move_to_home",cond=whenReply("moverobotfailed"))
 				}	 
 			}
 		}

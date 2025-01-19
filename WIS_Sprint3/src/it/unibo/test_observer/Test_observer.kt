@@ -38,19 +38,20 @@ class Test_observer ( name: String, scope: CoroutineScope, isconfined: Boolean=f
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t021",targetState="start_test",cond=whenRequest("test_req"))
+					 transition(edgeName="t024",targetState="start_test",cond=whenRequest("test_req"))
 				}	 
 				state("start_test") { //this:State
 					action { //it:State
 						CommUtils.outcyan("$name: starting test")
-						observeResource("localhost","8022","ctx_wis","wis","system_state")
+						connectToMqttBroker( "ws://localhost:9001" )
+						subscribe(  "system_state" ) //mqtt.subscribe(this,topic)
 						request("system_state_req", "system_state_req" ,"wis" )  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t022",targetState="handle_system_state_repl",cond=whenReply("system_state_repl"))
+					 transition(edgeName="t025",targetState="handle_system_state_repl",cond=whenReply("system_state_repl"))
 				}	 
 				state("handle_system_state_repl") { //this:State
 					action { //it:State
@@ -94,7 +95,7 @@ class Test_observer ( name: String, scope: CoroutineScope, isconfined: Boolean=f
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t023",targetState="handle_update",cond=whenDispatch("system_state"))
+					 transition(edgeName="t026",targetState="handle_update",cond=whenEvent("system_state"))
 				}	 
 				state("handle_update") { //this:State
 					action { //it:State
