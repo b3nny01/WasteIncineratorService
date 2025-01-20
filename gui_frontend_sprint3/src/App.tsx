@@ -4,6 +4,7 @@ import "./App.css";
 import ServiceAreaDiv from "./components/ServiceAreaDiv";
 import InfoDiv from "./components/InfoDiv";
 import useWebSocket, { ReadyState } from "react-use-websocket";
+import ControlDiv from "./components/ControlDiv";
 
 const webSocketUrl = "ws://localhost:8085/accessgui";
 
@@ -45,6 +46,7 @@ function App() {
           opRobotState={systemState.opRobotState}
           ledState={systemState.ledState}
         />
+        <ControlDiv/>
       </div>
     </div>
   );

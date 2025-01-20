@@ -22,13 +22,13 @@ class Led ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
-		
-				var MODE=LedMode.OFF
+		 val configurator = main.resources.configuration.SystemConfigurator
+		 var MODE=LedMode.OFF  
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
 						CommUtils.outmagenta("$name starts")
-						delay(2000) 
+						delay(1000) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -38,7 +38,7 @@ class Led ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 				}	 
 				state("init_mqtt") { //this:State
 					action { //it:State
-						connectToMqttBroker( "ws://localhost:9001" )
+						connectToMqttBroker( "${configurator.getProperty("mqtt_broker_uri")}" )
 						subscribe(  "system_state" ) //mqtt.subscribe(this,topic)
 						//genTimer( actor, state )
 					}
@@ -55,7 +55,7 @@ class Led ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t03",targetState="handle_update_mode",cond=whenEvent("system_state"))
+					 transition(edgeName="t021",targetState="handle_update_mode",cond=whenEvent("system_state"))
 				}	 
 				state("handle_update_mode") { //this:State
 					action { //it:State
@@ -78,8 +78,7 @@ class Led ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 													}
 								CommUtils.outmagenta("$name: mode: $MODE")
 								if(  NEW_MODE!=MODE  
-								 ){
-													MODE=NEW_MODE	
+								 ){ MODE=NEW_MODE  
 								//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(led_state,$MODE)" ) 
 								publish(MsgUtil.buildEvent(name,"actor_state","actor_state(led_state,$MODE)").toString(), "actor_state" )   
 								}

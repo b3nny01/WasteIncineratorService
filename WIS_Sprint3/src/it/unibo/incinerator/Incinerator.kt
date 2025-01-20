@@ -21,6 +21,7 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
+		 val configurator = main.resources.configuration.SystemConfigurator
 		
 		 		var ACTIVE	   = false;
 		 		var BURNING    = false;
@@ -28,7 +29,7 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 				state("s0") { //this:State
 					action { //it:State
 						CommUtils.outred("$name starts")
-						delay(2000) 
+						delay(1000) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -38,7 +39,7 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 				}	 
 				state("init_mqtt") { //this:State
 					action { //it:State
-						connectToMqttBroker( "ws://localhost:9001" )
+						connectToMqttBroker( "${configurator.getProperty("mqtt_broker_uri")}" )
 						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(incinerator_active,$ACTIVE)" ) 
 						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(incinerator_active,$ACTIVE)").toString(), "actor_state" )   
 						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(incinerator_burning,$BURNING)" ) 
@@ -65,8 +66,7 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 					action { //it:State
 						if( checkMsgContent( Term.createTerm("incinerator_activation(ACTIVE)"), Term.createTerm("incinerator_activation(ACTIVE)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								
-												ACTIVE=payloadArg(0).toBoolean()
+								 ACTIVE=payloadArg(0).toBoolean()  
 								//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(incinerator_active,$ACTIVE)" ) 
 								publish(MsgUtil.buildEvent(name,"actor_state","actor_state(incinerator_active,$ACTIVE)").toString(), "actor_state" )   
 						}
@@ -92,8 +92,7 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 						 ){//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(incinerator_burning,$BURNING)" ) 
 						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(incinerator_burning,$BURNING)").toString(), "actor_state" )   
 						delay(5000) 
-						 
-										BURNING=false
+						 BURNING=false  
 						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(incinerator_burning,$BURNING)" ) 
 						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(incinerator_burning,$BURNING)").toString(), "actor_state" )   
 						}

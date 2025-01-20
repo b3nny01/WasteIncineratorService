@@ -26,17 +26,15 @@ context(ctx_basic_robot, "127.0.0.1",  "TCP", "8020").
  qactor( basicrobot, ctx_basic_robot, "external").
   qactor( incinerator, ctx_wis, "it.unibo.incinerator.Incinerator").
  static(incinerator).
-  qactor( sonar, ctx_wis, "it.unibo.sonar.Sonar").
- static(sonar).
-  qactor( led, ctx_wis, "it.unibo.led.Led").
- static(led).
   qactor( scale, ctx_wis, "it.unibo.scale.Scale").
  static(scale).
   qactor( op_robot, ctx_wis, "it.unibo.op_robot.Op_robot").
  static(op_robot).
   qactor( wis, ctx_wis, "it.unibo.wis.Wis").
  static(wis).
-  qactor( mqtt_test, ctx_wis, "it.unibo.mqtt_test.Mqtt_test").
- static(mqtt_test).
+  qactor( sonar, ctx_wis, "it.unibo.sonar.Sonar").
+ static(sonar).
+  qactor( led, ctx_wis, "it.unibo.led.Led").
+ static(led).
   qactor( test_observer, ctx_wis, "it.unibo.test_observer.Test_observer").
  static(test_observer).

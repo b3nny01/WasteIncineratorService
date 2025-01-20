@@ -32,7 +32,7 @@ function buildGridTemplateAreas(robotPosX: number, robotPosY: number) {
   return result;
 }
 
-function ServiceArea(props: {
+export default function ServiceAreaDiv(props: {
   rps: number;
   active: boolean;
   burning: boolean;
@@ -73,5 +73,3 @@ function ServiceArea(props: {
     </div>
   );
 }
-
-export default ServiceArea;

@@ -51,7 +51,11 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 				}	 
 				state("init_mqtt") { //this:State
 					action { //it:State
-						connectToMqttBroker( "ws://localhost:9001" )
+						connectToMqttBroker( "${configurator.getProperty("mqtt_broker_uri")}" )
+						 OP_ROBOT_STATE=OpRobotState.ENGAGING  
+						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_state,$OP_ROBOT_STATE)" ) 
+						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(op_robot_state,$OP_ROBOT_STATE)").toString(), "actor_state" )   
+						delay(100) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -61,10 +65,6 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 				}	 
 				state("engage_robot") { //this:State
 					action { //it:State
-						 OP_ROBOT_STATE=OpRobotState.ENGAGING  
-						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_state,$OP_ROBOT_STATE)" ) 
-						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(op_robot_state,$OP_ROBOT_STATE)").toString(), "actor_state" )   
-						delay(100) 
 						CommUtils.outyellow("$name: engaging robot")
 						request("engage", "engage(wis,330)" ,"basicrobot" )  
 						//genTimer( actor, state )
@@ -72,16 +72,14 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t05",targetState="handle_engage_robot_repl",cond=whenReply("engagedone"))
+					 transition(edgeName="t03",targetState="handle_engage_robot_repl",cond=whenReply("engagedone"))
 				}	 
 				state("handle_engage_robot_repl") { //this:State
 					action { //it:State
-						
-									OK = false
+						 OK = false  
 						if( checkMsgContent( Term.createTerm("engagedone(ARG)"), Term.createTerm("engagedone(ARG)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								
-												OK=true	
+								 OK=true  
 						}
 						 OP_ROBOT_STATE=OpRobotState.ENGAGED  
 						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_state,$OP_ROBOT_STATE)" ) 
@@ -101,9 +99,13 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 				state("check_start_conditions") { //this:State
 					action { //it:State
 						delay(500) 
-						 OP_ROBOT_STATE=OpRobotState.CHECKING  
+						
+									OP_ROBOT_STATE=OpRobotState.CHECKING
+									OP_ROBOT_POS=LOCATIONS[Location.HOME]
 						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_state,$OP_ROBOT_STATE)" ) 
 						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(op_robot_state,$OP_ROBOT_STATE)").toString(), "actor_state" )   
+						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_pos,$OP_ROBOT_POS)" ) 
+						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(op_robot_pos,$OP_ROBOT_POS)").toString(), "actor_state" )   
 						delay(100) 
 						CommUtils.outgreen("$name: checking conditions")
 						request("system_state_req", "system_state_req" ,"wis" )  
@@ -112,7 +114,7 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t06",targetState="handle_start_conditions_verified_repl",cond=whenReply("system_state_repl"))
+					 transition(edgeName="t04",targetState="handle_start_conditions_verified_repl",cond=whenReply("system_state_repl"))
 				}	 
 				state("handle_start_conditions_verified_repl") { //this:State
 					action { //it:State
@@ -157,13 +159,14 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t07",targetState="load_rp",cond=whenReply("moverobotdone"))
-					transition(edgeName="t08",targetState="move_to_waste_storage",cond=whenReply("moverobotfailed"))
+					 transition(edgeName="t05",targetState="load_rp",cond=whenReply("moverobotdone"))
+					transition(edgeName="t06",targetState="move_to_waste_storage",cond=whenReply("moverobotfailed"))
 				}	 
 				state("load_rp") { //this:State
 					action { //it:State
-						 OP_ROBOT_STATE=OpRobotState.MOVED_WS  
-						 OP_ROBOT_POS=LOCATIONS[Location.WASTE_STORAGE]  
+						
+									OP_ROBOT_STATE=OpRobotState.MOVED_WS
+									OP_ROBOT_POS=LOCATIONS[Location.WASTE_STORAGE]
 						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_state,$OP_ROBOT_STATE)" ) 
 						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(op_robot_state,$OP_ROBOT_STATE)").toString(), "actor_state" )   
 						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_pos,$OP_ROBOT_POS)" ) 
@@ -203,13 +206,14 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t09",targetState="request_to_burn",cond=whenReply("moverobotdone"))
-					transition(edgeName="t010",targetState="move_to_burn_in",cond=whenReply("moverobotfailed"))
+					 transition(edgeName="t07",targetState="request_to_burn",cond=whenReply("moverobotdone"))
+					transition(edgeName="t08",targetState="move_to_burn_in",cond=whenReply("moverobotfailed"))
 				}	 
 				state("request_to_burn") { //this:State
 					action { //it:State
-						 OP_ROBOT_STATE=OpRobotState.MOVED_BI  
-						 OP_ROBOT_POS=LOCATIONS[Location.BURN_IN]  
+						 
+									OP_ROBOT_STATE=OpRobotState.MOVED_BI 
+									OP_ROBOT_POS=LOCATIONS[Location.BURN_IN]
 						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_state,$OP_ROBOT_STATE)" ) 
 						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(op_robot_state,$OP_ROBOT_STATE)").toString(), "actor_state" )   
 						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_pos,$OP_ROBOT_POS)" ) 
@@ -250,13 +254,14 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t011",targetState="wait_for_burn_repl",cond=whenReply("moverobotdone"))
-					transition(edgeName="t012",targetState="return_to_home",cond=whenReply("moverobotfailed"))
+					 transition(edgeName="t09",targetState="wait_for_burn_repl",cond=whenReply("moverobotdone"))
+					transition(edgeName="t010",targetState="return_to_home",cond=whenReply("moverobotfailed"))
 				}	 
 				state("wait_for_burn_repl") { //this:State
 					action { //it:State
-						 OP_ROBOT_STATE=OpRobotState.MOVED_H  
-						 OP_ROBOT_POS=LOCATIONS[Location.HOME]  
+						 
+									OP_ROBOT_STATE=OpRobotState.MOVED_H
+									OP_ROBOT_POS=LOCATIONS[Location.HOME]
 						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_state,$OP_ROBOT_STATE)" ) 
 						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(op_robot_state,$OP_ROBOT_STATE)").toString(), "actor_state" )   
 						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_pos,$OP_ROBOT_POS)" ) 
@@ -272,12 +277,11 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t013",targetState="handle_burn_repl",cond=whenReply("burn_repl"))
+					 transition(edgeName="t011",targetState="handle_burn_repl",cond=whenReply("burn_repl"))
 				}	 
 				state("handle_burn_repl") { //this:State
 					action { //it:State
-						
-									OK=payloadArg(0).toBoolean()	
+						 OK=payloadArg(0).toBoolean()  
 						CommUtils.outgreen("$name: burn request result: $OK")
 						//genTimer( actor, state )
 					}
@@ -303,13 +307,14 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t014",targetState="load_ash",cond=whenReply("moverobotdone"))
-					transition(edgeName="t015",targetState="move_to_burn_out",cond=whenReply("moverobotfailed"))
+					 transition(edgeName="t012",targetState="load_ash",cond=whenReply("moverobotdone"))
+					transition(edgeName="t013",targetState="move_to_burn_out",cond=whenReply("moverobotfailed"))
 				}	 
 				state("load_ash") { //this:State
 					action { //it:State
-						 OP_ROBOT_STATE=OpRobotState.MOVED_BO  
-						 OP_ROBOT_POS=LOCATIONS[Location.BURN_OUT]  
+						 
+									OP_ROBOT_STATE=OpRobotState.MOVED_BO
+									OP_ROBOT_POS=LOCATIONS[Location.BURN_OUT]
 						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_state,$OP_ROBOT_STATE)" ) 
 						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(op_robot_state,$OP_ROBOT_STATE)").toString(), "actor_state" )   
 						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_pos,$OP_ROBOT_POS)" ) 
@@ -349,12 +354,13 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t016",targetState="unload_ash",cond=whenReply("moverobotdone"))
+					 transition(edgeName="t014",targetState="unload_ash",cond=whenReply("moverobotdone"))
 				}	 
 				state("unload_ash") { //this:State
 					action { //it:State
-						 OP_ROBOT_STATE=OpRobotState.MOVED_AS  
-						 OP_ROBOT_POS=LOCATIONS[Location.ASH_STORAGE]  
+						 
+							 		OP_ROBOT_STATE=OpRobotState.MOVED_AS
+									OP_ROBOT_POS=LOCATIONS[Location.ASH_STORAGE]
 						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_state,$OP_ROBOT_STATE)" ) 
 						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(op_robot_state,$OP_ROBOT_STATE)").toString(), "actor_state" )   
 						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(op_robot_pos,$OP_ROBOT_POS)" ) 
@@ -390,7 +396,7 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t017",targetState="handle_continue_conditions_verified_repl",cond=whenReply("system_state_repl"))
+					 transition(edgeName="t015",targetState="handle_continue_conditions_verified_repl",cond=whenReply("system_state_repl"))
 				}	 
 				state("handle_continue_conditions_verified_repl") { //this:State
 					action { //it:State
@@ -436,8 +442,8 @@ class Op_robot ( name: String, scope: CoroutineScope, isconfined: Boolean=false 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t018",targetState="check_start_conditions",cond=whenReply("moverobotdone"))
-					transition(edgeName="t019",targetState="move_to_home",cond=whenReply("moverobotfailed"))
+					 transition(edgeName="t016",targetState="check_start_conditions",cond=whenReply("moverobotdone"))
+					transition(edgeName="t017",targetState="move_to_home",cond=whenReply("moverobotfailed"))
 				}	 
 			}
 		}

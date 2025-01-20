@@ -5,10 +5,10 @@
 ## Sprint info 
 
 <table>
-<tr><th>Sprint name</th><td>Sprint 2</td></tr>
-<tr><th>Previous sprint</th><td><a href="/WIS_Sprint1">Sprint 1</a></td></tr>
+<tr><th>Sprint name</th><td>Sprint 3</td></tr>
+<tr><th>Previous sprint</th><td><a href="/WIS_Sprint2">Sprint 2</a></td></tr>
 <tr><th>Next sprint</th><td></td></tr>
-<tr><th>QAK model</th><td><a href="../src/sprint2.qak">sprint2.qak</a></td></tr>
+<tr><th>QAK model</th><td><a href="../src/sprint3.qak">sprint3.qak</a></td></tr>
 <tr><th>Developed by</th><td>Alessio Benenati<br/>Giulia Fattori</td></tr>
 <tr><th>Repo Site</th><td><a href="https://github.com/b3nny01/WasteIncineratorService">WasteIncineratorService</td><tr>
 </table>

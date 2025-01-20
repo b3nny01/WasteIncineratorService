@@ -10,6 +10,7 @@ function WasteStorageCellDiv(props: { rps: number }) {
                 <span className="label">RPs:</span>
                 <span className="value">{String(props.rps)}</span>
             </div>
+
         </div>
     );
 }

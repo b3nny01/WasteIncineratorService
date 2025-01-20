@@ -50,7 +50,11 @@
 }
 
 .App > .right-div > .info-div{
-  height:80%;
+  height:60%;
+}
+
+.App > .right-div > .control-div{
+  height: 20%;
 }
 
 .App > .right-div > .service-area-iframe{

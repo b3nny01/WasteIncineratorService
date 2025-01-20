@@ -31,7 +31,7 @@ class Sonar ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 				state("s0") { //this:State
 					action { //it:State
 						CommUtils.outmagenta("$name starts")
-						delay(2000) 
+						delay(1000) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -41,7 +41,7 @@ class Sonar ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 				}	 
 				state("init_mqtt") { //this:State
 					action { //it:State
-						connectToMqttBroker( "ws://localhost:9001" )
+						connectToMqttBroker( "${configurator.getProperty("mqtt_broker_uri")}" )
 						subscribe(  "system_state" ) //mqtt.subscribe(this,topic)
 						//genTimer( actor, state )
 					}
@@ -58,7 +58,7 @@ class Sonar ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t02",targetState="handle_unload_ash",cond=whenEvent("system_state"))
+					 transition(edgeName="t020",targetState="handle_unload_ash",cond=whenEvent("system_state"))
 				}	 
 				state("handle_unload_ash") { //this:State
 					action { //it:State

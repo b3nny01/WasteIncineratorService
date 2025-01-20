@@ -21,7 +21,8 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
-		
+		 val configurator = main.resources.configuration.SystemConfigurator
+		 
 		 		var RP = 0
 		 		var A = false
 		 		var B = false 
@@ -42,7 +43,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 				}	 
 				state("init_mqtt") { //this:State
 					action { //it:State
-						connectToMqttBroker( "ws://localhost:9001" )
+						connectToMqttBroker( "${configurator.getProperty("mqtt_broker_uri")}" )
 						subscribe(  "actor_state" ) //mqtt.subscribe(this,topic)
 						//genTimer( actor, state )
 					}
@@ -72,8 +73,8 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t020",targetState="update_state",cond=whenEvent("actor_state"))
-					transition(edgeName="t021",targetState="handle_system_state_req",cond=whenRequest("system_state_req"))
+					 transition(edgeName="t018",targetState="update_state",cond=whenEvent("actor_state"))
+					transition(edgeName="t019",targetState="handle_system_state_req",cond=whenRequest("system_state_req"))
 				}	 
 				state("update_state") { //this:State
 					action { //it:State

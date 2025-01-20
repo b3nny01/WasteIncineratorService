@@ -26,23 +26,21 @@ with Diagram('wis_systemArch', show=False, outformat='png', graph_attr=graphattr
      sys = Custom('','./qakicons/system.png')
 ### see https://renenyffenegger.ch/notes/tools/Graphviz/attributes/label/HTML-like/index
      with Cluster('ctx_wis', graph_attr=nodeattr):
-          incinerator=Custom('incinerator','./qakicons/symActorSmall.png')
-          sonar=Custom('sonar','./qakicons/symActorWithobjSmall.png')
-          led=Custom('led','./qakicons/symActorSmall.png')
+          incinerator=Custom('incinerator','./qakicons/symActorWithobjSmall.png')
           scale=Custom('scale','./qakicons/symActorWithobjSmall.png')
           op_robot=Custom('op_robot','./qakicons/symActorWithobjSmall.png')
-          wis=Custom('wis','./qakicons/symActorSmall.png')
-          mqtt_test=Custom('mqtt_test','./qakicons/symActorSmall.png')
-          test_observer=Custom('test_observer','./qakicons/symActorSmall.png')
+          wis=Custom('wis','./qakicons/symActorWithobjSmall.png')
+          sonar=Custom('sonar','./qakicons/symActorWithobjSmall.png')
+          led=Custom('led','./qakicons/symActorWithobjSmall.png')
+          test_observer=Custom('test_observer','./qakicons/symActorWithobjSmall.png')
      wisfacade=Custom('wisfacade','./qakicons/server.png')
      with Cluster('ctx_basic_robot', graph_attr=nodeattr):
           basicrobot=Custom('basicrobot(ext)','./qakicons/externalQActor.png')
      wisfacade=Custom('wisfacade','./qakicons/server.png')
-     sys >> Edge( label='system_state', **evattr, decorate='true', fontcolor='darkgreen') >> sonar
-     sys >> Edge( label='system_state', **evattr, decorate='true', fontcolor='darkgreen') >> led
      sys >> Edge( label='system_state', **evattr, decorate='true', fontcolor='darkgreen') >> scale
      sys >> Edge( label='actor_state', **evattr, decorate='true', fontcolor='darkgreen') >> wis
-     sys >> Edge( label='system_state', **evattr, decorate='true', fontcolor='darkgreen') >> mqtt_test
+     sys >> Edge( label='system_state', **evattr, decorate='true', fontcolor='darkgreen') >> sonar
+     sys >> Edge( label='system_state', **evattr, decorate='true', fontcolor='darkgreen') >> led
      sys >> Edge( label='system_state', **evattr, decorate='true', fontcolor='darkgreen') >> test_observer
      op_robot >> Edge(color='magenta', style='solid', decorate='true', label='<system_state_req<font color="darkgreen"> system_state_repl</font> &nbsp; >',  fontcolor='magenta') >> wis
      op_robot >> Edge(color='magenta', style='solid', decorate='true', label='<burn_req<font color="darkgreen"> burn_repl</font> &nbsp; >',  fontcolor='magenta') >> incinerator

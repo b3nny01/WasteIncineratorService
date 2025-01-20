@@ -25,11 +25,12 @@ class Scale ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 		
 		 		var O="init"
 		 		var ROLL_PACKETS=configurator.getProperty("mock_scale.roll_packets").toInt()
+		 		val BROKER_URI=configurator.getProperty("mqtt_broker_uri")
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
 						CommUtils.outblue("$name starts")
-						delay(2000) 
+						delay(1000) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -39,7 +40,7 @@ class Scale ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 				}	 
 				state("init_mqtt") { //this:State
 					action { //it:State
-						connectToMqttBroker( "ws://localhost:9001" )
+						connectToMqttBroker( "${configurator.getProperty("mqtt_broker_uri")}" )
 						subscribe(  "system_state" ) //mqtt.subscribe(this,topic)
 						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(waste_storage_rps,$ROLL_PACKETS)" ) 
 						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(waste_storage_rps,$ROLL_PACKETS)").toString(), "actor_state" )   
@@ -58,7 +59,7 @@ class Scale ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t04",targetState="handle_load_rp",cond=whenEvent("system_state"))
+					 transition(edgeName="t02",targetState="handle_load_rp",cond=whenEvent("system_state"))
 				}	 
 				state("handle_load_rp") { //this:State
 					action { //it:State
