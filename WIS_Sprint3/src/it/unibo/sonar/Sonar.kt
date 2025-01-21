@@ -43,6 +43,7 @@ class Sonar ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 					action { //it:State
 						connectToMqttBroker( "${configurator.getProperty("mqtt_broker_uri")}" )
 						subscribe(  "system_state" ) //mqtt.subscribe(this,topic)
+						subscribe(  "update_storage" ) //mqtt.subscribe(this,topic)
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -58,7 +59,8 @@ class Sonar ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t020",targetState="handle_unload_ash",cond=whenEvent("system_state"))
+					 transition(edgeName="t021",targetState="handle_unload_ash",cond=whenEvent("system_state"))
+					transition(edgeName="t022",targetState="handle_update_storage",cond=whenEvent("update_storage"))
 				}	 
 				state("handle_unload_ash") { //this:State
 					action { //it:State
@@ -73,6 +75,26 @@ class Sonar ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 											 		L+=L_STEP;
 											 		val ASH_LEVEL=L/MAX_L 
 								CommUtils.outmagenta("$name: ash level: $ASH_LEVEL")
+								//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(ash_storage_level,$ASH_LEVEL)" ) 
+								publish(MsgUtil.buildEvent(name,"actor_state","actor_state(ash_storage_level,$ASH_LEVEL)").toString(), "actor_state" )   
+								}
+						}
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
+				}	 
+				state("handle_update_storage") { //this:State
+					action { //it:State
+						if( checkMsgContent( Term.createTerm("update_storage(STORAGE)"), Term.createTerm("update_storage(STORAGE)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								
+												val STORAGE=payloadArg(0);
+								if(  STORAGE.equals("ash")  
+								 ){
+													val ASH_LEVEL=MAX_L 
 								//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(ash_storage_level,$ASH_LEVEL)" ) 
 								publish(MsgUtil.buildEvent(name,"actor_state","actor_state(ash_storage_level,$ASH_LEVEL)").toString(), "actor_state" )   
 								}

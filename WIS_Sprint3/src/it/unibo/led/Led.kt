@@ -55,7 +55,7 @@ class Led ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t021",targetState="handle_update_mode",cond=whenEvent("system_state"))
+					 transition(edgeName="t023",targetState="handle_update_mode",cond=whenEvent("system_state"))
 				}	 
 				state("handle_update_mode") { //this:State
 					action { //it:State

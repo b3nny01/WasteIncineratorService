@@ -67,13 +67,10 @@ public class ApplguiCore {
     public void handleWsMsg(String id, String msg) {
         CommUtils.outcyan("AGC | handleWsMsg msg " + msg);
         JSONObject jsonMsg = new JSONObject(msg);
-        boolean isCmd = jsonMsg.has("cmd");
-        if (isCmd) {
-            String cmdStr = jsonMsg.get("cmd").toString();
-            IApplMessage message = CommUtils.buildDispatch("gui23xyz9526", "cmd", cmdStr, "basicrobot");
-            outinadapter.docmd(message);
-            return;
-        }
+        String cmdStr = jsonMsg.toString();
+        IApplMessage message = CommUtils.buildDispatch("robotgui", "cmd", cmdStr, "msg_receiver");
+        outinadapter.docmd(message);
+        return;
 
     }
 

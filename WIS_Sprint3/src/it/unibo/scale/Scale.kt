@@ -42,6 +42,7 @@ class Scale ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 					action { //it:State
 						connectToMqttBroker( "${configurator.getProperty("mqtt_broker_uri")}" )
 						subscribe(  "system_state" ) //mqtt.subscribe(this,topic)
+						subscribe(  "update_storage" ) //mqtt.subscribe(this,topic)
 						//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(waste_storage_rps,$ROLL_PACKETS)" ) 
 						publish(MsgUtil.buildEvent(name,"actor_state","actor_state(waste_storage_rps,$ROLL_PACKETS)").toString(), "actor_state" )   
 						//genTimer( actor, state )
@@ -60,6 +61,7 @@ class Scale ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 					sysaction { //it:State
 					}	 	 
 					 transition(edgeName="t02",targetState="handle_load_rp",cond=whenEvent("system_state"))
+					transition(edgeName="t03",targetState="handle_update_storage",cond=whenEvent("update_storage"))
 				}	 
 				state("handle_load_rp") { //this:State
 					action { //it:State
@@ -74,6 +76,26 @@ class Scale ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 													if(ROLL_PACKETS>0){
 														ROLL_PACKETS--
 													}
+								//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(waste_storage_rps,$ROLL_PACKETS)" ) 
+								publish(MsgUtil.buildEvent(name,"actor_state","actor_state(waste_storage_rps,$ROLL_PACKETS)").toString(), "actor_state" )   
+								}
+						}
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
+				}	 
+				state("handle_update_storage") { //this:State
+					action { //it:State
+						if( checkMsgContent( Term.createTerm("update_storage(STORAGE)"), Term.createTerm("update_storage(STORAGE)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								
+												val STORAGE=payloadArg(0);
+								if(  STORAGE.equals("waste")  
+								 ){
+													ROLL_PACKETS++
 								//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(waste_storage_rps,$ROLL_PACKETS)" ) 
 								publish(MsgUtil.buildEvent(name,"actor_state","actor_state(waste_storage_rps,$ROLL_PACKETS)").toString(), "actor_state" )   
 								}

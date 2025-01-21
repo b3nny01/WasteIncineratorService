@@ -46,7 +46,9 @@ function App() {
           opRobotState={systemState.opRobotState}
           ledState={systemState.ledState}
         />
-        <ControlDiv/>
+        <ControlDiv
+          sendMessage={sendMessage}
+        />
       </div>
     </div>
   );

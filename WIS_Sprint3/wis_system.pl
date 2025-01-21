@@ -8,6 +8,8 @@ reply( system_state_repl, system_state_repl(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT
 event( system_state, system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,OP_ROBOT_POS,LED_STATE) ).
 request( burn_req, burn_req(N) ).
 reply( burn_repl, burn_repl(N) ).  %%for burn_req
+dispatch( cmd, cmd(STORAGE) ).
+event( update_storage, update_storage(STORAGE) ).
 request( engage, engage(OWNER,STEPTIME) ).
 reply( engagedone, engagedone(ARG) ).  %%for engage
 reply( engagerefused, engagerefused(ARG) ).  %%for engage
@@ -36,5 +38,7 @@ context(ctx_basic_robot, "127.0.0.1",  "TCP", "8020").
  static(sonar).
   qactor( led, ctx_wis, "it.unibo.led.Led").
  static(led).
+  qactor( msg_receiver, ctx_wis, "it.unibo.msg_receiver.Msg_receiver").
+ static(msg_receiver).
   qactor( test_observer, ctx_wis, "it.unibo.test_observer.Test_observer").
  static(test_observer).

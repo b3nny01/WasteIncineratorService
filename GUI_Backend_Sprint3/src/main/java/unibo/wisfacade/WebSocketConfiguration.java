@@ -13,7 +13,7 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
 
     public WebSocketConfiguration(){
         //Inovocato alla CONNESSIONE
-        //CommUtils.outred("WebSocketConfiguration onnnnnnnnnnnnnnnnnn");
+        //CommUtils.outred("WebSocketConfiguration on");
     }
 
     @Override

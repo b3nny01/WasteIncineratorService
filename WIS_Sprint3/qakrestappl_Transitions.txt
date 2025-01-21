@@ -1,1 +1,2 @@
 {"actor":"incinerator", "msgType":"dispatch", "curstate":"idle", "nextstate":"handle_activation", "msgId":"incinerator_activation"}
+{"actor":"msg_receiver", "msgType":"dispatch", "curstate":"idle", "nextstate":"execcmd", "msgId":"cmd"}

@@ -21,55 +21,28 @@ class Monitoring_device ( name: String, scope: CoroutineScope, isconfined: Boole
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
-		 
-		 		var CURR_ASH_LEVEL = 0.0
-		 		val MAX_ASH_LEVEL = 3.0
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						CommUtils.outmagenta("$name starts")
+						CommUtils.outgreen("$name STARTS")
 						delay(500) 
-						
-									val ASH_LEVEL=CURR_ASH_LEVEL/MAX_ASH_LEVEL	
-						updateResourceRep( "actor_state(ash_storage_level,$ASH_LEVEL)"  
-						)
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
+					 transition( edgeName="goto",targetState="measureLevel", cond=doswitch() )
 				}	 
-				state("idle") { //this:State
+				state("measureLevel") { //this:State
 					action { //it:State
-						CommUtils.outmagenta("$name: idle")
+						emit("ashLevel", "ashLevel(10)" ) 
+						delay(2000) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t05",targetState="handle_unload_ash",cond=whenEvent("unload_ash"))
-				}	 
-				state("handle_unload_ash") { //this:State
-					action { //it:State
-						
-									var R=false
-									if(CURR_ASH_LEVEL<MAX_ASH_LEVEL){
-										R=true
-										CURR_ASH_LEVEL++
-									}
-									
-						CommUtils.outmagenta("$name: handling ash request, result:$R")
-						
-									val ASH_LEVEL=CURR_ASH_LEVEL/MAX_ASH_LEVEL	
-						updateResourceRep( "actor_state(ash_storage_level,$ASH_LEVEL)"  
-						)
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
+					 transition( edgeName="goto",targetState="measureLevel", cond=doswitch() )
 				}	 
 			}
 		}

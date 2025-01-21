@@ -1,13 +1,28 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./ControlDiv.css";
 import OpRobotStateDiv from "./OpRobotStateDiv";
 import LedStateDiv from "./LedStateDiv";
 
-export default function ControlDiv() {
+interface ControlDivProps {
+  sendMessage: (message: string) => void;
+}
+
+export default function ControlDiv({sendMessage}: ControlDivProps) {
+
+  const handleAddRP = () => {
+    sendMessage("waste")
+    console.log("Message sent: add RP")
+  };
+
+  const handleEmptyAshes = () => {
+    sendMessage("ash")
+    console.log("Message sent: empty ashes")
+  };
+  
   return (
     <div className="control-div">
-      <input type="button" className="add-rp-btn" value="Add rp"/>
-      <input type="button" className="empty-ashes-btn" value="Empty ashes"/>
+      <input type="button" className="add-rp-btn" value="Add RP" onClick={handleAddRP}/>
+      <input type="button" className="empty-ashes-btn" value="Empty ashes" onClick={handleEmptyAshes}/>
     </div>
   );
 }
