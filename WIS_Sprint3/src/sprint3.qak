@@ -10,10 +10,10 @@ Reply 		system_state_repl			: system_state_repl(RP,ACTIVE,BURNING,ASH_LEVEL,OP_R
 Event 		system_state				: system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,OP_ROBOT_POS,LED_STATE)
 
 Request burn_req					: burn_req(N)
-Reply 	burn_repl					: burn_repl(N) for burn_req 
+Reply 	burn_repl					: burn_repl(N) for burn_req   
 
 //Facade Interface===========================================================================
-Dispatch cmd       	  : cmd(STORAGE)  
+Event cmd       	  : cmd(STORAGE)  
 
 Event update_storage  : update_storage(STORAGE)
 
@@ -156,6 +156,7 @@ QActor scale context ctx_wis withobj configurator using "main.resources.configur
 				[#
 					ROLL_PACKETS++
 				#]
+				println("$name: mock rp update") color blue
 				publish "actor_state" -m actor_state:actor_state(waste_storage_rps,$ROLL_PACKETS)
 			}
 		}
@@ -623,8 +624,9 @@ QActor sonar context ctx_wis withobj configurator using "main.resources.configur
 			#]
 			if[# STORAGE.equals("ash") #]{
 				[#
-					val ASH_LEVEL=MAX_L 
+					val ASH_LEVEL=0 
 				#]
+				println("$name: mock ash update") color magenta
 				publish "actor_state" -m actor_state:actor_state(ash_storage_level,$ASH_LEVEL)
 			}
 		}
@@ -688,17 +690,18 @@ QActor msg_receiver context ctx_wis withobj configurator using "main.resources.c
 	
 	State init_mqtt{
 		connectToMqttBroker "${configurator.getProperty(\"mqtt_broker_uri\")}"
+		subscribe "mock_cmd"
 	} Goto idle
 	
 	State idle{
 		println("$name: idle") color cyan
-	} Transition t0 whenMsg cmd -> execcmd
+	} Transition t0 whenEvent cmd -> execcmd 
 	
 	State execcmd{
 		printCurrentMessage
 		onMsg( cmd : cmd(STORAGE) ){
 	  		[# val CurrentStorage = payloadArg(0) #] 
-			publish "update_storage" -m update_storage : update_storagr($CurrentStorage)
+			publish "update_storage" -m update_storage : update_storage($CurrentStorage)
 		} 
 	} Goto idle
 }

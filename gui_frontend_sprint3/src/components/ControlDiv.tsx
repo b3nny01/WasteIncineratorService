@@ -10,12 +10,12 @@ interface ControlDivProps {
 export default function ControlDiv({sendMessage}: ControlDivProps) {
 
   const handleAddRP = () => {
-    sendMessage("waste")
+    sendMessage(JSON.stringify("waste"))
     console.log("Message sent: add RP")
   };
 
   const handleEmptyAshes = () => {
-    sendMessage("ash")
+    sendMessage(JSON.stringify("ash"))
     console.log("Message sent: empty ashes")
   };
   

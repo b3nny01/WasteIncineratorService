@@ -44,6 +44,7 @@ with Diagram('wis_systemArch', show=False, outformat='png', graph_attr=graphattr
      sys >> Edge( label='system_state', **evattr, decorate='true', fontcolor='darkgreen') >> sonar
      sys >> Edge( label='update_storage', **evattr, decorate='true', fontcolor='darkgreen') >> sonar
      sys >> Edge( label='system_state', **evattr, decorate='true', fontcolor='darkgreen') >> led
+     sys >> Edge( label='cmd', **evattr, decorate='true', fontcolor='darkgreen') >> msg_receiver
      sys >> Edge( label='system_state', **evattr, decorate='true', fontcolor='darkgreen') >> test_observer
      op_robot >> Edge(color='magenta', style='solid', decorate='true', label='<system_state_req<font color="darkgreen"> system_state_repl</font> &nbsp; >',  fontcolor='magenta') >> wis
      op_robot >> Edge(color='magenta', style='solid', decorate='true', label='<burn_req<font color="darkgreen"> burn_repl</font> &nbsp; >',  fontcolor='magenta') >> incinerator

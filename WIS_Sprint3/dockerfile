@@ -1,0 +1,10 @@
+FROM openjdk:12.0.2
+## ADD extracts the tar
+ADD ./build/distributions/wis_system-1.0.tar /
+WORKDIR /wis_system-1.0/bin
+COPY ./*.pl ./
+COPY ./*.json ./
+COPY ./*.bin ./
+COPY ./*.txt ./
+# RUN microdnf install findutils
+CMD ["bash", "wis_system"]

@@ -94,7 +94,8 @@ class Sonar ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 												val STORAGE=payloadArg(0);
 								if(  STORAGE.equals("ash")  
 								 ){
-													val ASH_LEVEL=MAX_L 
+													val ASH_LEVEL=0 
+								CommUtils.outmagenta("$name: mock ash update")
 								//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(ash_storage_level,$ASH_LEVEL)" ) 
 								publish(MsgUtil.buildEvent(name,"actor_state","actor_state(ash_storage_level,$ASH_LEVEL)").toString(), "actor_state" )   
 								}

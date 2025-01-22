@@ -8,7 +8,7 @@ reply( system_state_repl, system_state_repl(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT
 event( system_state, system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,OP_ROBOT_POS,LED_STATE) ).
 request( burn_req, burn_req(N) ).
 reply( burn_repl, burn_repl(N) ).  %%for burn_req
-dispatch( cmd, cmd(STORAGE) ).
+event( cmd, cmd(STORAGE) ).
 event( update_storage, update_storage(STORAGE) ).
 request( engage, engage(OWNER,STEPTIME) ).
 reply( engagedone, engagedone(ARG) ).  %%for engage

@@ -36,26 +36,4 @@ public class M2MController {
 
         return mainPage;
     }
-
-    @PostMapping("/testHTTP")  //per provare HTTP in ServiceCallerInteraction
-    public String homePagePost(@RequestBody String request ) {
-        if( guiCore == null ) guiCore = FacadeBuilder.guiCore;
-        CommUtils.outgreen (" --- M2MController | entry request= "+request  );
-        IApplMessage req = new ApplMessage(request);
-        guiCore.dorequest( "gui", req.msgContent() ) ;
-        //answer = M2MController.m2mCtrl.ge;
-        while( answer == null ){
-            try {
-                Thread.sleep(300);
-                CommUtils.outgreen (" --- M2MController | waits for the answer " );
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        //La risposta dell'actor viene gestita da handleReplyMsg in guiCore
-        //return "testHTTP with POST done";
-        String outS = answer;
-        answer = null;
-        return outS;
-    }
 }

@@ -3,7 +3,7 @@ task buildFrontend{
 }
 
 task exportFrontendToBackend{
-    dependsOn "buildFrontend"
+    // dependsOn "buildFrontend"
     doLast{
         copy{
             from "gui_frontend_sprint3/build"

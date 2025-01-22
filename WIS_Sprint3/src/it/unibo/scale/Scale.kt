@@ -96,6 +96,7 @@ class Scale ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) 
 								if(  STORAGE.equals("waste")  
 								 ){
 													ROLL_PACKETS++
+								CommUtils.outblue("$name: mock rp update")
 								//val m = MsgUtil.buildEvent(name, "actor_state", "actor_state(waste_storage_rps,$ROLL_PACKETS)" ) 
 								publish(MsgUtil.buildEvent(name,"actor_state","actor_state(waste_storage_rps,$ROLL_PACKETS)").toString(), "actor_state" )   
 								}

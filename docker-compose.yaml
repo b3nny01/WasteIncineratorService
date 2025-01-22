@@ -1,0 +1,34 @@
+services:
+  mqttBroker:
+    image: eclipse-mosquitto
+    expose:
+      - 1883
+      - 9001
+    ports:
+      - 9001:9001
+    volumes:
+      - ./MQTT_Broker/config:/mosquitto/config
+      - ./MQTT_Broker/:/mosquitto/data
+      - ./MQTT_Broker/:/mosquitto/log
+
+  virtualEnv:
+    image: docker.io/natbodocker/virtualrobotdisi23:1.0
+    expose:
+      - 8090
+      - 8091
+    ports:
+      - 8090:8090
+
+  basicRobot:
+    image: basicrobot
+    ports:
+      - 8020:8020
+    depends_on:
+      - virtualEnv  
+  wis:
+    image: wis
+    ports:
+      - 8085:8085
+    depends_on:
+      - basicRobot
+

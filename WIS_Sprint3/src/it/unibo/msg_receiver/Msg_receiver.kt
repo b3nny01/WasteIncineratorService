@@ -36,6 +36,7 @@ class Msg_receiver ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 				state("init_mqtt") { //this:State
 					action { //it:State
 						connectToMqttBroker( "${configurator.getProperty("mqtt_broker_uri")}" )
+						subscribe(  "mock_cmd" ) //mqtt.subscribe(this,topic)
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -51,7 +52,7 @@ class Msg_receiver ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t024",targetState="execcmd",cond=whenDispatch("cmd"))
+					 transition(edgeName="t024",targetState="execcmd",cond=whenEvent("cmd"))
 				}	 
 				state("execcmd") { //this:State
 					action { //it:State
@@ -60,8 +61,8 @@ class Msg_receiver ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 						if( checkMsgContent( Term.createTerm("cmd(STORAGE)"), Term.createTerm("cmd(STORAGE)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								 val CurrentStorage = payloadArg(0)  
-								//val m = MsgUtil.buildEvent(name, "update_storage", "update_storagr($CurrentStorage)" ) 
-								publish(MsgUtil.buildEvent(name,"update_storage","update_storagr($CurrentStorage)").toString(), "update_storage" )   
+								//val m = MsgUtil.buildEvent(name, "update_storage", "update_storage($CurrentStorage)" ) 
+								publish(MsgUtil.buildEvent(name,"update_storage","update_storage($CurrentStorage)").toString(), "update_storage" )   
 						}
 						//genTimer( actor, state )
 					}
