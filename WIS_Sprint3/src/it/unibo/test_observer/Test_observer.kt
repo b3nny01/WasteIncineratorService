@@ -39,7 +39,7 @@ class Test_observer ( name: String, scope: CoroutineScope, isconfined: Boolean=f
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t025",targetState="start_test",cond=whenRequest("test_req"))
+					 transition(edgeName="t022",targetState="start_test",cond=whenRequest("test_req"))
 				}	 
 				state("start_test") { //this:State
 					action { //it:State
@@ -52,7 +52,7 @@ class Test_observer ( name: String, scope: CoroutineScope, isconfined: Boolean=f
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t026",targetState="handle_system_state_repl",cond=whenReply("system_state_repl"))
+					 transition(edgeName="t023",targetState="handle_system_state_repl",cond=whenReply("system_state_repl"))
 				}	 
 				state("handle_system_state_repl") { //this:State
 					action { //it:State
@@ -96,7 +96,7 @@ class Test_observer ( name: String, scope: CoroutineScope, isconfined: Boolean=f
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t027",targetState="handle_update",cond=whenEvent("system_state"))
+					 transition(edgeName="t024",targetState="handle_update",cond=whenEvent("system_state"))
 				}	 
 				state("handle_update") { //this:State
 					action { //it:State
