@@ -6,5 +6,6 @@ COPY ./*.pl ./
 COPY ./*.json ./
 COPY ./*.bin ./
 COPY ./*.txt ./
+COPY ./*.properties ./
 # RUN microdnf install findutils
 CMD ["bash", "wis_system"]

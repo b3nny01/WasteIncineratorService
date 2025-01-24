@@ -29,7 +29,7 @@ public class FacadeBuilder {
         options.setConnectionTimeout(10);
 
         try {
-            mqttClient = new MqttClient("ws://localhost:9001", "facade");
+            mqttClient = new MqttClient("ws://mqttBroker:9001", "facade");
             mqttClient.connect(options);
         } catch (MqttException e) {
             e.printStackTrace();

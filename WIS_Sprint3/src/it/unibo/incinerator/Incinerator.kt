@@ -11,6 +11,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
+//Sept2024
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory 
+import org.json.simple.parser.JSONParser
+import org.json.simple.JSONObject
+
 
 //User imports JAN2024
 
@@ -29,7 +35,7 @@ class Incinerator ( name: String, scope: CoroutineScope, isconfined: Boolean=fal
 				state("s0") { //this:State
 					action { //it:State
 						CommUtils.outred("$name starts")
-						delay(1000) 
+						delay(500) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

@@ -32,14 +32,11 @@ with Diagram('wis_systemArch', show=False, outformat='png', graph_attr=graphattr
           wis=Custom('wis','./qakicons/symActorWithobjSmall.png')
           msg_receiver=Custom('msg_receiver','./qakicons/symActorWithobjSmall.png')
           test_observer=Custom('test_observer','./qakicons/symActorWithobjSmall.png')
-     wisfacade=Custom('wisfacade','./qakicons/server.png')
      with Cluster('ctx_basic_robot', graph_attr=nodeattr):
           basicrobot=Custom('basicrobot(ext)','./qakicons/externalQActor.png')
-     wisfacade=Custom('wisfacade','./qakicons/server.png')
      with Cluster('ctx_monitoring_device', graph_attr=nodeattr):
           sonar=Custom('sonar(ext)','./qakicons/externalQActor.png')
           led=Custom('led(ext)','./qakicons/externalQActor.png')
-     wisfacade=Custom('wisfacade','./qakicons/server.png')
      sys >> Edge( label='system_state', **evattr, decorate='true', fontcolor='darkgreen') >> scale
      sys >> Edge( label='update_storage', **evattr, decorate='true', fontcolor='darkgreen') >> scale
      sys >> Edge( label='actor_state', **evattr, decorate='true', fontcolor='darkgreen') >> wis
@@ -49,6 +46,5 @@ with Diagram('wis_systemArch', show=False, outformat='png', graph_attr=graphattr
      op_robot >> Edge(color='magenta', style='solid', decorate='true', label='<burn_req<font color="darkgreen"> burn_repl</font> &nbsp; >',  fontcolor='magenta') >> incinerator
      op_robot >> Edge(color='magenta', style='solid', decorate='true', label='<engage<font color="darkgreen"> engagedone engagerefused</font> &nbsp; moverobot<font color="darkgreen"> moverobotdone moverobotfailed</font> &nbsp; >',  fontcolor='magenta') >> basicrobot
      test_observer >> Edge(color='magenta', style='solid', decorate='true', label='<system_state_req<font color="darkgreen"> system_state_repl</font> &nbsp; >',  fontcolor='magenta') >> wis
-     wisfacade >> Edge(color='blue', style='solid', decorate='true', label='< &harr; >',  fontcolor='blue') >> wis
      wis >> Edge(color='blue', style='solid',  decorate='true', label='<incinerator_activation &nbsp; >',  fontcolor='blue') >> incinerator
 diag

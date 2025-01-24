@@ -34,12 +34,12 @@ Reply moverobotfailed:  moverobotfailed(PLANDONE, PLANTODO) for moverobot
 
 //Tester interface===========================================================================
 Request test_req : test_req(N)
-Reply test_repl: test_repl(N) for test_req
+Reply test_repl: test_repl(N) for test_req 
 //===========================================================================================
  
 //Contexts===================================================================================
 Context ctx_wis 		ip 	[	host="localhost"	port=8022]  
-Context ctx_basic_robot ip 	[	host= "127.0.0.1"	port=8020]
+Context ctx_basic_robot ip 	[	host= "basicRobot"	port=8020]
 //===========================================================================================
 
 //BasicRobot declaration=====================================================================

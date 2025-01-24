@@ -26,9 +26,15 @@ services:
     depends_on:
       - virtualEnv  
   wis:
-    image: wis
+    image: wis:latest
     ports:
-      - 8085:8085
+      - 8022:8022
     depends_on:
       - basicRobot
+  backend:
+    image: wis_backend:latest
+    ports:
+      - 8085:8085
+
+
 

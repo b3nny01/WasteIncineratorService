@@ -10,7 +10,6 @@ fun main() = runBlocking {
 	        "localhost", this, "wis_system.pl", "sysRules.pl", "ctx_wis"
 	)
 	//JAN Facade
-	unibo.wisfacade.WisFacadeApplication.main( arrayOf<String>() );
 	//JAN24 Display
 }
 
