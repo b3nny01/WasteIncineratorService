@@ -58,7 +58,7 @@ class Msg_receiver ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t021",targetState="execcmd",cond=whenEvent("cmd"))
+					 transition(edgeName="t024",targetState="execcmd",cond=whenEvent("cmd"))
 				}	 
 				state("execcmd") { //this:State
 					action { //it:State

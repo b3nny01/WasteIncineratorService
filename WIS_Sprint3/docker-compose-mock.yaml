@@ -7,9 +7,9 @@ services:
     ports:
       - 9001:9001
     volumes:
-      - ./MQTT_Broker/config:/mosquitto/config
-      - ./MQTT_Broker/:/mosquitto/data
-      - ./MQTT_Broker/:/mosquitto/log
+      - ../MQTT_Broker/config:/mosquitto/config
+      - ../MQTT_Broker/:/mosquitto/data
+      - ../MQTT_Broker/:/mosquitto/log
 
   virtualEnv:
     image: docker.io/natbodocker/virtualrobotdisi23:1.0
@@ -20,21 +20,23 @@ services:
       - 8090:8090
 
   basicRobot:
-    image: basicrobot
+    image: ghcr.io/b3nny01/basic-robot
     ports:
       - 8020:8020
     depends_on:
       - virtualEnv  
   wis:
-    image: wis:latest
+    image: ghcr.io/b3nny01/wis-3-mock:latest
     ports:
       - 8022:8022
     depends_on:
       - basicRobot
   backend:
-    image: wis_backend:latest
+    image: ghcr.io/b3nny01/wis-backend:latest
     ports:
       - 8085:8085
+    depends_on:
+      - wis
 
 
 

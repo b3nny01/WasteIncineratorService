@@ -2,10 +2,10 @@ import React from "react";
 import "./LedStateDiv.css";
 
 const stateImageMapping = {
-  OFFLINE: require("../assets/img/offline.png"),
-  ON: require("../assets/img/led_on.png"),
-  OFF: require("../assets/img/led_off.png"),
-  BLINKING: require("../assets/img/led_blinking.gif"),
+  offline: require("../assets/img/offline.png"),
+  on: require("../assets/img/led_on.png"),
+  off: require("../assets/img/led_off.png"),
+  blinking: require("../assets/img/led_blinking.gif"),
 };
 
 export default function LedStateDiv(props: { ledState: String }) {

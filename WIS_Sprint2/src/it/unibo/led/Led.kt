@@ -11,9 +11,15 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
+//Sept2024
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory 
+import org.json.simple.parser.JSONParser
+import org.json.simple.JSONObject
+
 
 //User imports JAN2024
-import main.resources.utils.LedMode
+import main.resources.utils.LedState
 
 class Led ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : ActorBasicFsm( name, scope, confined=isconfined ){
 
@@ -23,7 +29,7 @@ class Led ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
 		
-				var MODE=LedMode.OFF
+				var MODE=LedState.OFF
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -57,11 +63,11 @@ class Led ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 													val L=payloadArg(3).toDouble()
 													
 													if(B){
-														MODE=LedMode.BLINKING;
+														MODE=LedState.BLINKING;
 													}else if(RP==0 || L==1.0){
-														MODE=LedMode.ON
+														MODE=LedState.ON
 													}else{
-														MODE=LedMode.OFF
+														MODE=LedState.OFF
 													}
 								CommUtils.outmagenta("$name: mode: $MODE")
 						}

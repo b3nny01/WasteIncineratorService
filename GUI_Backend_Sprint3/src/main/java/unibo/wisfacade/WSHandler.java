@@ -18,7 +18,7 @@ Gestisce la websocket avendo come riferimento applicativo ApplguiCore
  */
 
 
-public class WSClient extends AbstractWebSocketHandler {
+public class WSHandler extends AbstractWebSocketHandler {
     private final List<WebSocketSession> sessions               = new ArrayList<>();
     private final Map<String, WebSocketSession> pendingRequests = new HashMap<>();
     private final Map<String, WebSocketSession> curSessions     = new HashMap<>();

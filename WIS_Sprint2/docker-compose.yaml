@@ -1,0 +1,24 @@
+services:
+  virtualEnv:
+    image: docker.io/natbodocker/virtualrobotdisi23:1.0
+    expose:
+      - 8090
+      - 8091
+    ports:
+      - 8090:8090
+
+  basicRobot:
+    image: basicrobot
+    ports:
+      - 8020:8020
+    depends_on:
+      - virtualEnv  
+  wis:
+    image: wis-2:latest
+    ports:
+      - 8022:8022
+    depends_on:
+      - basicRobot
+
+
+

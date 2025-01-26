@@ -16,14 +16,14 @@ Logica applicativa (domain core) della gui
 Creata da ServiceFacadeController usando FacadeBuilder
  */
 public class ApplguiCore {
-    private IMqttClient mqttClient;
-    private WSClient wsClient;
+    private MqttHandler mqttHandler;
+    private WSHandler wsHandler;
     private String reqid = "dofibo"; // config.get(6); CHE NE SA?
     private String reqcontent = "dofibo(X)"; // config.get(7);
 
-    public ApplguiCore(IMqttClient mqttClient,WSClient wsClient) {
-        this.mqttClient = mqttClient;
-        this.wsClient=wsClient;
+    public ApplguiCore(MqttHandler mqttClient,WSHandler wsClient) {
+        this.mqttHandler = mqttClient;
+        this.wsHandler=wsClient;
     }
 
     // Chiamato da CoapObserver
@@ -43,20 +43,13 @@ public class ApplguiCore {
                 pos,
                 tks[6]));
 
-        wsClient.sendToAll(systemState.toString()); 
+        wsHandler.sendToAll(systemState.toString()); 
     }
 
 
     public void handleWsMsg(String id, String msg) {
         CommUtils.outcyan("AGC | handleWsMsg msg " + msg);
         IApplMessage message = CommUtils.buildEvent("facade", "cmd","cmd("+msg+")"); 
-        
-        try {
-            mqttClient.publish("mock_cmd", new MqttMessage(message.toString().getBytes()));
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }
-        return;
-
+        mqttHandler.publish("mock_cmd", message.toString());
     }
 }

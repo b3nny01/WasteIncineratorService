@@ -3,7 +3,7 @@ task buildFrontend{
 }
 
 task exportFrontendToBackend{
-    // dependsOn "buildFrontend"
+    dependsOn "buildFrontend"
     doLast{
         copy{
             from "gui_frontend_sprint3/build"
@@ -29,28 +29,4 @@ task buildBackend{
         }
 }
 
-}
-
-task exportBackendToWIS3{
-    dependsOn "buildBackend"
-    doLast{
-        copy{
-            from "GUI_Backend_Sprint3/build/libs"
-            into "unibolibs"
-        }
-    }
-}
-
-
-task buildWIS3{
-    dependsOn "exportBackendToWIS3","WIS_Sprint3:build"
-
-    project("WIS_Sprint3").tasks.withType(Test) {
-        enabled = false
-    }
-    project("WIS_Sprint3").afterEvaluate{
-        project("WIS_Sprint3").tasks.named("build"){
-            mustRunAfter(rootProject.tasks.named("exportBackendToWIS3"))
-        }
-    }
 }
