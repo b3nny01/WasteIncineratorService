@@ -49,15 +49,15 @@ In order to simplify the application deployment, we decided to **dockerize all t
 
 A **MQTT Broker** is needed to implement the MQTT protocol. We decided to use a Mosquitto local broker, as it is easily integrated alongside our qak architecture; this broker is also used to implement communication between the ServiceStatusGui and the qak system, more details will be given in the next section.</br>
 The actors that need to send or receive messages connect to the broker and then either **subscribe to or publish updates on specific topics**:</br>
--**actor_state**: topic used by the actors to publish updates about their own status.</br>
--**system_state**: topic used by WIS to expose the real-time state of the whole system.</br>
--**mock_cmd**: topic used by Backend to send the command (increase RP or empty AshStorage) when a button is pressed.
+* **actor_state**: topic used by the actors to publish updates about their own status.
+* **system_state**: topic used by WIS to expose the real-time state of the whole system.
+* **mock_cmd**: topic used by Backend to send the command (increase RP or empty AshStorage) when a button is pressed.
 
 ### ServiceStatusGui
 
 We decided to split our Gui into two projects:</br>
--**Backend**: it manages all communication between the Gui and the WIS System, using the MQTT protocol.</br>
--**Frontend**: React Application showing the console. It communicates with Backend via WebSocket.
+* **Backend**: it manages all communication between the Gui and the WIS System, using the MQTT protocol.
+* **Frontend**: React Application showing the console. It communicates with Backend via WebSocket.
 
 
 ### Usage
