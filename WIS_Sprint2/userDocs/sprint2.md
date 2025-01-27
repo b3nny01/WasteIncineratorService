@@ -15,7 +15,7 @@
 
 ## Sprint Starting Condition and Goals
 
-In the previous sprint, we focused on studying the requirements related to the application logic of OpRobot and WIS.**In this sprint, the focus is on the MonitoringDevice**, specifically aiming to **connect the virtual system** produced in sprint 1 **to a real MonitoringDevice** deployed on a physical Raspberry Pi.
+In the previous sprint, we focused on studying the requirements related to the application logic of OpRobot and WIS. **In this sprint, the focus is on the MonitoringDevice**, specifically aiming to **connect the virtual system** produced in sprint 1 **to a real MonitoringDevice** deployed on a physical Raspberry Pi.
 
 ## Problem Analysis
 
