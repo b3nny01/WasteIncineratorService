@@ -1,4 +1,4 @@
-System wis_system                        
+System wis_system                         
  
 Event    	actor_state					: actor_state(PROPERTY,VALUE) 
 
@@ -702,76 +702,6 @@ QActor msg_receiver context ctx_wis withobj configurator using "main.resources.c
 		} 
 	} Goto idle
 }
- 
-//Tester=====================================================================================
-QActor test_observer context ctx_wis  withobj configurator using "main.resources.configuration.SystemConfigurator"{
- 	[#
- 		var RP = 0
- 		var A = false
- 		var B = false 
- 		var L = 0.0
- 		var O = ""
- 		var LS="off"
- 		var END=false
- 	#]
- 	
- 	State s0 initial{ 
- 		println("$name starts") color cyan
- 		
-	} Transition t0 whenRequest test_req->start_test
-	
-	State start_test{
-		println("$name: starting test") color cyan
-		connectToMqttBroker "${configurator.getProperty(\"mqtt_broker_uri\")}"
-		subscribe "system_state"
-		request wis -m system_state_req:system_state_req
-	}Transition t0 whenReply system_state_repl -> handle_system_state_repl
-	
-	State handle_system_state_repl{
-		onMsg(system_state_repl:system_state_repl(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,OP_ROBOT_POS,LED_STATE)){
-			[#
-				RP=payloadArg(0).toInt()
-				A=payloadArg(1).toBoolean();
-				B=payloadArg(2).toBoolean();
-				L=payloadArg(3).toDouble();
-				O=payloadArg(4)
-				LS=payloadArg(6)
-			#]
-		}
-	}Goto check_end
-	
-	State check_end{
-		[#
-			END=(RP==0) || (L==1.0)	
-		#]
-		println("$name: end of test: $END")
-			
-	}Goto wait_for_updates if[#!END#] else end_test
-	
-	State wait_for_updates{
-		println("$name: waiting for updates...") color cyan
-	}Transition t0 whenEvent system_state -> handle_update
-	
-	State handle_update{
-		onMsg(system_state:system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,OP_ROBOT_POS,LED_STATE)){
-			[#
-				RP=payloadArg(0).toInt()
-				A=payloadArg(1).toBoolean()
-				B=payloadArg(2).toBoolean()
-				L=payloadArg(3).toDouble()
-				O=payloadArg(4)
-				LS=payloadArg(6)
-				
-			#]
-		}
-	}Goto check_end
-	
-	State end_test{
-		println("$name: ending test")
-		replyTo test_req with test_repl : test_repl($RP,$A,$B,$L,$O,$LS)
-	}
-	
- }    
                    
                    
                    

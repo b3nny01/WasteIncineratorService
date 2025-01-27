@@ -11,6 +11,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
+//Sept2024
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory 
+import org.json.simple.parser.JSONParser
+import org.json.simple.JSONObject
+
 
 //User imports JAN2024
 
@@ -43,10 +49,10 @@ class Md_test_observer ( name: String, scope: CoroutineScope, isconfined: Boolea
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t03",targetState="test_sua",cond=whenRequest("test_sonar_unload_ash"))
-					transition(edgeName="t04",targetState="test_lb",cond=whenRequest("test_led_burning"))
-					transition(edgeName="t05",targetState="test_lews",cond=whenRequest("test_led_empty_ws"))
-					transition(edgeName="t06",targetState="test_lfas",cond=whenRequest("test_led_full_as"))
+					 transition(edgeName="t012",targetState="test_sua",cond=whenRequest("test_sonar_unload_ash"))
+					transition(edgeName="t013",targetState="test_lb",cond=whenRequest("test_led_burning"))
+					transition(edgeName="t014",targetState="test_lews",cond=whenRequest("test_led_empty_ws"))
+					transition(edgeName="t015",targetState="test_lfas",cond=whenRequest("test_led_full_as"))
 				}	 
 				state("test_sua") { //this:State
 					action { //it:State
@@ -81,7 +87,7 @@ class Md_test_observer ( name: String, scope: CoroutineScope, isconfined: Boolea
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t07",targetState="sua_check_not_empty_ash_storage",cond=whenDispatch("actor_state"))
+					 transition(edgeName="t016",targetState="sua_check_not_empty_ash_storage",cond=whenDispatch("actor_state"))
 				}	 
 				state("sua_check_not_empty_ash_storage") { //this:State
 					action { //it:State
@@ -120,7 +126,7 @@ class Md_test_observer ( name: String, scope: CoroutineScope, isconfined: Boolea
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t08",targetState="lb_check_led_device_off_1",cond=whenReply("led_device_state_repl"))
+					 transition(edgeName="t017",targetState="lb_check_led_device_off_1",cond=whenReply("led_device_state_repl"))
 				}	 
 				state("lb_check_led_device_off_1") { //this:State
 					action { //it:State
@@ -149,7 +155,7 @@ class Md_test_observer ( name: String, scope: CoroutineScope, isconfined: Boolea
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t09",targetState="lb_check_led_device_blink",cond=whenReply("led_device_state_repl"))
+					 transition(edgeName="t018",targetState="lb_check_led_device_blink",cond=whenReply("led_device_state_repl"))
 				}	 
 				state("lb_check_led_device_blink") { //this:State
 					action { //it:State
@@ -178,7 +184,7 @@ class Md_test_observer ( name: String, scope: CoroutineScope, isconfined: Boolea
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t010",targetState="lb_check_led_device_off_2",cond=whenReply("led_device_state_repl"))
+					 transition(edgeName="t019",targetState="lb_check_led_device_off_2",cond=whenReply("led_device_state_repl"))
 				}	 
 				state("lb_check_led_device_off_2") { //this:State
 					action { //it:State
@@ -217,7 +223,7 @@ class Md_test_observer ( name: String, scope: CoroutineScope, isconfined: Boolea
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t011",targetState="lews_check_led_device_off_1",cond=whenReply("led_device_state_repl"))
+					 transition(edgeName="t020",targetState="lews_check_led_device_off_1",cond=whenReply("led_device_state_repl"))
 				}	 
 				state("lews_check_led_device_off_1") { //this:State
 					action { //it:State
@@ -246,7 +252,7 @@ class Md_test_observer ( name: String, scope: CoroutineScope, isconfined: Boolea
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t012",targetState="lews_check_led_device_on",cond=whenReply("led_device_state_repl"))
+					 transition(edgeName="t021",targetState="lews_check_led_device_on",cond=whenReply("led_device_state_repl"))
 				}	 
 				state("lews_check_led_device_on") { //this:State
 					action { //it:State
@@ -275,7 +281,7 @@ class Md_test_observer ( name: String, scope: CoroutineScope, isconfined: Boolea
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t013",targetState="lews_check_led_device_off_2",cond=whenReply("led_device_state_repl"))
+					 transition(edgeName="t022",targetState="lews_check_led_device_off_2",cond=whenReply("led_device_state_repl"))
 				}	 
 				state("lews_check_led_device_off_2") { //this:State
 					action { //it:State
@@ -314,7 +320,7 @@ class Md_test_observer ( name: String, scope: CoroutineScope, isconfined: Boolea
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t014",targetState="lfas_check_led_device_off_1",cond=whenReply("led_device_state_repl"))
+					 transition(edgeName="t023",targetState="lfas_check_led_device_off_1",cond=whenReply("led_device_state_repl"))
 				}	 
 				state("lfas_check_led_device_off_1") { //this:State
 					action { //it:State
@@ -343,7 +349,7 @@ class Md_test_observer ( name: String, scope: CoroutineScope, isconfined: Boolea
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t015",targetState="lfas_check_led_device_on",cond=whenReply("led_device_state_repl"))
+					 transition(edgeName="t024",targetState="lfas_check_led_device_on",cond=whenReply("led_device_state_repl"))
 				}	 
 				state("lfas_check_led_device_on") { //this:State
 					action { //it:State
@@ -372,7 +378,7 @@ class Md_test_observer ( name: String, scope: CoroutineScope, isconfined: Boolea
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t016",targetState="lfas_check_led_device_off_2",cond=whenReply("led_device_state_repl"))
+					 transition(edgeName="t025",targetState="lfas_check_led_device_off_2",cond=whenReply("led_device_state_repl"))
 				}	 
 				state("lfas_check_led_device_off_2") { //this:State
 					action { //it:State

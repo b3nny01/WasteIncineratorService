@@ -11,9 +11,14 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
+//Sept2024
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory 
+import org.json.simple.parser.JSONParser
+import org.json.simple.JSONObject
+
 
 //User imports JAN2024
-import main.resources.configuration.SystemConfiguration
 
 class Sonar_device ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : ActorBasicFsm( name, scope, confined=isconfined ){
 
@@ -23,67 +28,91 @@ class Sonar_device ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
 		 
-				var O="init"
-				var D=SystemConfiguration.getProperty("mock_sonar_device.base_distance").toInt()
+				lateinit var reader : java.io.BufferedReader
+				var working = false
+			    lateinit var process : Process	
+			    var Distance = 0
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						CommUtils.outyellow("$name starts")
-						delay(500) 
-						observeResource("192.168.1.2","8022","ctx_wis","wis","system_state")
+						CommUtils.outblue("$name starts")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="read_mock_data", cond=doswitch() )
+					 transition(edgeName="t00",targetState="handle_sonar_start",cond=whenDispatch("sonar_start"))
 				}	 
-				state("read_mock_data") { //this:State
+				state("handle_sonar_start") { //this:State
 					action { //it:State
-						CommUtils.outyellow("$name: mock python data: $D")
-						emitLocalStreamEvent("sonar_data", "distance($D)" ) 
+						
+						    	working = true		
+								process = Runtime.getRuntime().exec("python sonar.py")
+								reader  = java.io.BufferedReader(  java.io.InputStreamReader(process.getInputStream() ))	
+						CommUtils.outblue("SONAR starts")
+						delay(1000) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t017",targetState="handle_set_sonar_state",cond=whenDispatch("set_sonar_state"))
-					transition(edgeName="t018",targetState="handle_unload_ash",cond=whenDispatch("system_state"))
+					 transition( edgeName="goto",targetState="read_sonar_data", cond=doswitch() )
 				}	 
-				state("handle_set_sonar_state") { //this:State
+				state("read_sonar_data") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("set_sonar_state(D)"), Term.createTerm("set_sonar_state(D)"), 
-						                        currentMsg.msgContent()) ) { //set msgArgList
-								
-												D=payloadArg(0).toInt()
-						}
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition( edgeName="goto",targetState="read_mock_data", cond=doswitch() )
-				}	 
-				state("handle_unload_ash") { //this:State
-					action { //it:State
-						if( checkMsgContent( Term.createTerm("system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)"), Term.createTerm("system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)"), 
-						                        currentMsg.msgContent()) ) { //set msgArgList
-								
-												val NEW_O=payloadArg(4);
-												val TO_UPDATE=(NEW_O!=O && NEW_O=="ash_unloaded");
-												O=NEW_O
-								CommUtils.outgreen("$TO_UPDATE")
-								if(  TO_UPDATE  
-								 ){  
-											 		D-=3; 
+						 
+								var data = reader.readLine()
+								CommUtils.outyellow("$name with python: data = $data"   ) 
+								if( data != null ){
+									try { 
+										val vd = data.toFloat()
+										val v  = vd.toInt()
+										
+										Distance=v;
+									} catch(e: Exception){
+											CommUtils.outred("$name readSonarDataERROR: $e "   )
+									}
 								}
-						}
+								
+						emitLocalStreamEvent("sonar_data", "distance($Distance)" ) 
+						forward("do_read", "do_read(1)" ,name ) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="read_mock_data", cond=doswitch() )
+					 transition(edgeName="t01",targetState="handle_sonar_stop",cond=whenDispatch("sonar_stop"))
+					transition(edgeName="t02",targetState="read_sonar_data",cond=whenDispatchGuarded("do_read",{ working   
+					}))
+					transition(edgeName="t03",targetState="end_of_read",cond=whenDispatchGuarded("do_read",{ !working  
+					}))
+				}	 
+				state("end_of_read") { //this:State
+					action { //it:State
+						
+						   	    process.destroy()
+						    	if (process.isAlive()) {
+						    	    process.destroyForcibly();
+						    	}
+						       	CommUtils.outred("$tt $name | endOfRead"  )
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t04",targetState="handle_sonar_start",cond=whenDispatch("sonar_start"))
+					transition(edgeName="t05",targetState="handle_sonar_stop",cond=whenDispatch("sonar_stop"))
+				}	 
+				state("handle_sonar_stop") { //this:State
+					action { //it:State
+						 process.destroy();  
+						CommUtils.outblue("SONAR STOPPED")
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t06",targetState="handle_sonar_stop",cond=whenDispatch("sonar_stop"))
 				}	 
 			}
 		}

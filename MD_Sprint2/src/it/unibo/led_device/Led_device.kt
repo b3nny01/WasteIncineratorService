@@ -11,6 +11,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
+//Sept2024
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory 
+import org.json.simple.parser.JSONParser
+import org.json.simple.JSONObject
+
 
 //User imports JAN2024
 import main.resources.utils.LedState
@@ -23,53 +29,39 @@ class Led_device ( name: String, scope: CoroutineScope, isconfined: Boolean=fals
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
 		
-				var STATE=LedState.OFF
+				var P=Runtime.getRuntime().exec("python ledOff24.py");
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						CommUtils.outgreen("$name starts")
+						CommUtils.outred("$name START")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
-				}	 
-				state("idle") { //this:State
-					action { //it:State
-						CommUtils.outgreen("$name: idle")
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition(edgeName="t019",targetState="handle_update_mode",cond=whenDispatch("update_led_mode"))
-					transition(edgeName="t020",targetState="handle_led_device_state_req",cond=whenRequest("led_device_state_req"))
+					 transition(edgeName="t07",targetState="handle_update_mode",cond=whenDispatch("update_led_mode"))
 				}	 
 				state("handle_update_mode") { //this:State
 					action { //it:State
+						CommUtils.outred("$name in ${currentState.stateName} | $currentMsg | ${Thread.currentThread().getName()} n=${Thread.activeCount()}")
+						 	   
 						if( checkMsgContent( Term.createTerm("update_led_mode(M)"), Term.createTerm("update_led_mode(M)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-									
-												STATE=LedState.parseStr(payloadArg(0)); 
-								CommUtils.outgreen("$name: mode: $STATE")
+								
+												val S=LedState.parseStr(payloadArg(0));
+												P.destroy();
+												P=when (S){
+													LedState.BLINKING 	-> Runtime.getRuntime().exec("python ledBlink24.py")
+													LedState.ON			-> Runtime.getRuntime().exec("python ledOn24.py")
+													LedState.OFF 		-> Runtime.getRuntime().exec("python ledOff24.py")
+												}
 						}
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
-				}	 
-				state("handle_led_device_state_req") { //this:State
-					action { //it:State
-						answer("led_device_state_req", "led_device_state_repl", "led_device_state_repl($STATE)"   )  
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
+					 transition(edgeName="t08",targetState="handle_update_mode",cond=whenDispatch("update_led_mode"))
 				}	 
 			}
 		}

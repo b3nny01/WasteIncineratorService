@@ -11,6 +11,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
+//Sept2024
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory 
+import org.json.simple.parser.JSONParser
+import org.json.simple.JSONObject
+
 
 //User imports JAN2024
 import main.resources.configuration.SystemConfiguration
@@ -50,7 +56,7 @@ class Data_cleaner ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t01",targetState="filter",cond=whenEvent("sonar_data"))
+					 transition(edgeName="t010",targetState="filter",cond=whenEvent("sonar_data"))
 				}	 
 				state("filter") { //this:State
 					action { //it:State

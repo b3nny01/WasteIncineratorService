@@ -20,9 +20,11 @@ services:
       - 8090:8090
 
   basicRobot:
-    image: ghcr.io/b3nny01/basic-robot
+    image: docker.io/natbodocker/basicrobot24:1.0
     ports:
       - 8020:8020
+    volumes:
+      - ./basicrobotConfig.json:/basicrobot24-1.0/bin/basicrobotConfig.json
     depends_on:
       - virtualEnv  
   wis:

@@ -2,7 +2,7 @@ System wis_system
 // NOTE: message types have been chosen only to produce a first working prototype of the system so they are not 
 // fixed and have to be discussed in future sprints
 
-Dispatch	actor_state					: actor_state(PROPERTY,VALUE) 
+Dispatch	actor_state					: actor_state(PROPERTY,VALUE)  
 
 Dispatch 	incinerator_activation		: incinerator_activation(ACTIVE)
 
@@ -39,14 +39,11 @@ Reply test_repl: test_repl(N) for test_req
  
 //Contexts===================================================================================
 Context ctx_wis 			  ip 	[	host="localhost"		port=8022]  
-Context ctx_basic_robot 	  ip 	[	host= "basicRobot"		port=8020]
-Context ctx_monitoring_device ip 	[ 	host= "192.168.1.2" 	port=8012]
+Context ctx_basic_robot 	  ip 	[	host= "127.0.0.1"		port=8020]
 //===========================================================================================
 
 //ExternalActors declaration=================================================================
 ExternalQActor basicrobot 		context ctx_basic_robot
-ExternalQActor sonar 			context ctx_monitoring_device
-ExternalQActor led 				context ctx_monitoring_device 
 //===========================================================================================
 
 //WIS system=================================================================================
@@ -592,4 +589,77 @@ QActor test_observer context ctx_wis{
 	}
 	
  }  
+ 
+//MockActors=================================================================================
+QActor sonar context ctx_wis withobj configurator using "main.resources.configuration.SystemConfigurator"{    
+	[# 
+		var O="init"
+		var L=configurator.getProperty("mock_sonar.start_level").toDouble()
+		var L_STEP=configurator.getProperty("mock_sonar.level_step").toDouble()
+		val MAX_L=configurator.getProperty("mock_sonar.max_level").toDouble()
+	#]
+	State s0 initial{
+		println("$name starts") color magenta
+		delay 500
+		observeResource wis msgid system_state
+	}Goto idle
+	
+	State idle{
+		println("$name: idle") color magenta
+	}Transition t0 whenMsg  system_state-> handle_unload_ash
+	
+	State handle_unload_ash{
+		onMsg(system_state:system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)){
+			[#
+				val NEW_O=payloadArg(4);
+				val TO_UPDATE=(NEW_O!=O && O=="ash_unloaded");
+				O=NEW_O
+			#]
+			if[# TO_UPDATE #]{
+				[#  
+			 		L+=L_STEP;
+			 		val ASH_LEVEL=L/MAX_L 
+			 	#]
+			 	println("$name: ash level: $ASH_LEVEL") color magenta
+	 			updateResource [# "actor_state(ash_storage_level,$ASH_LEVEL)" #]
+	 		}
+		}
+	}Goto idle
+}
+
+QActor led context ctx_wis {
+	import "main.resources.utils.LedState"
+	[#
+		var MODE=LedState.OFF
+	#]
+	State s0 initial { 
+		println("$name starts") color magenta
+		observeResource wis msgid system_state
+		
+	}Goto idle
+	
+	State idle{
+		println("$name: idle") color magenta
+	}Transition t0 whenMsg system_state -> handle_update_mode
+	
+	State handle_update_mode{
+		onMsg(system_state:system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)){
+			[#
+					val RP=payloadArg(0).toInt()
+					val A=payloadArg(1).toBoolean()
+					val B=payloadArg(2).toBoolean()
+					val L=payloadArg(3).toDouble()
+					
+					if(B){
+						MODE=LedState.ON
+					}else if(RP==0 || L==1.0){
+						MODE=LedState.BLINKING;
+					}else{
+						MODE=LedState.OFF
+					}
+			#]
+			println("$name: mode: $MODE") color magenta
+		}
+	}Goto idle
+} 
  

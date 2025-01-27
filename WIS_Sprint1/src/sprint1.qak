@@ -1,4 +1,4 @@
-System wis_system
+System wis_system        
 
 // NOTE: message types have been chosen only to produce a first working prototype of the system so they are not 
 // fixed and have to be discussed in future sprints
@@ -39,7 +39,7 @@ Reply test_repl: test_repl(N) for test_req
  
 //Contexts===================================================================================
 Context ctx_wis 		ip 	[	host="localhost"	port=8022]  
-Context ctx_basic_robot ip 	[	host= "basicRobot"	port=8020]
+Context ctx_basic_robot ip 	[	host= "127.0.0.1"	port=8020]
 //===========================================================================================
 
 //BasicRobot declaration=====================================================================

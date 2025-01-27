@@ -11,6 +11,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import it.unibo.kactor.sysUtil.createActor   //Sept2023
+//Sept2024
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory 
+import org.json.simple.parser.JSONParser
+import org.json.simple.JSONObject
+
 
 //User imports JAN2024
 import main.resources.utils.LedState
@@ -29,7 +35,7 @@ class Led ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					action { //it:State
 						CommUtils.outred("$name starts")
 						delay(500) 
-						observeResource("192.168.1.2","8022","ctx_wis","wis","system_state")
+						observeResource("10.0.1.1","8022","ctx_wis","wis","system_state")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -45,7 +51,7 @@ class Led ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t02",targetState="handle_update_mode",cond=whenDispatch("system_state"))
+					 transition(edgeName="t011",targetState="handle_update_mode",cond=whenDispatch("system_state"))
 				}	 
 				state("handle_update_mode") { //this:State
 					action { //it:State
@@ -58,9 +64,9 @@ class Led ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 													val AL=payloadArg(3).toDouble() 
 													
 													if(B){
-														STATE=LedState.BLINKING;
-													}else if(RP==0 || AL==1.0){
 														STATE=LedState.ON
+													}else if(RP==0 || AL==1.0){
+														STATE=LedState.BLINKING;						
 													}else{
 														STATE=LedState.OFF
 													}

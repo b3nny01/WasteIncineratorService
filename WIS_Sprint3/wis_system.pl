@@ -25,7 +25,10 @@ reply( test_repl, test_repl(N) ).  %%for test_req
 %====================================================================================
 context(ctx_wis, "localhost",  "TCP", "8022").
 context(ctx_basic_robot, "basicRobot",  "TCP", "8020").
+context(ctx_monitoring_device, "10.0.1.3",  "TCP", "8012").
  qactor( basicrobot, ctx_basic_robot, "external").
+  qactor( sonar, ctx_monitoring_device, "external").
+  qactor( led, ctx_monitoring_device, "external").
   qactor( incinerator, ctx_wis, "it.unibo.incinerator.Incinerator").
  static(incinerator).
   qactor( scale, ctx_wis, "it.unibo.scale.Scale").
@@ -34,11 +37,5 @@ context(ctx_basic_robot, "basicRobot",  "TCP", "8020").
  static(op_robot).
   qactor( wis, ctx_wis, "it.unibo.wis.Wis").
  static(wis).
-  qactor( sonar, ctx_wis, "it.unibo.sonar.Sonar").
- static(sonar).
-  qactor( led, ctx_wis, "it.unibo.led.Led").
- static(led).
   qactor( msg_receiver, ctx_wis, "it.unibo.msg_receiver.Msg_receiver").
  static(msg_receiver).
-  qactor( test_observer, ctx_wis, "it.unibo.test_observer.Test_observer").
- static(test_observer).
