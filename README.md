@@ -93,10 +93,10 @@ At the end of each Sprint we produced an executable version of the system coveri
             User interface, MQTT Broker, and dockerization.
         </td>
         <td>
-            <a href="./WIS_Sprint2/src/sprint3.qak">sprint3.qak</a>
+            <a href="./WIS_Sprint3/src/sprint3.qak">sprint3.qak</a>
         </td>
         <td>
-            <img src="_resources/imgs/readmeLogo.svg" height="15px"/> <a href="WIS_Sprint2/userDocs/sprint3.md">sprint3.md</a><br/>
+            <img src="_resources/imgs/readmeLogo.svg" height="15px"/> <a href="WIS_Sprint3/userDocs/sprint3.md">sprint3.md</a><br/>
             <img src="_resources/imgs/pdfLogo.png" height="15px"/> <a href="https://nbviewer.org/github/b3nny01/WasteIncineratorService/blob/main/WIS_Sprint3/userDocs/sprint3.pdf" title="sprint3.pdf" download>sprint3.pdf</a><br/>
             <img src="_resources/imgs/htmlLogo.png" height="15px"/> <a href="https://htmlpreview.github.io/?https://github.com/b3nny01/WasteIncineratorService/blob/main/WIS_Sprint3/userDocs/sprint3.html" title="sprint3.html" download>sprint3.html</a>
         </td>
