@@ -29,7 +29,7 @@ Another possibility is using a publish/subscribe protocol, like **MQTT**, that i
 
 ### Interface
 
-Following the system requirements, a **ServiceStatusGui** is needed to display and update the status of two storages, the incinerator, and the OpRobot; on top of that, it must give the user the possibility to increase the number of RP in WasteStorage and empty completely the AshStorage. 
+Following the system requirements, a **ServiceStatusGui** is needed to display and update the status of two storages, the incinerator, and the OpRobot; on top of that, it must give the user the possibility to increase the number of RP in WasteStorage and empty completely the AshStorage.</br>
 Consequently, the Gui needs **both to receive and send information** from and to the qak system, which means they require a common communication protocol to exchange this data in real-time. The Gui also has to display all the required information on a **graphic interface**, using different intuitive icons.
 
 ## Project
@@ -47,7 +47,7 @@ In order to simplify the application deployment, we decided to **dockerize all t
 
 ### MQTT Broker
 
-A **MQTT Broker** is needed to implement the MQTT protocol. We decided to use a Mosquitto local broker, as it is easily integrated alongside our qak architecture; this broker is also used to implement communication between the ServiceStatusGui and the qak system, more details will be given in the next section.
+A **MQTT Broker** is needed to implement the MQTT protocol. We decided to use a Mosquitto local broker, as it is easily integrated alongside our qak architecture; this broker is also used to implement communication between the ServiceStatusGui and the qak system, more details will be given in the next section.</br>
 The actors that need to send or receive messages connect to the broker and then either **subscribe to or publish updates on specific topics**:
 -**actor_state**: topic used by the actors to publish updates about their own status.
 -**system_state**: topic used by WIS to expose the real-time state of the whole system.
@@ -82,8 +82,8 @@ gradlew build
 
 After that, copy the `MD_Sprint3/build/distributions/monitoring_device-1.0.zip` folder inside the raspberry (for instance using `scp`) and unzip it
 
-#### System activation
-Firstly you have to activate the monitoring device, to do so connect to your raspberry via `ssh`, then move inside the `monitoring_device-1.0/bin` folder and run
+#### System Activation
+Then, you have to activate the monitoring device, to do so connect to your raspberry via `ssh`, then move inside the `monitoring_device-1.0/bin` folder and run
 ```
 ./monitoring_device
 ```
