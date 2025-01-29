@@ -31,8 +31,6 @@ with Diagram('monitoring_deviceArch', show=False, outformat='png', graph_attr=gr
           led=Custom('led','./qakicons/symActorWithobjSmall.png')
           sonar_device=Custom('sonar_device','./qakicons/symActorSmall.png')
           led_device=Custom('led_device','./qakicons/symActorSmall.png')
-     with Cluster('ctx_wis', graph_attr=nodeattr):
-          wis=Custom('wis(ext)','./qakicons/externalQActor.png')
      data_cleaner >> Edge( label='sonar_clean_data', **eventedgeattr, decorate='true', fontcolor='red') >> sonar
      sonar_device >> Edge( label='sonar_data', **eventedgeattr, decorate='true', fontcolor='red') >> data_cleaner
      sys >> Edge( label='system_state', **evattr, decorate='true', fontcolor='darkgreen') >> led

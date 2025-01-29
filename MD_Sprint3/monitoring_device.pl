@@ -19,9 +19,7 @@ request( led_device_state_req, led_device_state_req(N) ).
 reply( led_device_state_repl, led_device_state_repl(S) ).  %%for led_device_state_req
 %====================================================================================
 context(ctx_monitoring_device, "localhost",  "TCP", "8012").
-context(ctx_wis, "10.0.1.1",  "TCP", "8022").
- qactor( wis, ctx_wis, "external").
-  qactor( sonar, ctx_monitoring_device, "it.unibo.sonar.Sonar").
+ qactor( sonar, ctx_monitoring_device, "it.unibo.sonar.Sonar").
  static(sonar).
   qactor( data_cleaner, ctx_monitoring_device, "it.unibo.data_cleaner.Data_cleaner").
  static(data_cleaner).

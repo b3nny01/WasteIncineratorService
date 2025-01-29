@@ -33,9 +33,6 @@ with Diagram('wis_systemArch', show=False, outformat='png', graph_attr=graphattr
           msg_receiver=Custom('msg_receiver','./qakicons/symActorWithobjSmall.png')
      with Cluster('ctx_basic_robot', graph_attr=nodeattr):
           basicrobot=Custom('basicrobot(ext)','./qakicons/externalQActor.png')
-     with Cluster('ctx_monitoring_device', graph_attr=nodeattr):
-          sonar=Custom('sonar(ext)','./qakicons/externalQActor.png')
-          led=Custom('led(ext)','./qakicons/externalQActor.png')
      sys >> Edge( label='system_state', **evattr, decorate='true', fontcolor='darkgreen') >> scale
      sys >> Edge( label='update_storage', **evattr, decorate='true', fontcolor='darkgreen') >> scale
      sys >> Edge( label='actor_state', **evattr, decorate='true', fontcolor='darkgreen') >> wis

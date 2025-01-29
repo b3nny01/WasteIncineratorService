@@ -41,12 +41,9 @@ Reply test_repl	 : test_repl(N) for test_req
 //Contexts===================================================================================
 Context ctx_wis 			  ip 	[	host="localhost"		port=8022]  
 Context ctx_basic_robot 	  ip 	[	host= "basicRobot"		port=8020]
-Context ctx_monitoring_device ip 	[ 	host= "10.0.1.3" 	port=8012]
 
 //ExternalActors declaration=================================================================
 ExternalQActor basicrobot 		context ctx_basic_robot
-ExternalQActor sonar 			context ctx_monitoring_device
-ExternalQActor led 				context ctx_monitoring_device 
 
 //WIS system=================================================================================
  QActor incinerator context ctx_wis  withobj configurator using "main.resources.configuration.SystemConfigurator"{        
