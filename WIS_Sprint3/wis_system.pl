@@ -34,5 +34,9 @@ context(ctx_basic_robot, "basicRobot",  "TCP", "8020").
  static(op_robot).
   qactor( wis, ctx_wis, "it.unibo.wis.Wis").
  static(wis).
+  qactor( sonar, ctx_wis, "it.unibo.sonar.Sonar").
+ static(sonar).
+  qactor( led, ctx_wis, "it.unibo.led.Led").
+ static(led).
   qactor( msg_receiver, ctx_wis, "it.unibo.msg_receiver.Msg_receiver").
  static(msg_receiver).

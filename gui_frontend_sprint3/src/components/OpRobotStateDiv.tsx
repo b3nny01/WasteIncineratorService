@@ -22,8 +22,8 @@ const stateImageMapping = {
   moved_as: require("../assets/img/moved_as.gif"),
   ash_unloading: require("../assets/img/ash_unloading.gif"),
   ash_unloaded: require("../assets/img/ash_unloaded.gif"),
-  cheking: require("../assets/img/checking.gif"),
-  cheked: require("../assets/img/checking.gif"),
+  checking: require("../assets/img/checking.gif"),
+  checked: require("../assets/img/checked.gif"),
 };
 
 export default function OpRobotStateDiv(props: { opRobotState: String }) {
