@@ -44,12 +44,12 @@ Based on the Problem Analysis carried out previously, we upgraded the executable
 <img src="resources/imgs/wis_system_3.png" width="1100px"/> 
 <Img src="resources/imgs/monitoring_device_3.png" width="1100px">
 
-As can be seen, the adoption of the MQTT protocol allowed a greater level of independence, in particular the WIS does not need anymore to know the MonitoringDevice ip address, while the MonitoringDevice still need the main host ip address in order to communicate with the MQTT broker, but it can be injected at runtime by the SystemConfigurator using the `monitoring_device.properties` file.
+As can be seen, the adoption of the MQTT protocol allowed a greater level of independence, in particular, the WIS does not need anymore to know the MonitoringDevice ip address, while the MonitoringDevice still needs the main host ip address to communicate with the MQTT broker, but it can be injected at runtime by the SystemConfigurator using the `monitoring_device.properties` file.
 
 ## Implementation
 
 ### Docker
-In order to simplify the application deployment, we decided to **dockerize all the components of the system** but the MonitoringDevice, since it needs to run on an embedded device.<br/>
+To simplify the application deployment, we decided to **dockerize all the components of the system** but the MonitoringDevice, since it needs to run on an embedded device.<br/>
 Here we attach the resulting deployment architecture:
 <img src="resources/imgs/wis_deployment_3.jpg"> 
 
@@ -75,7 +75,7 @@ We decided to split our Gui into two projects:<br/>
 ### Usage
 
 #### System Activation
-Then, you have to activate the monitoring device, to do so connect to your raspberry via `ssh`, then move inside the `monitoring_device-1.0/bin` folder and run
+Then, you have to activate the monitoring device, to do so connect to your Raspberry via `ssh` then move inside the `monitoring_device-1.0/bin` folder, and run
 ```
 ./monitoring_device
 ```
@@ -100,10 +100,10 @@ You will have to assemble those elements following this wiring scheme:
 
 <img src="resources/imgs/rasp_scheme.jpeg">
 
-Then you will have to deploy the Monitoring Device control software, to do so, open a terminal inside the `MD_Sprint3` folder run:
+Then you will have to deploy the Monitoring Device control software, to do so, open a terminal inside the `MD_Sprint3` folder run
 
 ```
 gradlew build
 ```
 
-After that, copy the `MD_Sprint3/build/distributions/monitoring_device-1.0.zip` folder inside the raspberry (for instance using `scp`) and unzip it
+After that, copy the `MD_Sprint3/build/distributions/monitoring_device-1.0.zip` folder inside the Raspberry (for instance using `scp`) and unzip it
