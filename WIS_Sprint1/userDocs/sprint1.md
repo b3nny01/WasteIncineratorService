@@ -7,7 +7,7 @@
 <table>
 <tr><th>Sprint name</th><td>Sprint 1</td></tr>
 <tr><th>Previous sprint</th><td><a href="/WIS_Sprint0">Sprint 0</a></td></tr>
-<tr><th>Next sprint</th><td><a href="/WIS_Sprint2">Sprint 1</a></td></tr>
+<tr><th>Next sprint</th><td><a href="/WIS_Sprint2">Sprint 2</a></td></tr>
 <tr><th>QAK model</th><td><a href="../src/sprint1.qak">sprint1.qak</a></td></tr>
 <tr><th>Developed by</th><td>Alessio Benenati<br/>Giulia Fattori</td></tr>
 <tr><th>Repo Site</th><td><a href="https://github.com/b3nny01/WasteIncineratorService">WasteIncineratorService</td><tr>
