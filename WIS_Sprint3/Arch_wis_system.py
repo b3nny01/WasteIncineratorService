@@ -30,17 +30,12 @@ with Diagram('wis_systemArch', show=False, outformat='png', graph_attr=graphattr
           scale=Custom('scale','./qakicons/symActorWithobjSmall.png')
           op_robot=Custom('op_robot','./qakicons/symActorWithobjSmall.png')
           wis=Custom('wis','./qakicons/symActorWithobjSmall.png')
-          sonar=Custom('sonar','./qakicons/symActorWithobjSmall.png')
-          led=Custom('led','./qakicons/symActorWithobjSmall.png')
           msg_receiver=Custom('msg_receiver','./qakicons/symActorWithobjSmall.png')
      with Cluster('ctx_basic_robot', graph_attr=nodeattr):
           basicrobot=Custom('basicrobot(ext)','./qakicons/externalQActor.png')
      sys >> Edge( label='system_state', **evattr, decorate='true', fontcolor='darkgreen') >> scale
      sys >> Edge( label='update_storage', **evattr, decorate='true', fontcolor='darkgreen') >> scale
      sys >> Edge( label='actor_state', **evattr, decorate='true', fontcolor='darkgreen') >> wis
-     sys >> Edge( label='system_state', **evattr, decorate='true', fontcolor='darkgreen') >> sonar
-     sys >> Edge( label='update_storage', **evattr, decorate='true', fontcolor='darkgreen') >> sonar
-     sys >> Edge( label='system_state', **evattr, decorate='true', fontcolor='darkgreen') >> led
      sys >> Edge( label='cmd', **evattr, decorate='true', fontcolor='darkgreen') >> msg_receiver
      op_robot >> Edge(color='magenta', style='solid', decorate='true', label='<system_state_req<font color="darkgreen"> system_state_repl</font> &nbsp; >',  fontcolor='magenta') >> wis
      op_robot >> Edge(color='magenta', style='solid', decorate='true', label='<burn_req<font color="darkgreen"> burn_repl</font> &nbsp; >',  fontcolor='magenta') >> incinerator

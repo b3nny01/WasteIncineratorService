@@ -71,43 +71,10 @@ We decided to split our Gui into two projects:<br/>
 * **Backend**: it manages all communication between the Gui and the WIS System, using the MQTT protocol.
 * **Frontend**: React Application showing the console. It communicates with Backend via WebSocket.
 
-## Test Plan
 
-For this sprint, we switched to a new QAK tester project, TEST_Sprint3, instead of using the JUnit library. This change simplifies communication with all system components.  
+### Usage
 
-**Test Project**: [wis_tester](../../TEST_Sprint3/src/wis_tester.qak)
-
-<table>
-<tr>
-  <th><b>Test Name</b></th>
-  <th><b>Initial Condition</b></th>
-  <th><b>Expected Behavior</b></th>
-</tr>
-<tr>
-  <td><b>test_check_n1</b></td>
-  <td>WasteStorage contains 5 RP, AshStorge is empty, nobody empties AshStorage, Incinerator is inactive</td>
-  <td>Once the OpRobot check the system state for the first time, the the WasteStorage contains 5RP, the Incinerator is active, and the AshStorage is empty</td>
-</tr>
-<tr>
-  <td><b>test_check_n2</b></td>
-  <td>test_check_n1 is ok</td>
-  <td>Once the OpRobot check the system state for the second time, the the WasteStorage contains 4RP, the Incinerator is active, and the AshStorage is 1/3 full</td>
-</tr>
-<tr>
-  <td><b>test_check_n3</b></td>
-  <td>test_check_n2 is ok</td>
-  <td>Once the OpRobot check the system state for the second time, the the WasteStorage contains 3RP, the Incinerator is active, and the AshStorage is 2/3 full</td>
-</tr>
-<tr>
-  <td><b>test_check_n4</b></td>
-  <td>test_check_n3 is ok</td>
-  <td>Once the OpRobot check the system state for the second time, the the WasteStorage contains 3RP, the Incinerator is active, and the AshStorage is full</td>
-</tr>
-</table>
-
-## Usage
-
-### System Activation
+#### System Activation
 Then, you have to activate the monitoring device, to do so connect to your Raspberry via `ssh` then move inside the `monitoring_device-1.0/bin` folder, and run
 ```
 ./monitoring_device
@@ -118,10 +85,10 @@ Lastly, you have to activate the WIS system by opening a third terminal inside t
 ```
 docker compose up
 ```
-**N.B.** Type `docker compose -f docker-compose-mock.yaml up` if you want to launch the mock version of the application, or `docker compose -f docker-compose-test.yaml up | grep tester-1` if you want to launch the test configured system
+**N.B.** Type `docker compose -f docker-compose-mock.yaml up` if you want to launch the mock version of the application.
 
 
-### Monitoring Device
+#### Monitoring Device
 Firstly, you will need:
 * a raspberry (we used a raspberry PI 3+)
 * a led

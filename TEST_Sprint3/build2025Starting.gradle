@@ -154,9 +154,9 @@ task dovesiamo {
 
 distributions {
     main {
-        distributionBaseName = 'basicrobot24'
+        distributionBaseName = 'wis_tester'
         contents { 
-             from './basicrobot24.pl'
+             from './wis_tester.pl'
              from './sysRules.pl'
              from './facadeConfig.json'
         }
