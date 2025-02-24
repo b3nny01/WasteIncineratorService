@@ -58,7 +58,7 @@ At the end of each Sprint we produced an executable version of the system coveri
             <a href="./WIS_Sprint1/">WIS_Sprint1</a>
         </td>
         <td width="300px">
-            OpRobot and WIS respondibilities and buisness logic, first working prototype in virtual environment.
+            OpRobot and WIS responsibilities and business logic, first working prototype in virtual environment.
         </td>
         <td>
             <a href="./WIS_Sprint1/src/sprint1.qak">sprint1.qak</a>
