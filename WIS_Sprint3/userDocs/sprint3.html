@@ -396,10 +396,10 @@ Consequently, the Gui needs <strong>both to receive and send information</strong
 <p>Based on the Problem Analysis carried out previously, we upgraded the executable version of the system covering the discussed features;<br/> we attach here a visual representation of the new system architecture:<br>
 <img src="resources/imgs/wis_system_3.png" width="1100px"/><br>
 <Img src="resources/imgs/monitoring_device_3.png" width="1100px"></p>
-<p>As can be seen, the adoption of the MQTT protocol allowed a greater level of independence, in particular the WIS does not need anymore to know the MonitoringDevice ip address, while the MonitoringDevice still need the main host ip address in order to communicate with the MQTT broker, but it can be injected at runtime by the SystemConfigurator using the <code>monitoring_device.properties</code> file.</p>
+<p>As can be seen, the adoption of the MQTT protocol allowed a greater level of independence, in particular, the WIS does not need anymore to know the MonitoringDevice ip address, while the MonitoringDevice still needs the main host ip address to communicate with the MQTT broker, but it can be injected at runtime by the SystemConfigurator using the <code>monitoring_device.properties</code> file.</p>
 <h2 id="implementation">Implementation</h2>
 <h3 id="docker">Docker</h3>
-<p>In order to simplify the application deployment, we decided to <strong>dockerize all the components of the system</strong> but the MonitoringDevice, since it needs to run on an embedded device.<br/><br>
+<p>To simplify the application deployment, we decided to <strong>dockerize all the components of the system</strong> but the MonitoringDevice, since it needs to run on an embedded device.<br/><br>
 Here we attach the resulting deployment architecture:<br>
 <img src="resources/imgs/wis_deployment_3.jpg"></p>
 <p>The following schema instead shows the mock deployment architecture:<br>
@@ -418,16 +418,46 @@ The actors that need to send or receive messages connect to the broker and then 
 <li><strong>Backend</strong>: it manages all communication between the Gui and the WIS System, using the MQTT protocol.</li>
 <li><strong>Frontend</strong>: React Application showing the console. It communicates with Backend via WebSocket.</li>
 </ul>
-<h3 id="usage">Usage</h3>
-<h4 id="system-activation">System Activation</h4>
-<p>Then, you have to activate the monitoring device, to do so connect to your raspberry via <code>ssh</code>, then move inside the <code>monitoring_device-1.0/bin</code> folder and run</p>
+<h2 id="test-plan">Test Plan</h2>
+<p>For this sprint, we switched to a new QAK tester project, TEST_Sprint3, instead of using the JUnit library. This change simplifies communication with all system components.</p>
+<p><strong>Test Project</strong>: <a href="../../TEST_Sprint3/src/wis_tester.qak">wis_tester</a></p>
+<table>
+<tr>
+  <th><b>Test Name</b></th>
+  <th><b>Initial Condition</b></th>
+  <th><b>Expected Behavior</b></th>
+</tr>
+<tr>
+  <td><b>test_check_n1</b></td>
+  <td>WasteStorage contains 5 RP, AshStorge is empty, nobody empties AshStorage, Incinerator is inactive</td>
+  <td>Once the OpRobot check the system state for the first time, the the WasteStorage contains 5RP, the Incinerator is active, and the AshStorage is empty</td>
+</tr>
+<tr>
+  <td><b>test_check_n2</b></td>
+  <td>test_check_n1 is ok</td>
+  <td>Once the OpRobot check the system state for the second time, the the WasteStorage contains 4RP, the Incinerator is active, and the AshStorage is 1/3 full</td>
+</tr>
+<tr>
+  <td><b>test_check_n3</b></td>
+  <td>test_check_n2 is ok</td>
+  <td>Once the OpRobot check the system state for the second time, the the WasteStorage contains 3RP, the Incinerator is active, and the AshStorage is 2/3 full</td>
+</tr>
+<tr>
+  <td><b>test_check_n4</b></td>
+  <td>test_check_n3 is ok</td>
+  <td>Once the OpRobot check the system state for the second time, the the WasteStorage contains 3RP, the Incinerator is active, and the AshStorage is full</td>
+</tr>
+</table>
+<h2 id="usage">Usage</h2>
+<h3 id="system-activation">System Activation</h3>
+<p>Then, you have to activate the monitoring device, to do so connect to your Raspberry via <code>ssh</code> then move inside the <code>monitoring_device-1.0/bin</code> folder, and run</p>
 <pre class="hljs"><code><div>./monitoring_device
 </div></code></pre>
 <p>Lastly, you have to activate the WIS system by opening a third terminal inside the <code>WIS_Sprint3</code> folder and running</p>
 <pre class="hljs"><code><div>docker compose up
 </div></code></pre>
-<p><strong>N.B.</strong> Type <code>docker compose -f docker-compose-mock.yaml up</code> if you want to launch the mock version of the application.</p>
-<h4 id="monitoring-device">Monitoring Device</h4>
+<p><strong>N.B.</strong> Type <code>docker compose -f docker-compose-mock.yaml up</code> if you want to launch the mock version of the application, or <code>docker compose -f docker-compose-test.yaml up | grep tester-1</code> if you want to launch the test configured system</p>
+<h3 id="monitoring-device">Monitoring Device</h3>
 <p>Firstly, you will need:</p>
 <ul>
 <li>a raspberry (we used a raspberry PI 3+)</li>
@@ -438,10 +468,10 @@ The actors that need to send or receive messages connect to the broker and then 
 </ul>
 <p>You will have to assemble those elements following this wiring scheme:</p>
 <img src="resources/imgs/rasp_scheme.jpeg">
-<p>Then you will have to deploy the Monitoring Device control software, to do so, open a terminal inside the <code>MD_Sprint3</code> folder run:</p>
+<p>Then you will have to deploy the Monitoring Device control software, to do so, open a terminal inside the <code>MD_Sprint3</code> folder run</p>
 <pre class="hljs"><code><div>gradlew build
 </div></code></pre>
-<p>After that, copy the <code>MD_Sprint3/build/distributions/monitoring_device-1.0.zip</code> folder inside the raspberry (for instance using <code>scp</code>) and unzip it</p>
+<p>After that, copy the <code>MD_Sprint3/build/distributions/monitoring_device-1.0.zip</code> folder inside the Raspberry (for instance using <code>scp</code>) and unzip it</p>
 
 </body>
 
