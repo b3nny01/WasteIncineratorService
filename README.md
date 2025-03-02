@@ -55,7 +55,7 @@ At the end of each Sprint we produced an executable version of the system coveri
             <img src="_resources/imgs/pdfLogo.png" height="15px"/> <a href="https://nbviewer.org/github/b3nny01/WasteIncineratorService/blob/main/Sprint0/README.pdf" title="sprint0.pdf" download>sprint0.pdf</a><br/>
         </td>
         <td>
-            <img src="Sprint0/_resources/imgs/wis_systemarch.png" height="300px">
+            <img src="Sprint0/_resources/imgs/wis_systemarch.png" height="100px">
         </td>
     </tr>
     <tr>
@@ -73,7 +73,7 @@ At the end of each Sprint we produced an executable version of the system coveri
             <img src="_resources/imgs/pdfLogo.png" height="15px"/> <a href="https://nbviewer.org/github/b3nny01/WasteIncineratorService/blob/main/Sprint1/README.pdf" title="sprint1.pdf" download>sprint1.pdf</a><br/>
         </td>
         <td>
-            <img src="Sprint1/_resources/imgs/sprint1_recording.gif" height="300px">
+            <img src="Sprint1/_resources/imgs/sprint1_recording.gif" height="100px">
         </td>
     </tr>
     <tr>
