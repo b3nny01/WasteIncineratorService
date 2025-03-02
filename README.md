@@ -36,6 +36,9 @@ At the end of each Sprint we produced an executable version of the system coveri
         <th>
             <b>UserDoc</tb>
         </th>
+        <th>
+        Output
+        </th>
     </tr>
     <tr>
         <td>
@@ -45,12 +48,14 @@ At the end of each Sprint we produced an executable version of the system coveri
             requirements analysis
         </td>
         <td>
-            <a href="./WIS_Sprint0/src/sprint0_v1.qak">sprint0.qak</a>
+            <a href="Sprint0/WIS/src/sprint0.qak">sprint0.qak</a>
         </td>
         <td>
-            <img src="_resources/imgs/readmeLogo.svg" height="15px"/> <a href="WIS_Sprint0/userDocs/sprint0_v1.md">sprint0.md</a><br/>
-            <img src="_resources/imgs/pdfLogo.png" height="15px"/> <a href="https://nbviewer.org/github/b3nny01/WasteIncineratorService/blob/main/WIS_Sprint0/userDocs/sprint0_v1.pdf" title="sprint0.pdf" download>sprint0.pdf</a><br/>
-            <img src="_resources/imgs/htmlLogo.png" height="15px"/> <a href="https://htmlpreview.github.io/?https://github.com/b3nny01/WasteIncineratorService/blob/main/WIS_Sprint0/userDocs/sprint0_v1.html" title="sprint0.html" download>sprint0.html</a>
+            <img src="_resources/imgs/readmeLogo.svg" height="15px"/> <a href="Sprint0/README.md">sprint0.md</a><br/>
+            <img src="_resources/imgs/pdfLogo.png" height="15px"/> <a href="https://nbviewer.org/github/b3nny01/WasteIncineratorService/blob/main/Sprint0/README.pdf" title="sprint0.pdf" download>sprint0.pdf</a><br/>
+        </td>
+        <td>
+            <img src="Sprint0/_resources/imgs/wis_systemarch.png" height="300px">
         </td>
     </tr>
     <tr>
@@ -61,12 +66,14 @@ At the end of each Sprint we produced an executable version of the system coveri
             OpRobot and WIS responsibilities and business logic, first working prototype in virtual environment.
         </td>
         <td>
-            <a href="./WIS_Sprint1/src/sprint1.qak">sprint1.qak</a>
+            <a href="Sprint1/WIS/src/sprint1.qak">sprint1.qak</a>
         </td>
         <td>
-            <img src="_resources/imgs/readmeLogo.svg" height="15px"/> <a href="WIS_Sprint1/userDocs/sprint1.md">sprint1.md</a><br/>
-            <img src="_resources/imgs/pdfLogo.png" height="15px"/> <a href="https://nbviewer.org/github/b3nny01/WasteIncineratorService/blob/main/WIS_Sprint1/userDocs/sprint1.pdf" title="sprint1.pdf" download>sprint1.pdf</a><br/>
-            <img src="_resources/imgs/htmlLogo.png" height="15px"/> <a href="https://htmlpreview.github.io/?https://github.com/b3nny01/WasteIncineratorService/blob/main/WIS_Sprint1/userDocs/sprint1.html" title="sprint1.html" download>sprint1.html</a>
+            <img src="_resources/imgs/readmeLogo.svg" height="15px"/> <a href="Sprint1/README.md">sprint1.md</a><br/>
+            <img src="_resources/imgs/pdfLogo.png" height="15px"/> <a href="https://nbviewer.org/github/b3nny01/WasteIncineratorService/blob/main/Sprint1/README.pdf" title="sprint1.pdf" download>sprint1.pdf</a><br/>
+        </td>
+        <td>
+            <img src="Sprint1/_resources/imgs/sprint1_recording.gif" height="300px">
         </td>
     </tr>
     <tr>
