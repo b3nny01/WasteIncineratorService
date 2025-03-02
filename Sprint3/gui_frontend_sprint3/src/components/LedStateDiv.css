@@ -1,0 +1,42 @@
+.led-state-div {
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+  align-items: center;
+}
+
+.led-state-div > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 50%;
+  height: 80%;
+}
+
+.led-state-div > div > .label {
+  font-size: 0.8rem;
+}
+
+.led-state-div > div > .value {
+  font-size: 1.2rem;
+  font-weight: bold;
+  padding: 0.5rem;
+}
+
+.led-state-div > .image-div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 50%;
+    height: 80%;
+    aspect-ratio: 1;
+    border-radius: 1rem;
+  }
+  
+  .led-state-div > .image-div > img {
+    width: auto;
+    height: 100%;
+    aspect-ratio: 1;
+    border-radius: 1rem;
+  }

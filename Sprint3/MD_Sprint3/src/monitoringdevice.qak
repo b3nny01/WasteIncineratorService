@@ -1,0 +1,469 @@
+System monitoring_device
+
+Dispatch 	sonar_start  	 : sonarstart(X)
+Dispatch 	sonar_stop   	 : sonarstop(X)
+Event		sonar_data   	 : distance(D)
+Event		sonar_clean_data : clean_data(D,MIND,MAXD)	
+
+Event	actor_state	: actor_state(P,V)
+Event 	system_state:system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,OP_ROBOT_POS,LED_STATE)
+
+Dispatch 	do_read 	    : do_read(X)
+
+Dispatch 	update_led_mode 	: update_led_mode(M)
+
+//Tester interface===========================================================================
+
+Request test_led_burning: 		test_req(N)
+Request test_led_empty_ws: 		test_req(N)
+Request test_led_full_as:		test_req(N)
+Request test_sonar_unload_ash:	test_req(N)
+
+Reply test_repl: test_repl(N)
+Dispatch set_system_state:system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,LED_STATE)
+Dispatch set_sonar_state: set_sonar_state(D)
+Request  led_device_state_req:led_device_state_req(N)
+Reply    led_device_state_repl: led_device_state_repl(S) for led_device_state_req
+//===========================================================================================
+ 
+Context ctx_monitoring_device ip [ host= "localhost" 	port=8012 ]   
+
+
+QActor sonar context ctx_monitoring_device withobj configurator using "main.resources.configuration.SystemConfigurator"{ 
+	State s0 initial{
+		println("$name starts") color magenta
+		delay 500
+		forward sonar_device -m sonar_start : sonarstart(1)			
+		subscribeTo data_cleaner for sonar_clean_data
+	}Goto init_mqtt
+	
+	State init_mqtt{
+		connectToMqttBroker "${configurator.getProperty(\"mqtt_broker_uri\")}"
+	}Goto idle
+	
+	State idle{
+		println("$name: idle") color magenta
+	} Transition t0 whenEvent sonar_clean_data -> handle_data
+	
+	State handle_data{
+		 onMsg(sonar_clean_data : clean_data(D,MIND,MAXD)) {
+		 	[#  
+		 		val D = payloadArg(0).toDouble()
+		 		val MIN_D= payloadArg(1).toDouble()
+		 		val MAX_D= payloadArg(2).toDouble()
+		 				 		
+		 		val ASH_LEVEL=(MAX_D-D)/(MAX_D-MIN_D) 
+		 	#]
+			publish "actor_state" -m actor_state:actor_state(ash_storage_level,$ASH_LEVEL)
+		 	println("$name: ash level: $ASH_LEVEL") color magenta
+
+    	}
+	}Goto idle
+}
+
+
+QActor data_cleaner context ctx_monitoring_device withobj configurator using "main.resources.configuration.SystemConfigurator"{
+	[# 
+		var CURRENT=0
+		var PREVIOUS = 0
+		val SENSITIVITY=configurator.getProperty("data_cleaner.sensitivity").toInt()
+		val START_D=configurator.getProperty("data_cleaner.start_distance").toInt()
+		val MIN_D=configurator.getProperty("data_cleaner.min_distance").toInt()
+		val MAX_D=configurator.getProperty("data_cleaner.max_distance").toInt()
+	#]
+	State s0 initial{
+		println("$name starts") color cyan
+		delay 500
+		subscribeTo sonar_device for sonar_data		
+	} Goto idle
+	
+	State idle{
+		println("$name: idle") color cyan
+	} Transition t0 whenEvent sonar_data -> filter
+	
+	State filter{
+		onMsg( sonar_data : distance(D) ){
+	      	[#  
+	      		CURRENT = payloadArg(0).toInt()-START_D
+		
+	      		if(CURRENT<=MIN_D)	CURRENT=MIN_D
+	      		if(CURRENT>=MAX_D)	CURRENT=MAX_D
+	      	#]
+	      	
+	      	println("$name: clean data: $CURRENT") color cyan
+	      		      	
+	      	if [# CURRENT >= (PREVIOUS + SENSITIVITY) || CURRENT <= (PREVIOUS - SENSITIVITY) #] {
+	     		emitlocalstream sonar_clean_data : clean_data($CURRENT,$MIN_D,$MAX_D)
+	     		[# PREVIOUS = CURRENT #]
+	     	}
+    	}
+	}Goto idle
+}
+
+
+
+
+QActor led context ctx_monitoring_device withobj configurator using "main.resources.configuration.SystemConfigurator" {
+	import "main.resources.utils.LedState"
+	[#
+		var STATE=LedState.OFF
+	#]
+	State s0 initial {
+		println("$name starts") color red
+		delay 500
+		
+	}Goto init_mqtt
+	
+	State init_mqtt{
+		connectToMqttBroker "${configurator.getProperty(\"mqtt_broker_uri\")}"
+		subscribe "system_state"
+	}Goto idle
+	
+	State idle{
+		println("$name: idle") color red
+	}Transition t0 whenEvent system_state -> handle_update_mode
+	
+	State handle_update_mode{
+		onMsg(system_state:system_state(RP,ACTIVE,BURNING,ASH_LEVEL,OP_ROBOT_STATE,OP_ROBOT_POS,LED_STATE)){
+			[#
+					val RP=payloadArg(0).toInt()
+					val A=payloadArg(1).toBoolean()
+					val B=payloadArg(2).toBoolean()
+					val AL=payloadArg(3).toDouble()
+					val LS=payloadArg(6)
+					
+					if(B){
+						STATE=LedState.ON;
+					}else if(RP==0 || AL==1.0){
+						STATE=LedState.BLINKING
+					}else{
+						STATE=LedState.OFF
+					}
+			#]
+			if[# LS!=STATE.toString()#]
+			{
+				publish "actor_state" -m actor_state:actor_state(led_state,$STATE)
+				println("$name: mode: $STATE") color red
+				forward led_device -m update_led_mode:update_led_mode($STATE)
+			}
+			
+		}
+	}Goto idle
+}
+
+//Tester=====================================================================================
+
+//QActor md_test_observer context ctx_monitoring_device{
+// 	[#
+// 		var OK=true;
+// 	#]
+// 	
+// 	State s0 initial{ 
+// 		println("$name starts") color cyan
+// 		delay 500
+//	} Goto idle
+//	
+//	State idle{
+//		println("$name: idle") color cyan
+//	}Transition t0 whenRequest test_sonar_unload_ash -> test_sua
+//				   whenRequest test_led_burning -> test_lb
+//				   whenRequest test_led_empty_ws -> test_lews
+//				   whenRequest test_led_full_as	 -> test_lfas
+//				   
+//
+// 	
+// 	// sonar ash unload (sua) =============================================================
+// 	State test_sua{
+// 		println("$name: test sonar unload ash") color cyan
+// 		[#
+// 			OK=true	
+// 		#]
+// 		observeResource sonar msgid actor_state
+// 		delay 500
+// 	}Goto sua_set_empty_ash_storage
+// 	
+// 	State sua_set_empty_ash_storage{
+// 		forward wis -m set_system_state:system_state(3,true,false,0,ash_unloading,off)
+// 		delay 500
+// 	}Goto sua_unload_ash
+// 	
+// 	State sua_unload_ash{
+// 		forward wis -m set_system_state:system_state(3,true,false,0,ash_unloaded,off)
+// 	}Transition t0 whenEvent actor_state -> sua_check_not_empty_ash_storage
+// 	
+// 	State sua_check_not_empty_ash_storage{
+// 		onMsg(actor_state:actor_state(P,V)){
+// 			[#
+// 				OK=(payloadArg(1).toDouble()==(1/3.0))
+// 			#]
+// 		}
+// 	}Goto end_sua_test
+// 	
+// 	State end_sua_test{
+// 		replyTo test_sonar_unload_ash with test_repl:test_repl($OK) 
+// 	}Goto idle
+// 	//=====================================================================================
+// 	
+//	// led burning (lb) ===================================================================
+//	State test_lb{
+//		println("$name: test sonar burning") color cyan
+//		[#
+//			OK=true	
+//		#]
+//		forward wis -m set_system_state:system_state(3,true,false,0,moved_bi,off)
+//		delay 500
+//		request led_device -m led_device_state_req:led_device_state_req
+//	}Transition t0 whenReply led_device_state_repl->lb_check_led_device_off_1
+//	
+//	State lb_check_led_device_off_1{
+//		onMsg(led_device_state_repl:led_device_state_repl(S)){
+//			[#
+//				OK=(payloadArg(0)=="off")
+//			#]
+//		}
+//	}Goto lb_set_burning_true if [# OK #] else end_lb_test
+//	
+//	State lb_set_burning_true{
+//		forward wis -m set_system_state:system_state(3,true,true,0,rp_unloaded,off)
+//		delay 500
+//		request led_device -m led_device_state_req:led_device_state_req
+//	}Transition t0 whenReply led_device_state_repl->lb_check_led_device_blink
+//	
+//	State lb_check_led_device_blink
+//	{
+//		onMsg( led_device_state_repl:led_device_state_repl(S)){
+//			[#
+//				OK=(payloadArg(0)=="blinking")
+//			#]
+//		}
+//		
+//	}Goto lb_set_burning_false if [# OK #] else end_lb_test
+//	
+//	State lb_set_burning_false{
+//		forward wis -m set_system_state:system_state(3,true,false,0,waiting,blinking)
+//		delay 500
+//		request led_device -m led_device_state_req:led_device_state_req
+//	}Transition t0 whenReply led_device_state_repl->lb_check_led_device_off_2
+//	
+//	State lb_check_led_device_off_2
+//	{
+//		onMsg( led_device_state_repl:led_device_state_repl(S)){
+//			[#
+//				OK=(payloadArg(0)=="off")
+//			#]
+//		}
+//		
+//	}Goto end_lb_test
+//	
+//	State end_lb_test{
+//		replyTo test_led_burning with test_repl:test_repl($OK) 
+//	}Goto idle
+//	//=====================================================================================
+//	
+//	// led empty waste storage (lews) =====================================================
+//	State test_lews{
+//		println("$name: test sonar empty waste storage") color cyan
+//		[#
+//			OK=true	
+//		#]
+//		forward wis -m set_system_state:system_state(1,true,false,0,moving_ws,off)
+//		delay 500
+//		request led_device -m led_device_state_req:led_device_state_req
+//	}Transition t0 whenReply led_device_state_repl->lews_check_led_device_off_1
+//	
+//	State lews_check_led_device_off_1{
+//		onMsg(led_device_state_repl:led_device_state_repl(S)){
+//			[#
+//				OK=(payloadArg(0)=="off")
+//			#]
+//		}
+//	}Goto lews_set_empty_waste_storage if [# OK #] else end_lews_test
+//	
+//	State lews_set_empty_waste_storage{
+//		forward wis -m set_system_state:system_state(0,true,false,0,rp_loaded,off)
+//		delay 500
+//		request led_device -m led_device_state_req:led_device_state_req
+//	}Transition t0 whenReply led_device_state_repl->lews_check_led_device_on
+//	
+//	State lews_check_led_device_on
+//	{
+//		onMsg( led_device_state_repl:led_device_state_repl(S)){
+//			[#
+//				OK=(payloadArg(0)=="on")
+//			#]
+//		}
+//		
+//	}Goto lews_set_full_waste_storage if [#OK#] else end_lews_test
+//	
+//	State lews_set_full_waste_storage{
+//		forward wis -m set_system_state:system_state(3,true,false,0,rp_loaded,off)
+//		delay 500
+//		request led_device -m led_device_state_req:led_device_state_req
+//	}Transition t0 whenReply led_device_state_repl->lews_check_led_device_off_2
+//	
+//	State lews_check_led_device_off_2
+//	{
+//		onMsg( led_device_state_repl:led_device_state_repl(S)){
+//			[#
+//				OK=(payloadArg(0)=="off")
+//			#]
+//		}
+//		
+//	}Goto end_lews_test 
+//	
+//	State end_lews_test{
+//		replyTo test_led_empty_ws with test_repl:test_repl($OK)  
+//	}Goto idle
+//	//=====================================================================================
+// 
+// 	// led full ash storage (lfas) ========================================================
+//	State test_lfas{
+//		println("$name: test sonar empty waste storage") color cyan
+//		[#
+//			OK=true	
+//		#]
+//		forward wis -m set_system_state:system_state(3,true,false,0,unloading_ash,off)
+//		delay 500
+//		request led_device -m led_device_state_req:led_device_state_req
+//	}Transition t0 whenReply led_device_state_repl->lfas_check_led_device_off_1
+//	
+//	State lfas_check_led_device_off_1{
+//		onMsg(led_device_state_repl:led_device_state_repl(S)){
+//			[#
+//				OK=(payloadArg(0)=="off")
+//			#]
+//		}
+//	}Goto lfas_set_full_ash_storage if [# OK #] else end_lfas_test
+//	
+//	State lfas_set_full_ash_storage{
+//		forward wis -m set_system_state:system_state(3,true,false,1,ash_unloaded,off)
+//		delay 500
+//		request led_device -m led_device_state_req:led_device_state_req
+//	}Transition t0 whenReply led_device_state_repl->lfas_check_led_device_on
+//	
+//	State lfas_check_led_device_on
+//	{
+//		onMsg( led_device_state_repl:led_device_state_repl(S)){
+//			[#
+//				OK=(payloadArg(0)=="on")
+//			#]
+//		}
+//		
+//	}Goto lfas_set_empty_ash_storage if [#OK#] else end_lfas_test
+//	
+//	State lfas_set_empty_ash_storage{
+//		forward wis -m set_system_state:system_state(3,true,false,0,ash_loaded,on)
+//		delay 500
+//		request led_device -m led_device_state_req:led_device_state_req
+//	}Transition t0 whenReply led_device_state_repl->lfas_check_led_device_off_2
+//	
+//	State lfas_check_led_device_off_2
+//	{
+//		onMsg( led_device_state_repl:led_device_state_repl(S)){
+//			[#
+//				OK=(payloadArg(0)=="off")
+//			#]
+//		}
+//		
+//	}Goto end_lfas_test 
+//	
+//	State end_lfas_test{
+//		replyTo test_led_full_as with test_repl:test_repl($OK)  
+//	}Goto idle
+// } 
+
+//PhysicalActors=============================================================================
+QActor sonar_device context ctx_monitoring_device {
+	
+	[# 
+		lateinit var reader : java.io.BufferedReader
+		var working = false
+	    lateinit var process : Process	
+	    var Distance = 0
+	#]	
+	
+	
+	State s0 initial {
+		println("$name starts") color blue
+	}Transition t0 whenMsg sonar_start -> handle_sonar_start
+		
+	State handle_sonar_start{
+		[#
+    	working = true		
+		process = Runtime.getRuntime().exec("python sonar.py")
+		reader  = java.io.BufferedReader(  java.io.InputStreamReader(process.getInputStream() ))	
+		#]	
+		println("SONAR starts") color blue
+		delay 1000
+	}
+	Goto read_sonar_data
+	
+	
+	State read_sonar_data{ 
+		[# 
+		var data = reader.readLine()
+		CommUtils.outyellow("$name with python: data = $data"   ) 
+		if( data != null ){
+			try { 
+				val vd = data.toFloat()
+				val v  = vd.toInt()
+				
+				Distance=v;
+			} catch(e: Exception){
+					CommUtils.outred("$name readSonarDataERROR: $e "   )
+			}
+		}
+		
+		#]	
+		emitlocalstream sonar_data : distance($Distance)
+		autodispatch do_read : do_read(1)
+	}
+	Transition t0 whenMsg sonar_stop  -> handle_sonar_stop
+				  whenMsg do_read and [# working  #] -> read_sonar_data 
+				  whenMsg do_read and [# !working #] -> end_of_read
+		
+	State end_of_read{
+		[#
+   	    process.destroy()
+    	if (process.isAlive()) {
+    	    process.destroyForcibly();
+    	}
+       	CommUtils.outred("$tt $name | endOfRead"  )
+		#]
+	}
+	Transition t0 whenMsg sonar_start -> handle_sonar_start
+				  whenMsg sonar_stop  -> handle_sonar_stop
+		
+	State handle_sonar_stop {
+		[# process.destroy(); #]		
+		println("SONAR STOPPED") color blue
+	}
+	Transition t0 whenMsg sonar_stop -> handle_sonar_stop
+}
+
+QActor led_device context ctx_monitoring_device{
+	import "main.resources.utils.LedState"
+	[#
+		var P=Runtime.getRuntime().exec("python ledOff24.py");
+	#]
+	State s0 initial{
+		println("$name START") color red
+	}
+	Transition t0 whenMsg update_led_mode -> handle_update_mode
+				 
+	State handle_update_mode{
+		printCurrentMessage color red
+		onMsg( update_led_mode : update_led_mode(M) ) {
+			[#
+				val S=LedState.parseStr(payloadArg(0));
+				P.destroy();
+				P=when (S){
+					LedState.BLINKING 	-> Runtime.getRuntime().exec("python ledBlink24.py")
+					LedState.ON			-> Runtime.getRuntime().exec("python ledOn24.py")
+					LedState.OFF 		-> Runtime.getRuntime().exec("python ledOff24.py")
+				}
+			#]
+		}
+	}
+	Transition t0 whenMsg update_led_mode -> handle_update_mode
+}

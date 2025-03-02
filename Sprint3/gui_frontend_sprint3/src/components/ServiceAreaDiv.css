@@ -1,0 +1,59 @@
+.service-area-div{
+    background-color: lightgray;
+    padding: 1rem;
+    border-radius: 1rem;
+    display: grid;
+    width: auto;
+    height: auto;
+    aspect-ratio: 9/7;
+    /* grid-template-areas:
+    'w0 h w1 w1 w1 w1 w1 w1 w2'
+    'w0 r . . . . . . w2'
+    'w0 . . . . i i . w2'
+    'w0 . . . . i i . w2'
+    'w0 . o . . . . . w2'
+    'w0 . . . . . . . w2'
+    'w0 ws ws w3 w3 w3 as as w2'; */
+    grid-template-columns: repeat(9,1fr);
+    grid-template-rows: repeat(7,1fr)
+}
+
+.service-area-div > .home-cell-div{
+    grid-area: h;
+}
+
+.service-area-div > .obstacle-cell-div{
+    grid-area: o;
+}
+
+.service-area-div > .incinerator-cell-div{
+    grid-area: i;
+}
+
+.service-area-div > .ash-storage-cell-div{
+    grid-area: as;
+}
+
+.service-area-div > .waste-storage-cell-div{
+    grid-area: ws;
+}
+
+.service-area-div >.wall-cell-div.w0 {
+   grid-area: w0;
+}
+
+.service-area-div >.wall-cell-div.w1 {
+    grid-area: w1;
+ }
+
+ .service-area-div >.wall-cell-div.w2 {
+    grid-area: w2;
+ }
+
+ .service-area-div >.wall-cell-div.w3 {
+    grid-area: w3;
+ }
+
+ .service-area-div > .op-robot-cell-div{
+    grid-area: r;
+ }

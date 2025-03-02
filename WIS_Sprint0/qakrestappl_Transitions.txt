@@ -1,1 +1,0 @@
-{"actor":"incinerator", "msgType":"dispatch", "curstate":"idle", "nextstate":"handleActivation", "msgId":"activationCommand"}

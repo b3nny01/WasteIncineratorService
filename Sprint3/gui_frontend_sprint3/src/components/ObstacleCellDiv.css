@@ -1,0 +1,9 @@
+.obstacle-cell-div{
+    background-color: gray;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    height: auto;
+    border-radius: 0.5rem;
+}
