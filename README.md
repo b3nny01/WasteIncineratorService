@@ -42,7 +42,7 @@ At the end of each Sprint we produced an executable version of the system coveri
     </tr>
     <tr>
         <td>
-            <a href="./WIS_Sprint0/">WIS_Sprint0</a>
+            <a href="Sprint0/WIS/">WIS_Sprint0</a>
         </td>
         <td width="300px">
             requirements analysis
@@ -60,7 +60,7 @@ At the end of each Sprint we produced an executable version of the system coveri
     </tr>
     <tr>
         <td>
-            <a href="./WIS_Sprint1/">WIS_Sprint1</a>
+            <a href="Sprint1/WIS/">WIS_Sprint1</a>
         </td>
         <td width="300px">
             OpRobot and WIS responsibilities and business logic, first working prototype in virtual environment.
@@ -76,40 +76,46 @@ At the end of each Sprint we produced an executable version of the system coveri
             <img src="Sprint1/_resources/imgs/sprint1_recording.gif" height="100px">
         </td>
     </tr>
-    <tr>
+        <tr>
         <td>
-            <a href="./WIS_Sprint2/">WIS_Sprint2</a>
+            <a href="Sprint2/WIS">WIS_Sprint2</a>
         </td>
         <td width="300px">
-            Monitoring device, prototype connection to a physical raspberry.
+            Connection of the virtual environment to a real monitoring device deployed on a phisical Raspberry.
         </td>
         <td>
-            <a href="./WIS_Sprint2/src/sprint2.qak">sprint2.qak</a>
+            <a href="Sprint2/WIS/src/sprint1.qak">sprint2.qak</a>,
+            <a href="Sprint2/MD/src/monitoring-device.qak">monitoring-device.qak</a>
         </td>
         <td>
-            <img src="_resources/imgs/readmeLogo.svg" height="15px"/> <a href="WIS_Sprint2/userDocs/sprint2.md">sprint2.md</a><br/>
-            <img src="_resources/imgs/pdfLogo.png" height="15px"/> <a href="https://nbviewer.org/github/b3nny01/WasteIncineratorService/blob/main/WIS_Sprint2/userDocs/sprint2.pdf" title="sprint2.pdf" download>sprint2.pdf</a><br/>
-            <img src="_resources/imgs/htmlLogo.png" height="15px"/> <a href="https://htmlpreview.github.io/?https://github.com/b3nny01/WasteIncineratorService/blob/main/WIS_Sprint2/userDocs/sprint2.html" title="sprint2.html" download>sprint2.html</a>
+            <img src="_resources/imgs/readmeLogo.svg" height="15px"/> <a href="Sprint2/README.md">sprint2.md</a><br/>
+            <img src="_resources/imgs/pdfLogo.png" height="15px"/> <a href="https://nbviewer.org/github/b3nny01/WasteIncineratorService/blob/main/Sprint2/README.pdf" title="sprint1.pdf" download>sprint2.pdf</a><br/>
+        </td>
+        <td>
+            <img src="Sprint2/_resources/imgs/monitoring_device.jpg" height="100px">
         </td>
     </tr>
     <tr>
         <td>
-            <a href="./WIS_Sprint3/">WIS_Sprint3</a>
+            <a href="Sprint3/WIS">WIS_Sprint3</a>
         </td>
         <td width="300px">
             User interface, MQTT Broker, and dockerization.
         </td>
         <td>
-            <a href="./WIS_Sprint3/src/sprint3.qak">sprint3.qak</a>
+            <a href="Sprint3/WIS/src/sprint3.qak">sprint3.qak</a>
         </td>
         <td>
-            <img src="_resources/imgs/readmeLogo.svg" height="15px"/> <a href="WIS_Sprint3/userDocs/sprint3.md">sprint3.md</a><br/>
-            <img src="_resources/imgs/pdfLogo.png" height="15px"/> <a href="https://nbviewer.org/github/b3nny01/WasteIncineratorService/blob/main/WIS_Sprint3/userDocs/sprint3.pdf" title="sprint3.pdf" download>sprint3.pdf</a><br/>
-            <img src="_resources/imgs/htmlLogo.png" height="15px"/> <a href="https://htmlpreview.github.io/?https://github.com/b3nny01/WasteIncineratorService/blob/main/WIS_Sprint3/userDocs/sprint3.html" title="sprint3.html" download>sprint3.html</a>
+            <img src="_resources/imgs/readmeLogo.svg" height="15px"/> <a href="Sprint3/README.md">sprint3.md</a><br/>
+            <img src="_resources/imgs/pdfLogo.png" height="15px"/> <a href="https://nbviewer.org/github/b3nny01/WasteIncineratorService/blob/main/Sprint3/README.pdf" title="sprint3.pdf" download>sprint3.pdf</a><br/>
         </td>
     </tr>
 </table>
 
-## Usage
-
 ## Credits
+Developed by
+* [b3nny01](https://github.com/b3nny01/)
+* [jjulespop](https://github.com/jjulespop/)
+
+QAK infrastructure and BasicRobot project by
+* Prof. [anatali](https://github.com/anatali)

@@ -51,7 +51,7 @@ Based on the Problem Analysis carried out previously, we implemented an executab
 
 <img src="_resources/imgs/wis_systemarch.png" width="1100px"/>
 
-## Implementation
+## Implementation and Deployment
 During the implementation phase no particular need of additions to the inital project emerged, so the system architecture remained unchanged.
 
 ## Test Plan
@@ -78,20 +78,20 @@ During the implementation phase no particular need of additions to the inital pr
 
 ### Usage
 To test the system you will have to activate the Virtual Environment first.
-To do so, open a terminal in the `unibo.basicrobot24` folder and type
+To do so, open a terminal in the `Libs/unibo.basicrobot24` folder and type
 ```
 docker compose -f virtualRobot23.yaml up
 ```
 **N.B.** If you have an older version of docker, you may have to type `docker-compose` instead of `docker compose`
 
 After that, you will have to activate the BasicRobot, which will act as a mediator between the VirtualRobot and the WasteIncineratorService application.
-To do so open another terminal inside the `unibo.basicrobot24` folder and type 
+To do so open another terminal inside the `Libs/unibo.basicrobot24` folder and type 
 
 ```
 gradlew run
 ```
 
-Lastly, you have to activate the WIS system by opening a third terminal inside the `WIS_Sprint1` folder and running
+Lastly, you have to activate the WIS system by opening a third terminal inside the `Sprint1/WIS` folder and running
 
 ```
 gradlew run

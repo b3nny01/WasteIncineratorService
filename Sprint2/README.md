@@ -6,9 +6,10 @@
 
 <table>
 <tr><th>Sprint name</th><td>Sprint 2</td></tr>
-<tr><th>Previous sprint</th><td><a href="/WIS_Sprint1">Sprint 1</a></td></tr>
+<tr><th>Previous sprint</th><td><a href="../Sprint1/">Sprint 1</a></td></tr>
 <tr><th>Next sprint</th><td></td></tr>
-<tr><th>QAK model</th><td><a href="../src/sprint2.qak">sprint2.qak</a></td></tr>
+<tr><th>QAK model</th><td><a href="WIS/src/sprint2.qak">sprint2.qak</a>,<br/>
+<a href="MD/src/monitoring-device.qak">monitoring-device.qak</a></td></tr>
 <tr><th>Developed by</th><td>Alessio Benenati<br/>Giulia Fattori</td></tr>
 <tr><th>Repo Site</th><td><a href="https://github.com/b3nny01/WasteIncineratorService">WasteIncineratorService</td><tr>
 </table>
@@ -29,28 +30,23 @@ A more in-depth study of the component's application logic reveals two possible 
 The second solution allows for greater decoupling between the two components, especially considering their different nature (the Sonar is a "producer" of information while the LED acts as a "consumer").  
 For this reason, it is recommended to **decompose the MonitoringDevice into its two subcomponents (LED and Sonar) and implement them as two independent actors in the same context**.
 
-### Analysis Architecture
-Below, we present a comparison between the system architecture derived from the problem analysis in sprint 1 and the one resulting from sprint 2.
-
-**Sprint 1 Architecture:**
-<br/>
-<img src="./resources/imgs/wis_system_1.png" width="1100px">
-<br/>
-
-**Sprint 2 Architecture:**
-<br/>
-<img src="./resources/imgs/wis_system_2.png" width="1100px"/>
-<br/>
-
 ## Project
 
 ### Project Architecture
 
-Based on the Problem Analysis carried out previously, we implemented an executable version of the system covering the discussed features; we attach here a visual representation of the system architecture:
+Below, we present a comparison between the system architecture derived from the problem analysis in sprint 1 and the one resulting from sprint 2.
 
-<img src="resources/imgs/wis_system_2.png" width="1100px"/>
+**Sprint 1 Architecture:**
+<br/>
+<img src="_resources/imgs/wis_system_1.png" width="1100px">
+<br/>
 
-## Implementation
+**Sprint 2 Architecture:**
+<br/>
+<img src="_resources/imgs/wis_system_2.png" width="1100px"/>
+<br/>
+
+## Implementation and Deployment
 
 ### Sonar and Led abstraction
 During the implementation, we encountered the **high sensitivity of the Sonar**, which often produces "noisy" data. For this reason, **it became necessary to introduce a "Filtering Pipeline"** to eliminate spurious data.  
@@ -64,12 +60,14 @@ In order to decouple the py we decided to split the Led actor into:
 - **LedDevice**, which handles the communication with the physical led
 - **Led**, which incorporates the Led business logic, deciding when to turn on and off the led
 
+**MonitoringDevice context details:**
+
+<img src="_resources/imgs/monitoring_device_2.png" width="550px">
+
 ### System Configurability
 During the implementation we faced the problem of the **lack of System Configurability**, so we decided to create a support singleton object **the SystemConfigurator** who is in charge of **loading the main properties of the system from a file during actors'initialization**.
  
-**MonitoringDevice context details:**
 
-<img src="resources/imgs/monitoring_device_2.png" width="550px">
 
 ## Test Plan
 
@@ -126,7 +124,7 @@ During the implementation we faced the problem of the **lack of System Configura
 
 #### Basic Robot Activation
 To test the system you will have to activate the Virtual Environment first.
-To do so, open a terminal in the `unibo.basicrobot24` folder and type
+To do so, open a terminal in the `Libs/unibo.basicrobot24` folder and type
 ```
 docker compose -f virtualRobot23.yaml up
 ```
@@ -134,7 +132,7 @@ docker compose -f virtualRobot23.yaml up
 
 Next activate the BasicRobot.
 It will act as a mediator between the VirtualRobot and the WasteIncineratorService application.
-To do so, open another terminal inside the `unibo.basicrobot24` folder and type 
+To do so, open another terminal inside the `Libs/unibo.basicrobot24` folder and type 
 
 ```
 gradlew run
@@ -150,15 +148,15 @@ After that, you will need:
 
 You will have to assemble those elements following this wiring scheme:
 
-<img src="resources/imgs/rasp_scheme.jpeg">
+<img src="_resources/imgs/rasp_scheme.jpeg">
 
-Then you will have to deploy the Monitoring Device control software, to do so, open a terminal inside the `MD_Sprint2` folder run:
+Then you will have to deploy the Monitoring Device control software, to do so, open a terminal inside the `Sprint2/MD` folder run:
 
 ```
 gradlew build
 ```
 
-After that, copy the `MD_Sprint2/build/distributions/monitoring_device-1.0.zip` folder inside the raspberry (for instance using `scp`) and unzip it
+After that, copy the `Sprint3/MD/build/distributions/monitoring_device-1.0.zip` folder inside the raspberry (for instance using `scp`) and unzip it
 
 #### System activation
 Firstly you have to activate the monitoring device, to do so connect to your raspberry via `ssh`, then move inside the `monitoring_device-1.0/bin` folder and run
@@ -166,7 +164,7 @@ Firstly you have to activate the monitoring device, to do so connect to your ras
 ./monitoring_device
 ```
 
-Lastly, you have to activate the WIS system by opening a third terminal inside the `WIS_Sprint1` folder and running
+Lastly, you have to activate the WIS system by opening a third terminal inside the `Sprint1/WIS` folder and running
 
 ```
 gradlew run

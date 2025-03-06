@@ -591,5 +591,5 @@ QActor test_observer context ctx_wis{
 		replyTo test_req with test_repl : test_repl($RP,$A,$B,$L,$O,$LS)
 	}
 	
- }  
+ }   
  
